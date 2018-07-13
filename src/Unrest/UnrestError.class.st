@@ -3,3 +3,8 @@ Class {
 	#superclass : #Error,
 	#category : #Unrest
 }
+
+{ #category : #private }
+UnrestError >> isResumable [
+	^ true
+]
