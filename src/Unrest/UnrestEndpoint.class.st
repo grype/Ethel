@@ -138,7 +138,7 @@ UnrestEndpoint >> validateHttpMethod: anHttpMethod [
 { #category : #http }
 UnrestEndpoint >> validateHttpResponse: aResponse [
 	aResponse isSuccess
-		ifTrue: [ ^ self ].
+		ifTrue: [ ^ true ].
 	UnrestError
 		signal:
 			('{1}: {2}'
