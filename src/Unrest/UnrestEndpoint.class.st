@@ -10,14 +10,14 @@ Class {
 	#category : #Unrest
 }
 
-{ #category : #accessing }
-UnrestEndpoint class >> path [
-	^ self subclassResponsibility
+{ #category : #'instance creation' }
+UnrestEndpoint class >> urlOn: aClient [
+	^ aClient baseUrl 
 ]
 
 { #category : #'instance creation' }
 UnrestEndpoint class >> withClient: aClient [ 
-	^ self basicNew initializeWithClient: aClient url: self path
+	^ self basicNew initializeWithClient: aClient url: (self urlOn: aClient)
 ]
 
 { #category : #'instance creation' }
