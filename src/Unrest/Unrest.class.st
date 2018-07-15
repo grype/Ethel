@@ -22,7 +22,14 @@ Unrest class >> withUrl: aUrl [
 
 { #category : #endpoints }
 Unrest >> / aPath [
+	"Creates a new generic endpoint."
 	^ self endpointClass withClient: self url: self baseUrl / aPath
+]
+
+{ #category : #endpoints }
+Unrest >> > endPointClass [
+	"Creates a new endpoint of specified class."
+	^ endPointClass withClient: self
 ]
 
 { #category : #accessing }

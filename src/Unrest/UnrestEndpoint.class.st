@@ -27,7 +27,23 @@ UnrestEndpoint class >> withClient: aClient url: aUrl [
 
 { #category : #endpoints }
 UnrestEndpoint >> / aPath [
+	"Creates a new generic endpoint by appending a new path."
 	^ self class withClient: client url: self url / aPath
+]
+
+{ #category : #endpoints }
+UnrestEndpoint >> > endPointClass [
+	"Creates a new endpoint of specified class."
+	^ endPointClass withClient: self client
+]
+
+{ #category : #endpoints }
+UnrestEndpoint >> >> endPointClass [
+	"Creates a new endpoint of specified class, while retaining existing data"
+
+	^ (endPointClass withClient: self client)
+		data: self data;
+		yourself
 ]
 
 { #category : #accessing }
