@@ -92,11 +92,16 @@ UnrestEndpoint >> httpClient [
 ]
 
 { #category : #initialization }
+UnrestEndpoint >> initializeData [
+	data := Dictionary new
+]
+
+{ #category : #initialization }
 UnrestEndpoint >> initializeWithClient: aClient url: aUrl [
 	self initialize.
 	client := aClient.
 	url := aUrl asUrl.
-	data := Dictionary new
+	self initializeData
 ]
 
 { #category : #'http requests' }
@@ -134,6 +139,11 @@ UnrestEndpoint >> put [
 { #category : #data }
 UnrestEndpoint >> remove: aPropertyName [
 	data remove: aPropertyName ifAbsent: [  ]
+]
+
+{ #category : #data }
+UnrestEndpoint >> resetData [
+	self initializeData
 ]
 
 { #category : #accessing }
