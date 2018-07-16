@@ -64,7 +64,13 @@ UnrestEndpoint >> client [
 
 { #category : #http }
 UnrestEndpoint >> configureHttpClient [
-	self httpClient url: url
+	| http |
+	self httpClient url: url.
+	headers isEmptyOrNil
+		ifTrue: [ ^ self ].
+
+	http := self httpClient.
+	headers associationsDo: [ :assoc | http headerAt: assoc key put: assoc value ]
 ]
 
 { #category : #accessing }
@@ -85,6 +91,16 @@ UnrestEndpoint >> delete [
 { #category : #'http requests' }
 UnrestEndpoint >> get [
 	^ self perform: #get dataInQuery: true
+]
+
+{ #category : #accessing }
+UnrestEndpoint >> headers [
+	^ headers
+]
+
+{ #category : #accessing }
+UnrestEndpoint >> headers: anObject [
+	headers := anObject
 ]
 
 { #category : #accessing }
