@@ -5,7 +5,8 @@ Class {
 		'client',
 		'url',
 		'data',
-		'httpClient'
+		'httpClient',
+		'headers'
 	],
 	#category : #Unrest
 }
@@ -83,7 +84,7 @@ UnrestEndpoint >> delete [
 
 { #category : #'http requests' }
 UnrestEndpoint >> get [
-	^ self perform: #post dataInQuery: true
+	^ self perform: #get dataInQuery: true
 ]
 
 { #category : #accessing }
