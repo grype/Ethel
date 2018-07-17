@@ -137,16 +137,16 @@ UnrestEndpoint >> patch [
 
 { #category : #'http requests' }
 UnrestEndpoint >> perform: anHttpMethod dataInQuery: useQuery [
-	| http result method |
+	| http result method sendData |
 
 	method := self validateHttpMethod: anHttpMethod.
 	self configureHttpClient.
 	http := self httpClient.
-	self data
-		ifNotNil: [ :d | 
+	sendData := self data.
+	sendData isEmptyOrNil ifFalse: [
 			useQuery
-				ifTrue: [ http queryAddAll: d ]
-				ifFalse: [ http contents: d ] ].
+				ifTrue: [ http queryAddAll: sendData ]
+				ifFalse: [ http contents: sendData ] ].
 	result := http perform: method.
 	self validateHttpResponse: http response.
 	^ result
