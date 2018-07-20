@@ -3,10 +3,20 @@ Class {
 	#superclass : #UnrestEndpoint,
 	#instVars : [
 		'path',
-		'data'
+		'data',
+		'method'
 	],
 	#category : #Unrest
 }
+
+{ #category : #configuring }
+UnrestPluggableEndpoint >> configureOn: http [
+	super configureOn: http.
+	method = #get
+		ifTrue: [ http queryAddAll: data ]
+		ifFalse: [ http contents: data ].
+	http method: method
+]
 
 { #category : #accessing }
 UnrestPluggableEndpoint >> data [
@@ -28,9 +38,19 @@ UnrestPluggableEndpoint >> dataRemoveAt: aPropertyName [
 	data remove: aPropertyName ifAbsent: [  ]
 ]
 
+{ #category : #api }
+UnrestPluggableEndpoint >> delete [
+	^ self perform: #delete
+]
+
 { #category : #accessing }
 UnrestPluggableEndpoint >> endpointPath [
 	^ path
+]
+
+{ #category : #api }
+UnrestPluggableEndpoint >> get [
+	^ self perform: #get
 ]
 
 { #category : #initialization }
@@ -44,6 +64,11 @@ UnrestPluggableEndpoint >> initializeData [
 	data := Dictionary new
 ]
 
+{ #category : #api }
+UnrestPluggableEndpoint >> patch [
+	^ self perform: #patch
+]
+
 { #category : #accessing }
 UnrestPluggableEndpoint >> path [
 	^ path
@@ -52,6 +77,22 @@ UnrestPluggableEndpoint >> path [
 { #category : #accessing }
 UnrestPluggableEndpoint >> path: anObject [
 	path := anObject
+]
+
+{ #category : #api }
+UnrestPluggableEndpoint >> perform: aMethod [
+	method := aMethod.
+	^ unrest execute: self
+]
+
+{ #category : #api }
+UnrestPluggableEndpoint >> post [
+	^ self perform: #post
+]
+
+{ #category : #api }
+UnrestPluggableEndpoint >> put [
+	^ self perform: #put
 ]
 
 { #category : #data }

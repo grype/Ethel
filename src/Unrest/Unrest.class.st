@@ -37,12 +37,9 @@ Unrest >> baseUrl [
 	^ baseUrl
 ]
 
-{ #category : #private }
-Unrest >> configureHttpClient: http [
-	http url: baseUrl.
-	self contentWriter ifNotNil: [ :val | http contentWriter: val ].
-	self contentReader ifNotNil: [ :val | http contentReader: val ].
-	self headers ifNotNil: [ :val | http headerAddAll: val ]
+{ #category : #http }
+Unrest >> configureHttpClient: http. [
+
 ]
 
 { #category : #accessing }
@@ -65,7 +62,7 @@ Unrest >> contentWriter: anObject [
 	contentWriter := anObject
 ]
 
-{ #category : #private }
+{ #category : #http }
 Unrest >> createHttpClient [
 	| client |
 	client := ZnClient new.
@@ -76,6 +73,23 @@ Unrest >> createHttpClient [
 { #category : #http }
 Unrest >> delete [
 	^ self perform: #delete dataInQuery: false
+]
+
+{ #category : #execution }
+Unrest >> execute [
+	| sender |
+	sender := thisContext sender.
+	(sender methodClass inheritsFrom: UnrestEndpoint) ifFalse: [ UnrestError signal: ('Cannot be executed by {1} because it is not an UnrestEndpoint!' format: { sender class greaseString}) ].
+	self execute: sender
+]
+
+{ #category : #execution }
+Unrest >> execute: anEndpoint [
+	| http |
+
+	http := self createHttpClient.
+	anEndpoint configureOn: http.
+	^ http execute
 ]
 
 { #category : #http }
@@ -115,11 +129,10 @@ Unrest >> perform: aMethod dataInQuery: useQuery [
 	| http result method sendData |
 
 	self validateMethod: aMethod.
-	self configureHttpClient.
-	http := self httpClient.
+	http := self createHttpClient.
 	sendData := self data.
-	sendData isEmptyOrNil ifFalse: [
-			useQuery
+	sendData isEmptyOrNil
+		ifFalse: [ useQuery
 				ifTrue: [ http queryAddAll: sendData ]
 				ifFalse: [ http contents: sendData ] ].
 	result := http perform: method.
