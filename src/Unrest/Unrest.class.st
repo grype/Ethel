@@ -80,11 +80,14 @@ Unrest >> execute [
 
 { #category : #execution }
 Unrest >> execute: anEndpoint [
-	| http |
+	| http result |
 
 	http := self createHttpClient.
 	anEndpoint configureOn: http.
-	^ http execute
+	self validateRequest: http request.
+	result := http execute.
+	self validateResponse: http response.
+	^ result
 ]
 
 { #category : #initialization }
@@ -101,6 +104,11 @@ Unrest >> validateMethod: aMethod [
 		ifTrue: [ method asSymbol ]
 		ifFalse:
 			[ UnrestError signal: ('Tried to perform invalid Method "{1}"' format: {aMethod}) ]
+]
+
+{ #category : #http }
+Unrest >> validateRequest: aRequest [
+	(aRequest method isNotNil and: [ aRequest url isNotNil ]) ifFalse: [ UnrestError signal: 'Invalid HTTP Request' ]
 ]
 
 { #category : #http }
