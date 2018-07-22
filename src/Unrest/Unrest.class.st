@@ -4,8 +4,7 @@ Class {
 	#instVars : [
 		'baseUrl',
 		'contentReader',
-		'contentWriter',
-		'headers'
+		'contentWriter'
 	],
 	#category : #Unrest
 }
@@ -70,11 +69,6 @@ Unrest >> createHttpClient [
 	^ client
 ]
 
-{ #category : #http }
-Unrest >> delete [
-	^ self perform: #delete dataInQuery: false
-]
-
 { #category : #execution }
 Unrest >> execute [
 	| sender |
@@ -92,62 +86,10 @@ Unrest >> execute: anEndpoint [
 	^ http execute
 ]
 
-{ #category : #http }
-Unrest >> get [
-	^ self perform: #get dataInQuery: true
-]
-
-{ #category : #accessing }
-Unrest >> headers [
-	^ headers
-]
-
-{ #category : #accessing }
-Unrest >> headers: anObject [
-	headers := anObject
-]
-
-{ #category : #initialization }
-Unrest >> initialize [
-	super initialize.
-	headers := Dictionary new
-]
-
 { #category : #initialization }
 Unrest >> initializeWithUrl: aUrl [
 	self initialize.
 	baseUrl := aUrl asUrl
-]
-
-{ #category : #http }
-Unrest >> patch [
-	^ self perform: #patch dataInQuery: false
-]
-
-{ #category : #http }
-Unrest >> perform: aMethod dataInQuery: useQuery [
-	| http result method sendData |
-
-	self validateMethod: aMethod.
-	http := self createHttpClient.
-	sendData := self data.
-	sendData isEmptyOrNil
-		ifFalse: [ useQuery
-				ifTrue: [ http queryAddAll: sendData ]
-				ifFalse: [ http contents: sendData ] ].
-	result := http perform: method.
-	self validateResponse: http response.
-	^ result
-]
-
-{ #category : #http }
-Unrest >> post [
-	^ self perform: #post dataInQuery: false
-]
-
-{ #category : #http }
-Unrest >> put [
-	^ self perform: #put dataInQuery: false
 ]
 
 { #category : #http }
