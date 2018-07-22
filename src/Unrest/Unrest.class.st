@@ -37,8 +37,9 @@ Unrest >> baseUrl [
 ]
 
 { #category : #http }
-Unrest >> configureHttpClient: http. [
-
+Unrest >> configureHttpClient: http [
+	contentReader ifNotNil: [ :val | http contentReader: val ].
+	contentWriter ifNotNil: [ :val | http contentWriter: val ]
 ]
 
 { #category : #accessing }
