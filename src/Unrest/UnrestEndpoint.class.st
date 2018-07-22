@@ -42,16 +42,21 @@ UnrestEndpoint >> > endPointClass [
 
 { #category : #configuring }
 UnrestEndpoint >> configureOn: http [
-	| effectivePath endpointMethod contextValues segments |
+	| effectivePath contextValues segments |
 
 	effectivePath := self endpointPath.
-	endpointMethod := self executingEndpointMethod.
-	endpointMethod
+	
+	self executingEndpointMethod
 		ifNotNil: [ :method | 
-			(endpointMethod pragmaAt: #endpoint:) ifNotNil: [ :pragma | pragma arguments ifNotEmpty: [ :val | effectivePath := Path / val first ] ].
-			endpointMethod pragmas detect: [ :each | unrest allowedHttpMethods includes: each keyword asLowercase asSymbol ] ifFound: [ :found | http method: found keyword asUppercase asSymbol ] ].
-	contextValues := (thisContext receiver class allSlots groupedBy: #name) collect: [ :each | each first read: self ].
-	segments := effectivePath segments collect: [:segment | segment format: contextValues ].
+			(method pragmaAt: #endpoint:)
+				ifNotNil: [ :pragma | pragma arguments ifNotEmpty: [ :val | effectivePath := effectivePath / val first ] ].
+			method pragmas
+				detect: [ :each | unrest allowedHttpMethods includes: each keyword asLowercase asSymbol ]
+				ifFound: [ :found | http method: found keyword asUppercase asSymbol ] ].
+			
+	contextValues := (thisContext receiver class allSlots groupedBy: #name)
+		collect: [ :each | each first read: self ].
+	segments := effectivePath segments collect: [ :segment | segment format: contextValues ].
 	http url: unrest baseUrl / segments
 ]
 
