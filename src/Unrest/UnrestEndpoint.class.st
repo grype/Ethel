@@ -7,9 +7,19 @@ Class {
 	#category : #Unrest
 }
 
+{ #category : #accessing }
+UnrestEndpoint class >> endpointPath [
+	^ self subclassResponsibility
+]
+
 { #category : #defaults }
 UnrestEndpoint class >> endpointPragmas [
 	^ #(#endpoint #endpoint:)
+]
+
+{ #category : #testing }
+UnrestEndpoint class >> isAbstract [
+	^ [self endpointPath isNil] on: Error do: [ true ]
 ]
 
 { #category : #testing }
@@ -62,7 +72,7 @@ UnrestEndpoint >> configureOn: http [
 
 { #category : #accessing }
 UnrestEndpoint >> endpointPath [
-	^ self subclassResponsibility
+	^ self class endpointPath 
 ]
 
 { #category : #executing }

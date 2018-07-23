@@ -9,6 +9,31 @@ Class {
 	#category : #Unrest
 }
 
+{ #category : #introspection }
+Unrest class >> associatedEndpointClasses [
+	| methods referencedClasses rootEndpointClass |
+
+	methods := self endpointMethods.
+	referencedClasses := ((methods flatCollect: [ :each | each value ])
+		collect: #value) asSet.
+	rootEndpointClass := (referencedClasses
+		flatCollect: [ :each | each withAllSuperclasses ])
+		select: [ :each | each superclass == UnrestEndpoint ].
+	^ (rootEndpointClass flatCollect: #withAllSubclasses)
+		reject: [ :each | each isAbstract ]
+]
+
+{ #category : #introspection }
+Unrest class >> endpointMethods [
+	^ (self methods
+		collect: [ :aMethod | 
+			aMethod
+				->
+					(aMethod allLiterals
+						select: [ :aLiteral | aLiteral value isClass and: [ aLiteral value inheritsFrom: UnrestEndpoint ] ]) ])
+		select: [ :each | each value isNotEmpty ]
+]
+
 { #category : #'instance creation' }
 Unrest class >> withUrl: aUrl [
 	^ self basicNew initializeWithUrl: aUrl
@@ -90,6 +115,15 @@ Unrest >> execute: anEndpoint [
 	^ result
 ]
 
+{ #category : #'gt-inspector-extension' }
+Unrest >> gtEndpointsIn: aComposite [
+	<gtInspectorPresentationOrder: 10>
+	^ aComposite roassal2
+		title: 'Endpoints';
+		initializeView: [ RTUMLClassBuilder new ];
+		painting: [ :view | self viewEndpointsOn: view ]
+]
+
 { #category : #initialization }
 Unrest >> initializeWithUrl: aUrl [
 	self initialize.
@@ -121,4 +155,34 @@ Unrest >> validateResponse: aResponse [
 				format:
 					{aResponse statusLine code.
 					aResponse statusLine reason})
+]
+
+{ #category : #visualization }
+Unrest >> viewEndpointsOn: aBuilder [
+	| endpoints colorNormalizer |
+
+	endpoints := PlaidClient associatedEndpointClasses.
+	colorNormalizer := RTMultiLinearColorForIdentity new objects: self allowedHttpMethods.
+	aBuilder methodShape
+		color: [ :method | 
+			((method pragmas collect: [ :p | p keyword asLowercase asSymbol ])
+				intersection: self allowedHttpMethods) ifEmpty: [ nil ] ifNotEmpty: [ :foundPragmaMethods | colorNormalizer rtValue: foundPragmaMethods first ]
+			 ].
+
+	aBuilder
+		addObjects: endpoints;
+		classname: [ :cls | cls endpointPath pathString ];
+		instanceVariables: #instVarNames;
+		methodsNames: [ :cls | 
+			cls methods
+				select: [ :aMethod | (aMethod pragmas collect: #keyword) includesAny: UnrestEndpoint endpointPragmas ] ];
+		methodselector: #selector;
+		attributeselector: #yourself;
+		superclass: [ :cls | 
+			cls endpointPath parent isRoot
+				ifTrue: [ nil ]
+				ifFalse: [ endpoints detect: [ :each | each endpointPath = cls endpointPath parent ] ifNone: [ nil ] ] ].
+
+
+	aBuilder treeLayout
 ]
