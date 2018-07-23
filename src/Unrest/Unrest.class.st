@@ -25,7 +25,12 @@ Unrest class >> associatedEndpointClasses [
 
 { #category : #introspection }
 Unrest class >> endpointMethods [
-	^ (self methods
+	^ self endpointMethodsOn: self
+]
+
+{ #category : #introspection }
+Unrest class >> endpointMethodsOn: aClass [
+	^ (aClass methods
 		collect: [ :aMethod | 
 			aMethod
 				->
