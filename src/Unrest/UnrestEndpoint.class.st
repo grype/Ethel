@@ -35,6 +35,15 @@ UnrestEndpoint class >> on: unrestClient [
 	^ self basicNew initializeOn: unrestClient
 ]
 
+{ #category : #accessing }
+UnrestEndpoint class >> referencingPaths [
+	^ ((Unrest endpointMethodsOn: self)
+		collect: [ :aMethod | 
+			(aMethod key pragmaAt: #endpoint:)
+				ifNil: [ self endpointPath ]
+				ifNotNil: [ :val | self endpointPath / val arguments first ] ]) asSet
+]
+
 { #category : #endpoints }
 UnrestEndpoint >> / aString [
 	"Creates a new generic endpoint by appending a new path."

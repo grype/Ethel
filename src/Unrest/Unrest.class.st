@@ -129,6 +129,15 @@ Unrest >> gtEndpointsIn: aComposite [
 		painting: [ :view | self viewEndpointsOn: view ]
 ]
 
+{ #category : #'gt-inspector-extension' }
+Unrest >> gtMapIn: aComposite [
+	<gtInspectorPresentationOrder: 10>
+	^ aComposite roassal2
+		title: 'Map';
+		initializeView: [ RTInteractiveTreeBuilder new ];
+		painting: [ :view | self viewMapOn: view ]
+]
+
 { #category : #initialization }
 Unrest >> initializeWithUrl: aUrl [
 	self initialize.
@@ -170,9 +179,9 @@ Unrest >> viewEndpointsOn: aBuilder [
 	colorNormalizer := RTMultiLinearColorForIdentity new objects: self allowedHttpMethods.
 	aBuilder methodShape
 		color: [ :method | 
-			((method pragmas collect: [ :p | p keyword asLowercase asSymbol ])
-				intersection: self allowedHttpMethods) ifEmpty: [ nil ] ifNotEmpty: [ :foundPragmaMethods | colorNormalizer rtValue: foundPragmaMethods first ]
-			 ].
+			((method pragmas collect: [ :p | p keyword asLowercase asSymbol ]) intersection: self allowedHttpMethods)
+				ifEmpty: [ nil ]
+				ifNotEmpty: [ :foundPragmaMethods | colorNormalizer rtValue: foundPragmaMethods first ] ].
 
 	aBuilder
 		addObjects: endpoints;
@@ -181,13 +190,51 @@ Unrest >> viewEndpointsOn: aBuilder [
 		methodsNames: [ :cls | 
 			cls methods
 				select: [ :aMethod | (aMethod pragmas collect: #keyword) includesAny: UnrestEndpoint endpointPragmas ] ];
-		methodselector: #selector;
+		methodselector: [ :aMethod | 
+			| str |
+
+			str := '' writeStream.
+			str nextPutAll: aMethod selector.
+			(aMethod pragmaAt: #endpoint:) ifNotNil: [ :p | str nextPutAll: (' ~> /{1}' format: {p arguments first}) ].
+			str contents ];
 		attributeselector: #yourself;
 		superclass: [ :cls | 
 			cls endpointPath parent isRoot
 				ifTrue: [ nil ]
 				ifFalse: [ endpoints detect: [ :each | each endpointPath = cls endpointPath parent ] ifNone: [ nil ] ] ].
 
-
 	aBuilder treeLayout
+]
+
+{ #category : #visualization }
+Unrest >> viewMapOn: aBuilder [
+	| paths |
+
+	paths := (self class associatedEndpointClasses flatCollect: [ :aCls | aCls referencingPaths ]) asSet.
+	paths
+		do: [ :aPath | 
+			| p |
+
+			p := aPath parent.
+			[ p isRoot ]
+				whileFalse: [ paths add: p.
+					p := p parent ] ].
+	paths := paths sorted: [ :a :b | a pathString < b pathString ].
+	aBuilder view canvas color: (Color colorFrom: '#EEE').
+	aBuilder
+		explore: Path root
+		using: [ :aPath | 
+			aPath isRoot
+				ifTrue: [ paths select: [ :each | each size = 1 ] ]
+				ifFalse: [ paths
+						select: [ :each | each segments size = (aPath segments size + 1) and: [ each segments beginsWith: aPath segments ] ] ] ].
+	aBuilder rightward.
+	aBuilder gap: 200 @ 10.
+	aBuilder labelShape
+		text: [ :aPath | 
+			aPath isRoot
+				ifTrue: [ self baseUrl ]
+				ifFalse: [ aPath segments last ] ].
+	aBuilder build.
+	^ aBuilder view
 ]
