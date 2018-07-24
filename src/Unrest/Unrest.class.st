@@ -195,7 +195,7 @@ Unrest >> viewMapOn: aBuilder [
 				ifFalse: [ paths
 						select: [ :each | each segments size = (aPath segments size + 1) and: [ each segments beginsWith: aPath segments ] ] ] ].
 	aBuilder rightward.
-	aBuilder gap: 200 @ 10.
+	aBuilder gap: 120 @ 0.
 	aBuilder labelShape
 		text: [ :aPath | 
 			aPath isRoot
