@@ -15,7 +15,7 @@ UnrestPluggableEndpoint >> configureOn: http [
 	method = #get
 		ifTrue: [ http queryAddAll: data ]
 		ifFalse: [ http contents: data ].
-	http method: method
+	http method: method greaseString asUppercase asSymbol
 ]
 
 { #category : #accessing }
