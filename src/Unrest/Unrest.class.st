@@ -121,21 +121,21 @@ Unrest >> execute: anEndpoint [
 ]
 
 { #category : #'gt-inspector-extension' }
-Unrest >> gtEndpointsIn: aComposite [
-	<gtInspectorPresentationOrder: 10>
-	^ aComposite roassal2
-		title: 'Endpoints';
-		initializeView: [ RTUMLClassBuilder new ];
-		painting: [ :view | self viewEndpointsOn: view ]
-]
-
-{ #category : #'gt-inspector-extension' }
 Unrest >> gtMapIn: aComposite [
 	<gtInspectorPresentationOrder: 10>
 	^ aComposite roassal2
 		title: 'Map';
 		initializeView: [ RTInteractiveTreeBuilder new ];
 		painting: [ :view | self viewMapOn: view ]
+]
+
+{ #category : #'gt-inspector-extension' }
+Unrest >> gtTopologyIn: aComposite [
+	<gtInspectorPresentationOrder: 11>
+	^ aComposite roassal2
+		title: 'Topology';
+		initializeView: [ RTUMLClassBuilder new ];
+		painting: [ :view | self viewTopologyOn: view ]
 ]
 
 { #category : #initialization }
@@ -172,7 +172,40 @@ Unrest >> validateResponse: aResponse [
 ]
 
 { #category : #visualization }
-Unrest >> viewEndpointsOn: aBuilder [
+Unrest >> viewMapOn: aBuilder [
+	| paths |
+
+	paths := (self class associatedEndpointClasses flatCollect: [ :aCls | aCls referencingPaths ]) asSet.
+	paths
+		do: [ :aPath | 
+			| p |
+
+			p := aPath parent.
+			[ p isRoot ]
+				whileFalse: [ paths add: p.
+					p := p parent ] ].
+	paths := paths sorted: [ :a :b | a pathString < b pathString ].
+	aBuilder view canvas color: (Color colorFrom: '#EEE').
+	aBuilder
+		explore: Path root
+		using: [ :aPath | 
+			aPath isRoot
+				ifTrue: [ paths select: [ :each | each size = 1 ] ]
+				ifFalse: [ paths
+						select: [ :each | each segments size = (aPath segments size + 1) and: [ each segments beginsWith: aPath segments ] ] ] ].
+	aBuilder rightward.
+	aBuilder gap: 200 @ 10.
+	aBuilder labelShape
+		text: [ :aPath | 
+			aPath isRoot
+				ifTrue: [ self baseUrl ]
+				ifFalse: [ aPath segments last ] ].
+	aBuilder build.
+	^ aBuilder view
+]
+
+{ #category : #visualization }
+Unrest >> viewTopologyOn: aBuilder [
 	| endpoints colorNormalizer |
 
 	endpoints := PlaidClient associatedEndpointClasses.
@@ -204,37 +237,4 @@ Unrest >> viewEndpointsOn: aBuilder [
 				ifFalse: [ endpoints detect: [ :each | each endpointPath = cls endpointPath parent ] ifNone: [ nil ] ] ].
 
 	aBuilder treeLayout
-]
-
-{ #category : #visualization }
-Unrest >> viewMapOn: aBuilder [
-	| paths |
-
-	paths := (self class associatedEndpointClasses flatCollect: [ :aCls | aCls referencingPaths ]) asSet.
-	paths
-		do: [ :aPath | 
-			| p |
-
-			p := aPath parent.
-			[ p isRoot ]
-				whileFalse: [ paths add: p.
-					p := p parent ] ].
-	paths := paths sorted: [ :a :b | a pathString < b pathString ].
-	aBuilder view canvas color: (Color colorFrom: '#EEE').
-	aBuilder
-		explore: Path root
-		using: [ :aPath | 
-			aPath isRoot
-				ifTrue: [ paths select: [ :each | each size = 1 ] ]
-				ifFalse: [ paths
-						select: [ :each | each segments size = (aPath segments size + 1) and: [ each segments beginsWith: aPath segments ] ] ] ].
-	aBuilder rightward.
-	aBuilder gap: 200 @ 10.
-	aBuilder labelShape
-		text: [ :aPath | 
-			aPath isRoot
-				ifTrue: [ self baseUrl ]
-				ifFalse: [ aPath segments last ] ].
-	aBuilder build.
-	^ aBuilder view
 ]
