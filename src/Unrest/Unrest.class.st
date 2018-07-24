@@ -176,15 +176,17 @@ Unrest >> validateResponse: aResponse [
 Unrest >> viewMapOn: aBuilder [
 	| paths |
 
-	paths := (self class associatedEndpointClasses flatCollect: [ :aCls | aCls referencingPaths ]) asSet.
-	paths
+	paths := Set new.
+	(self class associatedEndpointClasses flatCollect: [ :aCls | aCls referencingPaths ]) asSet
 		do: [ :aPath | 
 			| p |
 
+			paths add: aPath.
 			p := aPath parent.
 			[ p isRoot ]
 				whileFalse: [ paths add: p.
 					p := p parent ] ].
+			
 	paths := paths sorted: [ :a :b | a pathString < b pathString ].
 	aBuilder view canvas color: (Color colorFrom: '#EEE').
 	aBuilder
