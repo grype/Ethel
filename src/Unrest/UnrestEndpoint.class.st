@@ -64,17 +64,23 @@ UnrestEndpoint >> configureOn: http [
 	| effectivePath contextValues segments |
 
 	effectivePath := self endpointPath.
-	
+
+	contextValues := (thisContext receiver class allSlots groupedBy: #name) collect: [ :each | each first read: self ].
+
 	self executingEndpointMethod
 		ifNotNil: [ :method | 
-			(method pragmaAt: #endpoint:)
-				ifNotNil: [ :pragma | pragma arguments ifNotEmpty: [ :val | effectivePath := effectivePath / val first ] ].
-			method pragmas
-				detect: [ :each | unrest allowedHttpMethods includes: each keyword asLowercase asSymbol ]
-				ifFound: [ :found | http method: found keyword asUppercase asSymbol ] ].
-			
-	contextValues := (thisContext receiver class allSlots groupedBy: #name)
-		collect: [ :each | each first read: self ].
+			| methodContext |
+
+			(method pragmaAt: #endpoint:) ifNotNil: [ :pragma | pragma arguments ifNotEmpty: [ :val | effectivePath := effectivePath / val first ] ].
+			method pragmas detect: [ :each | unrest allowedHttpMethods includes: each keyword asLowercase asSymbol ] ifFound: [ :found | http method: found keyword asUppercase asSymbol ].
+			methodContext := thisContext.
+			[ methodContext method isNotNil and: [ methodContext method ~= method ] ] whileTrue: [ methodContext := methodContext sender ].
+			methodContext method == method
+				ifTrue: [ | temps |
+
+					temps := (methodContext tempNames collect: [ :each | each -> (methodContext tempNamed: each) ]) asDictionary.
+					contextValues addAll: temps ] ].
+
 	segments := effectivePath segments collect: [ :segment | segment format: contextValues ].
 	http url: unrest baseUrl / segments
 ]
