@@ -124,7 +124,7 @@ Unrest >> execute: anEndpoint [
 Unrest >> gtMapIn: aComposite [
 	<gtInspectorPresentationOrder: 10>
 	^ aComposite roassal2
-		title: 'Map';
+		title: ['Map' translated];
 		initializeView: [ RTInteractiveTreeBuilder new ];
 		painting: [ :view | self viewMapOn: view ]
 ]
@@ -133,7 +133,7 @@ Unrest >> gtMapIn: aComposite [
 Unrest >> gtTopologyIn: aComposite [
 	<gtInspectorPresentationOrder: 11>
 	^ aComposite roassal2
-		title: 'Topology';
+		title: ['Topology' translated];
 		initializeView: [ RTUMLClassBuilder new ];
 		painting: [ :view | self viewTopologyOn: view ]
 ]
@@ -168,7 +168,8 @@ Unrest >> validateResponse: aResponse [
 			('{1}: {2}'
 				format:
 					{aResponse statusLine code.
-					aResponse statusLine reason})
+					aResponse statusLine reason}).
+	^ false
 ]
 
 { #category : #visualization }

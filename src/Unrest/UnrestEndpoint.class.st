@@ -7,14 +7,41 @@ Class {
 	#category : #Unrest
 }
 
+{ #category : #'accessing-context' }
+UnrestEndpoint class >> endpointHttpMethodFromContext: aContext validMethods: aListOfMethods [
+	| validMethods |
+	validMethods := aListOfMethods collect: [ :each | each asLowercase asSymbol ].
+	^ aContext method pragmas
+		detect: [ :each | validMethods includes: each keyword asLowercase asSymbol ]
+		ifFound: [ :val | val keyword ]
+		ifNone: [ nil ]
+]
+
 { #category : #accessing }
 UnrestEndpoint class >> endpointPath [
 	^ self subclassResponsibility
 ]
 
+{ #category : #'accessing-context' }
+UnrestEndpoint class >> endpointPathFromContext: aContext [
+	^ (aContext method pragmaAt: #endpoint:) ifNotNil: [ :pragma | pragma arguments first ]
+]
+
 { #category : #defaults }
 UnrestEndpoint class >> endpointPragmas [
 	^ #(#endpoint #endpoint:)
+]
+
+{ #category : #'accessing-context' }
+UnrestEndpoint class >> endpointTempsFromContext: aContext [
+	^ (aContext tempNames collect: [ :each | each -> (aContext tempNamed: each) ]) asDictionary
+]
+
+{ #category : #configuring }
+UnrestEndpoint class >> endpointValuesFromContext: aContext [
+	^ aContext receiver class allSlots
+		ifEmpty: [ Dictionary new ]
+		ifNotEmpty: [ :val | (val groupedBy: #name) collect: [ :each | each first read: self ] ]
 ]
 
 { #category : #testing }
@@ -64,22 +91,14 @@ UnrestEndpoint >> configureOn: http [
 	| effectivePath contextValues segments |
 
 	effectivePath := self endpointPath.
+	contextValues := self class endpointValuesFromContext: thisContext.
 
-	contextValues := (thisContext receiver class allSlots groupedBy: #name) collect: [ :each | each first read: self ].
-
-	self executingEndpointMethod
-		ifNotNil: [ :method | 
-			| methodContext |
-
-			(method pragmaAt: #endpoint:) ifNotNil: [ :pragma | pragma arguments ifNotEmpty: [ :val | effectivePath := effectivePath / val first ] ].
-			method pragmas detect: [ :each | unrest allowedHttpMethods includes: each keyword asLowercase asSymbol ] ifFound: [ :found | http method: found keyword asUppercase asSymbol ].
-			methodContext := thisContext.
-			[ methodContext method isNotNil and: [ methodContext method ~= method ] ] whileTrue: [ methodContext := methodContext sender ].
-			methodContext method == method
-				ifTrue: [ | temps |
-
-					temps := (methodContext tempNames collect: [ :each | each -> (methodContext tempNamed: each) ]) asDictionary.
-					contextValues addAll: temps ] ].
+	self executingContext
+		ifNotNil: [ :context | 
+			(self class endpointPathFromContext: context) ifNotNil: [ :val | effectivePath := effectivePath / val ].
+			(self class endpointHttpMethodFromContext: context validMethods: unrest allowedHttpMethods)
+				ifNotNil: [ :val | http method: val asUppercase asSymbol ].
+			(self class endpointTempsFromContext: context) ifNotEmpty: [ :val | contextValues addAll: val ] ].
 
 	segments := effectivePath segments collect: [ :segment | segment format: contextValues ].
 	http url: unrest baseUrl / segments
@@ -96,14 +115,14 @@ UnrestEndpoint >> execute [
 ]
 
 { #category : #configuring }
-UnrestEndpoint >> executingEndpointMethod [
+UnrestEndpoint >> executingContext [
 	| sender |
 
 	sender := thisContext sender.
 	[ sender isNotNil and: [ (self class isEndpointMethod: sender method) not ] ]
 		whileTrue: [ sender := sender sender ].
 
-	^ sender ifNotNil: [ :val | val method ]
+	^ sender
 ]
 
 { #category : #initialization }
