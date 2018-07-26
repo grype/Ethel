@@ -209,15 +209,16 @@ Unrest >> viewMapOn: aBuilder [
 
 { #category : #visualization }
 Unrest >> viewTopologyOn: aBuilder [
-	| endpoints colorNormalizer |
+	| endpoints colors allHttpMethods |
 
 	endpoints := PlaidClient associatedEndpointClasses.
-	colorNormalizer := RTMultiLinearColorForIdentity new objects: self allowedHttpMethods.
+	allHttpMethods := self allowedHttpMethods collect: #asLowercase.
+	colors := RTColorPalette qualitative colors: allHttpMethods size scheme: 'Set2'.
 	aBuilder methodShape
 		color: [ :method | 
 			((method pragmas collect: [ :p | p keyword asLowercase asSymbol ]) intersection: self allowedHttpMethods)
 				ifEmpty: [ nil ]
-				ifNotEmpty: [ :foundPragmaMethods | colorNormalizer rtValue: foundPragmaMethods first ] ].
+				ifNotEmpty: [ :foundPragmaMethods | colors at: (allHttpMethods indexOf: foundPragmaMethods first asLowercase) ] ].
 
 	aBuilder
 		addObjects: endpoints;
