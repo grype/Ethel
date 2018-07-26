@@ -4,10 +4,16 @@ Class {
 	#instVars : [
 		'path',
 		'data',
-		'method'
+		'method',
+		'headers'
 	],
 	#category : #Unrest
 }
+
+{ #category : #configuring }
+UnrestPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
+	anEndpoint headers: headers
+]
 
 { #category : #configuring }
 UnrestPluggableEndpoint >> configureOn: http [
@@ -15,7 +21,8 @@ UnrestPluggableEndpoint >> configureOn: http [
 	method = #get
 		ifTrue: [ http queryAddAll: data ]
 		ifFalse: [ http contents: data ].
-	http method: method greaseString asUppercase asSymbol
+	http method: method greaseString asUppercase asSymbol.
+	http headerAddAll: headers
 ]
 
 { #category : #accessing }
@@ -53,15 +60,26 @@ UnrestPluggableEndpoint >> get [
 	^ self perform: #get
 ]
 
+{ #category : #accessing }
+UnrestPluggableEndpoint >> headers [
+	^ headers
+]
+
 { #category : #initialization }
 UnrestPluggableEndpoint >> initialize [
 	super initialize.
-	self initializeData 
+	self initializeData.
+	self initializeHeaders.
 ]
 
 { #category : #initialization }
 UnrestPluggableEndpoint >> initializeData [
 	data := Dictionary new
+]
+
+{ #category : #initialization }
+UnrestPluggableEndpoint >> initializeHeaders [
+	headers := Dictionary new
 ]
 
 { #category : #api }

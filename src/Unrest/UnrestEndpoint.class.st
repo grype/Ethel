@@ -90,7 +90,17 @@ UnrestEndpoint >> / aString [
 { #category : #endpoints }
 UnrestEndpoint >> > endPointClass [
 	"Creates a new endpoint of specified class."
-	^ endPointClass on: unrest
+
+	| newEndpoint |
+
+	newEndpoint := endPointClass on: unrest.
+	self configureDerivedEndpoint: newEndpoint.
+	^ newEndpoint 
+]
+
+{ #category : #configuring }
+UnrestEndpoint >> configureDerivedEndpoint: anEndpoint [
+
 ]
 
 { #category : #configuring }
