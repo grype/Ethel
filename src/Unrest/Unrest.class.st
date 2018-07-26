@@ -222,24 +222,19 @@ Unrest >> viewTopologyOn: aBuilder [
 
 	aBuilder
 		addObjects: endpoints;
-		"classname: [ :cls | cls endpointPath pathString];"
-		classname: [ :cls | cls name ];
+		classname: #name;
 		instanceVariables: #instVarNames;
-		methodsNames: [ :cls | 
-			cls methods
-				select: [ :aMethod | (aMethod pragmas collect: #keyword) includesAny: UnrestEndpoint endpointPragmas ] ];
+		methodsNames:
+				[ :cls | cls methods select: [ :aMethod | (aMethod pragmas collect: #keyword) includesAny: UnrestEndpoint endpointPragmas ] ];
 		methodselector: [ :aMethod | 
-			| str |
-
-			str := '' writeStream.
-			str nextPutAll: aMethod selector.
-			(aMethod pragmaAt: #endpoint:) ifNotNil: [ :p | str nextPutAll: (' ~> /{1}' format: {p arguments first}) ].
-			str contents ];
+			'{1} ~> {2}'
+				format:
+					{aMethod selector.
+					((aMethod pragmaAt: #endpoint:)
+						ifNil: [ aMethod methodClass endpointPath pathString ]
+						ifNotNil: [ :p | (aMethod methodClass endpointPath / p arguments first) pathString ])} ];
 		attributeselector: #yourself;
-		superclass: [ :cls | 
-			cls endpointPath parent isRoot
-				ifTrue: [ nil ]
-				ifFalse: [ endpoints detect: [ :each | each endpointPath = cls endpointPath parent ] ifNone: [ nil ] ] ].
+		superclass: #superclass.
 
 	aBuilder treeLayout
 ]
