@@ -122,7 +122,7 @@ Unrest >> execute: anEndpoint [
 
 { #category : #'gt-inspector-extension' }
 Unrest >> gtMapIn: aComposite [
-	<gtInspectorPresentationOrder: 10>
+	<gtInspectorPresentationOrder: 11>
 	^ aComposite roassal2
 		title: ['Map' translated];
 		initializeView: [ RTInteractiveTreeBuilder new ];
@@ -131,7 +131,7 @@ Unrest >> gtMapIn: aComposite [
 
 { #category : #'gt-inspector-extension' }
 Unrest >> gtTopologyIn: aComposite [
-	<gtInspectorPresentationOrder: 11>
+	<gtInspectorPresentationOrder: 12>
 	^ aComposite roassal2
 		title: ['Topology' translated];
 		initializeView: [ RTUMLClassBuilder new ];
