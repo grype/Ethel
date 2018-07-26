@@ -124,7 +124,7 @@ Unrest >> gtMapIn: aComposite [
 	<gtInspectorPresentationOrder: 11>
 	^ aComposite roassal2
 		title: ['Map' translated];
-		initializeView: [ UnrestInteractiveTreeBuilder new ];
+		initializeView: [ RTInteractiveTreeBuilder new ];
 		painting: [ :view | self viewMapOn: view ]
 ]
 
