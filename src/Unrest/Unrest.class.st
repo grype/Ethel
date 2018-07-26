@@ -222,7 +222,8 @@ Unrest >> viewTopologyOn: aBuilder [
 
 	aBuilder
 		addObjects: endpoints;
-		classname: [ :cls | cls endpointPath pathString ];
+		"classname: [ :cls | cls endpointPath pathString];"
+		classname: [ :cls | cls name ];
 		instanceVariables: #instVarNames;
 		methodsNames: [ :cls | 
 			cls methods
