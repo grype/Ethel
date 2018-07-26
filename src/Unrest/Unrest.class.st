@@ -20,7 +20,6 @@ Unrest class >> associatedEndpointClasses [
 		flatCollect: [ :each | each withAllSuperclasses ])
 		select: [ :each | each superclass == UnrestEndpoint ].
 	^ (rootEndpointClass flatCollect: #withAllSubclasses)
-		reject: [ :each | each isAbstract ]
 ]
 
 { #category : #introspection }
@@ -125,7 +124,7 @@ Unrest >> gtMapIn: aComposite [
 	<gtInspectorPresentationOrder: 11>
 	^ aComposite roassal2
 		title: ['Map' translated];
-		initializeView: [ RTInteractiveTreeBuilder new ];
+		initializeView: [ UnrestInteractiveTreeBuilder new ];
 		painting: [ :view | self viewMapOn: view ]
 ]
 
@@ -176,7 +175,7 @@ Unrest >> validateResponse: aResponse [
 Unrest >> viewMapOn: aBuilder [
 	| paths |
 	
-	paths := (self class associatedEndpointClasses flatCollect: [ :aCls | aCls referencingPaths ]) asSet
+	paths := ((self class associatedEndpointClasses reject: #isAbstract) flatCollect: [ :aCls | aCls referencingPaths ]) asSet
 		flatCollect: [ :aPath | 
 			| p result |
 

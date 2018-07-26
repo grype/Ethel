@@ -64,11 +64,18 @@ UnrestEndpoint class >> on: unrestClient [
 
 { #category : #accessing }
 UnrestEndpoint class >> referencingPaths [
+	^ self referencingPathsWithMethods collect: #value
+]
+
+{ #category : #accessing }
+UnrestEndpoint class >> referencingPathsWithMethods [
 	^ ((Unrest endpointMethodsOn: self)
 		collect: [ :aMethod | 
-			(aMethod key pragmaAt: #endpoint:)
-				ifNil: [ self endpointPath ]
-				ifNotNil: [ :val | self endpointPath / val arguments first ] ]) asSet
+			aMethod
+				->
+					((aMethod key pragmaAt: #endpoint:)
+						ifNil: [ self endpointPath ]
+						ifNotNil: [ :val | self endpointPath / val arguments first ]) ]) asSet
 ]
 
 { #category : #endpoints }
