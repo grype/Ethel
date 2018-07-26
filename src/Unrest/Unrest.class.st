@@ -211,7 +211,7 @@ Unrest >> viewMapOn: aBuilder [
 Unrest >> viewTopologyOn: aBuilder [
 	| endpoints colors allHttpMethods |
 
-	endpoints := PlaidClient associatedEndpointClasses.
+	endpoints := self class associatedEndpointClasses.
 	allHttpMethods := self allowedHttpMethods collect: #asLowercase.
 	colors := RTColorPalette qualitative colors: allHttpMethods size scheme: 'Set2'.
 	aBuilder methodShape
