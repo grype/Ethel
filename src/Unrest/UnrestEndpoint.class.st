@@ -41,7 +41,7 @@ UnrestEndpoint class >> endpointTempsFromContext: aContext [
 UnrestEndpoint class >> endpointValuesFromContext: aContext [
 	^ aContext receiver class allSlots
 		ifEmpty: [ Dictionary new ]
-		ifNotEmpty: [ :val | (val groupedBy: #name) collect: [ :each | each first read: self ] ]
+		ifNotEmpty: [ :val | (val groupedBy: #name) collect: [ :each | each first read: aContext receiver ] ]
 ]
 
 { #category : #testing }
