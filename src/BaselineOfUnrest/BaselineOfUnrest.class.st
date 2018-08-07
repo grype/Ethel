@@ -9,7 +9,7 @@ BaselineOfUnrest >> baseline: spec [
 	<baseline>
 	spec
 		for: #common
-		do: [ spec repository: 'github://cotap/grype-experiments/repository'.
+		do: [ spec repository: 'github://grype/Unrest/src'.
 			spec
 				project: 'Roassal2'
 				with: [ spec
@@ -17,7 +17,7 @@ BaselineOfUnrest >> baseline: spec [
 						versionString: #stable;
 						repository: 'http://smalltalkhub.com/mc/Pharo/MetaRepoForPharo60/main/' ].
 			spec package: #Unrest.
-			spec package: #'Unrest-Tools' with: [ spec requires: #('Roassal2') ].
+			spec package: #'Unrest-Tools' with: [ spec requires: #('Unrest' 'Roassal2') ].
 			spec
 				group: 'default' with: #('Unrest');
 				group: 'development' with: #('Unrest' 'Unrest-Tools') ]
