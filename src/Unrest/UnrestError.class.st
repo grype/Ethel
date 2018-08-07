@@ -1,7 +1,7 @@
 Class {
 	#name : #UnrestError,
 	#superclass : #Error,
-	#category : #Unrest
+	#category : #'Unrest-Core'
 }
 
 { #category : #private }

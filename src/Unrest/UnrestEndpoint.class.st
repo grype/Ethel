@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'unrest'
 	],
-	#category : #Unrest
+	#category : #'Unrest-Core'
 }
 
 { #category : #'accessing-context' }

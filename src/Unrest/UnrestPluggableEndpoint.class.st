@@ -7,7 +7,7 @@ Class {
 		'method',
 		'headers'
 	],
-	#category : #Unrest
+	#category : #'Unrest-Core'
 }
 
 { #category : #configuring }
@@ -47,7 +47,7 @@ UnrestPluggableEndpoint >> dataRemoveAt: aPropertyName [
 
 { #category : #api }
 UnrestPluggableEndpoint >> delete [
-	^ self perform: #delete
+	^ self executeHttpMethod: #delete
 ]
 
 { #category : #accessing }
@@ -56,8 +56,14 @@ UnrestPluggableEndpoint >> endpointPath [
 ]
 
 { #category : #api }
+UnrestPluggableEndpoint >> executeHttpMethod: aMethod [
+	method := aMethod.
+	^ unrest execute: self
+]
+
+{ #category : #api }
 UnrestPluggableEndpoint >> get [
-	^ self perform: #get
+	^ self executeHttpMethod: #get
 ]
 
 { #category : #accessing }
@@ -84,7 +90,7 @@ UnrestPluggableEndpoint >> initializeHeaders [
 
 { #category : #api }
 UnrestPluggableEndpoint >> patch [
-	^ self perform: #patch
+	^ self executeHttpMethod: #patch
 ]
 
 { #category : #accessing }
@@ -98,19 +104,13 @@ UnrestPluggableEndpoint >> path: anObject [
 ]
 
 { #category : #api }
-UnrestPluggableEndpoint >> perform: aMethod [
-	method := aMethod.
-	^ unrest execute: self
-]
-
-{ #category : #api }
 UnrestPluggableEndpoint >> post [
-	^ self perform: #post
+	^ self executeHttpMethod: #post
 ]
 
 { #category : #api }
 UnrestPluggableEndpoint >> put [
-	^ self perform: #put
+	^ self executeHttpMethod: #put
 ]
 
 { #category : #data }
