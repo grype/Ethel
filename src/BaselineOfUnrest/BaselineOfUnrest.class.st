@@ -16,5 +16,9 @@ BaselineOfUnrest >> baseline: spec [
 						className: #ConfigurationOfRoassal2;
 						versionString: #stable;
 						repository: 'http://smalltalkhub.com/mc/Pharo/MetaRepoForPharo60/main/' ].
-			spec package: #Unrest with: [ spec requires: #('Roassal2') ] ]
+			spec package: #Unrest.
+			spec package: #'Unrest-Tools' with: [ spec requires: #('Roassal2') ].
+			spec
+				group: 'default' with: #('Unrest');
+				group: 'development' with: #('Unrest' 'Unrest-Tools') ]
 ]
