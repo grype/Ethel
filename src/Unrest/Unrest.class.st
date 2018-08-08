@@ -119,6 +119,18 @@ Unrest >> execute: anEndpoint [
 	^ result
 ]
 
+{ #category : #accessing }
+Unrest >> implementorsOfPath: aPath [
+	| pathsAndMethods |
+
+	pathsAndMethods := (self class associatedEndpointClasses
+		reject: [ :each | each isAbstract ])
+		flatCollect: [ :each | each referencingPathsWithMethods ].
+	^ pathsAndMethods
+		select: [ :each | each value = aPath ]
+		thenCollect: [ :each | each key key ]
+]
+
 { #category : #initialization }
 Unrest >> initializeWithUrl: aUrl [
 	self initialize.
