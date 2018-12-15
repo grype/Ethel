@@ -66,9 +66,24 @@ UnrestPluggableEndpoint >> get [
 	^ self executeHttpMethod: #get
 ]
 
+{ #category : #headers }
+UnrestPluggableEndpoint >> headerAt: aPropertyName put: aValue [
+	headers at: aPropertyName put: aValue
+]
+
 { #category : #accessing }
 UnrestPluggableEndpoint >> headers [
 	^ headers
+]
+
+{ #category : #headers }
+UnrestPluggableEndpoint >> headersRemoveAll [
+	headers removeAll
+]
+
+{ #category : #headers }
+UnrestPluggableEndpoint >> headersRemoveAt: aName [
+	headers remove: aName ifAbsent: [  ]
 ]
 
 { #category : #initialization }
@@ -116,4 +131,9 @@ UnrestPluggableEndpoint >> put [
 { #category : #data }
 UnrestPluggableEndpoint >> resetData [
 	self initializeData
+]
+
+{ #category : #headers }
+UnrestPluggableEndpoint >> resetHeaders [
+	self initializeHeaders 
 ]
