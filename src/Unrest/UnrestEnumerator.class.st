@@ -8,27 +8,17 @@ Class {
 	#category : #'Unrest-Core'
 }
 
-{ #category : #accessing }
-UnrestEnumerator >> cursor [
+{ #category : #enumerating }
+UnrestEnumerator >> all: aBlock [
+	^ [ self hasMore ] whileTrue: [ self next: aBlock ]
+]
+
+{ #category : #enumerating }
+UnrestEnumerator >> hasMore [
+	^ self subclassResponsibility
+]
+
+{ #category : #enumerating }
+UnrestEnumerator >> next: aBlock [
 	^ self subclassResponsibility 
-]
-
-{ #category : #enumerating }
-UnrestEnumerator >> next [
-	^ self subclassResponsibility 
-]
-
-{ #category : #enumerating }
-UnrestEnumerator >> previous [
-	^ self subclassResponsibility 
-]
-
-{ #category : #enumerating }
-UnrestEnumerator >> upToEnd [
-	[ self cursor atEnd ] whileFalse: [ self next ]
-]
-
-{ #category : #enumerating }
-UnrestEnumerator >> upToStart [
-	[ self cursor atStart ] whileFalse: [ self previous ]
 ]
