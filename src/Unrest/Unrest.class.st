@@ -1,3 +1,47 @@
+"
+I am a RESTful network client. I exist to simplify creation and maintenance of RESTful clients.
+
+I can be used as-is for scripting purposes. However, if you'd like to reify a particular API - do subclass me.
+
+I use ZincHTTPComponents for actual transport, and collaborate with instances of ==UnrestEndpoint== for configuring and executing HTTP requests.
+
+Instantiate me #withUrl:
+
+client := Unrest withUrl: ZnUrl fromString: 'https://api.example.com/v1'.
+
+By default I don't provide any special content reader or writer. If, for example, you're dealing
+with reading JSON response, you can configure me with:
+
+client contentWriter: [ :obj | ZnEntity json: obj asJson ].
+
+From there, you're typically traversing endpoints and executing requests. 
+
+response := (client / 'interesting-data') get.
+
+When scripting, I create instances of ==UnrestPluggableEndpoint==, which maintains a ==Dictionary== accessible via #data, and provides convenience methods for various HTTP methods. The above example amounts to a GET request to 'http://api.example.com/v1/interesting-data'. You can easily craft the pluggable endpoint with various particulars such as headers and data.
+
+response := (client / 'things') 
+	headerAt: #Authorization put: '...'; 
+	dataAt: #thing put: aThing;
+	post.
+	
+When subclassing, it helps to provide access to all top-level endpoints from within the subclass like this:
+
+UnrestSubclass>>thingsEndpoint
+	^ self > ThingsEndpoint
+	
+Override #configureHttpClient: for providing custom configuration of the http transport. Transport configuration is a two-phase process, where I occupy the first phase, via #configureHttpClient:, and the endpoint - the second phase. This way you can keep my configuration general...
+
+For custom error handling, override #validateResponse:.
+
+See comment on ==UnrestEndpoint== for creating custom endpoints.
+
+Instance Variables
+	baseUrl:		<ZnUrl>
+	contentReader:		<Block>
+	contentWriter:		<Block>
+
+"
 Class {
 	#name : #Unrest,
 	#superclass : #Object,
@@ -102,6 +146,7 @@ Unrest >> createHttpClient [
 { #category : #execution }
 Unrest >> execute [
 	| sender |
+	self deprecated: 'Not used anymore'.
 	sender := thisContext sender.
 	(sender methodClass inheritsFrom: UnrestEndpoint) ifFalse: [ UnrestError signal: ('Cannot be executed by {1} because it is not an UnrestEndpoint!' format: { sender class greaseString}) ].
 	self execute: sender
