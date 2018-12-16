@@ -30,9 +30,9 @@ When subclassing:
 It also helps to provide access to all top-level endpoints from within the subclass like this:
 
 UnrestSubclass>>thingsEndpoint
-	^ self > ThingsEndpoint
+	^ self > (ThingsEndpoint on: self)
 	
-This way you could chain endpoints from starting with the client:
+This way you could chain endpoints starting with the client:
 
 client foo bar get. ""GET /foo/bar""
 client foo bar title: 'Title'; body: 'Body'; post.
