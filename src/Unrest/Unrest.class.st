@@ -1,38 +1,41 @@
 "
-I am a RESTful network client. I exist to simplify creation and maintenance of RESTful clients.
+I am a RESTful network client.
 
-I can be used as-is for scripting purposes. However, if you'd like to reify a particular API - do subclass me.
-
-I use ZincHTTPComponents for actual transport, and collaborate with instances of ==UnrestEndpoint== for configuring and executing HTTP requests.
+I can be used as-is for scripting purposes. However, if you'd like to make explicit a particular API - do subclass me. I use ZincHTTPComponents for actual transport, and collaborate with instances of ==UnrestEndpoint== for configuring and executing HTTP requests.
 
 Instantiate me #withUrl:
 
-client := Unrest withUrl: ZnUrl fromString: 'https://api.example.com/v1'.
+client := Unrest withUrl: 'https://api.example.com/v1'.
 
 By default I don't provide any special content reader or writer. If, for example, you're dealing
-with reading JSON response, you can configure me with:
+with reading JSON responses, you can configure me with:
 
 client contentWriter: [ :obj | ZnEntity json: obj asJson ].
 
-From there, you're typically traversing endpoints and executing requests. 
+From there, you're typically traversing endpoints and executing requests:
 
-response := (client / 'interesting-data') get.
+response := (client / 'things') get. ""GET /things""
 
-When scripting, I create instances of ==UnrestPluggableEndpoint==, which maintains a ==Dictionary== accessible via #data, and provides convenience methods for various HTTP methods. The above example amounts to a GET request to 'http://api.example.com/v1/interesting-data'. You can easily craft the pluggable endpoint with various particulars such as headers and data.
+When scripting, I create instances of ==UnrestPluggableEndpoint==, which provides ways for setting custom headers and data, as well as convenience methods for various HTTP methods.
 
 response := (client / 'things') 
-	headerAt: #Authorization put: '...'; 
-	dataAt: #thing put: aThing;
+	headerAt: #Authorization put: '...';
+	data: aThing;
 	post.
 	
-When subclassing, it helps to provide access to all top-level endpoints from within the subclass like this:
+When subclassing:
+	* override #configureHttpClient: when there's a need to configure http transport with data not specific to a particular endpoint - endpoints get to configure transport before being executed.
+	* override #validateResponse: for custom error handling
+
+It also helps to provide access to all top-level endpoints from within the subclass like this:
 
 UnrestSubclass>>thingsEndpoint
 	^ self > ThingsEndpoint
 	
-Override #configureHttpClient: for providing custom configuration of the http transport. Transport configuration is a two-phase process, where I occupy the first phase, via #configureHttpClient:, and the endpoint - the second phase. This way you can keep my configuration general...
+This way you could chain endpoints from starting with the client:
 
-For custom error handling, override #validateResponse:.
+client foo bar get. ""GET /foo/bar""
+client foo bar title: 'Title'; body: 'Body'; post.
 
 See comment on ==UnrestEndpoint== for creating custom endpoints.
 
