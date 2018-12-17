@@ -150,7 +150,7 @@ UnrestEndpoint >> > endPointClass [
 
 { #category : #configuring }
 UnrestEndpoint >> configureDerivedEndpoint: anEndpoint [
-
+	"Configures newly derived endpoint"
 ]
 
 { #category : #configuring }
