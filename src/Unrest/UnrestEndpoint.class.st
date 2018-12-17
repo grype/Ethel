@@ -181,7 +181,7 @@ UnrestEndpoint >> execute [
 	^ unrest execute: self
 ]
 
-{ #category : #configuring }
+{ #category : #executing }
 UnrestEndpoint >> executingContext [
 	| sender |
 
@@ -196,4 +196,9 @@ UnrestEndpoint >> executingContext [
 UnrestEndpoint >> initializeOn: aClient [
 	self initialize.
 	unrest := aClient
+]
+
+{ #category : #accessing }
+UnrestEndpoint >> unrest [
+	^ unrest
 ]
