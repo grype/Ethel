@@ -22,6 +22,44 @@ UnrestTest >> testEndpointComposition [
 ]
 
 { #category : #tests }
+UnrestTest >> testExecution [
+	| ep http response |
+
+	http := ZnClient new.
+	response := ZnResponse ok: (ZnEntity text: 'ok').
+	ep := client test.
+
+	http stub.
+	client stub.
+	ep stub.
+
+	[ http execute willReturn: response.
+	http response willReturn: response.
+	client createHttpClient willReturn: http ] should expect.
+
+	ep get should be: response.
+
+	[ ep configureOn: (Instance of: ZnClient).
+	client validateRequest: (Instance of: ZnRequest).
+	http execute.
+	client validateResponse: (Instance of: ZnResponse) ] should beDoneInOrder
+]
+
+{ #category : #tests }
+UnrestTest >> testHttpClientCreation [
+	client stub.
+	client createHttpClient.
+	client should receive configureHttpClient: (Instance of: ZnClient)
+]
+
+{ #category : #tests }
+UnrestTest >> testHttpMethodValidation [
+	client stub.
+	client allowedHttpMethods do: [ :each | (client validateMethod: each) should be ].
+	[ client validateMethod: #foo ] should raise: UnrestError
+]
+
+{ #category : #tests }
 UnrestTest >> testImplementorsOfPath [
 	| implementors |
 	implementors := client implementorsOfPath: UnrestTestEndpoint endpointPath.
