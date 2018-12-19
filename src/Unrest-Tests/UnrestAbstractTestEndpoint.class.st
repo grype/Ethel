@@ -7,10 +7,26 @@ Class {
 	#category : #'Unrest-Tests-Models'
 }
 
+{ #category : #tests }
+UnrestAbstractTestEndpoint class >> testHeaderName [
+	^ #'X-Test'
+]
+
+{ #category : #tests }
+UnrestAbstractTestEndpoint class >> testHeaderValue [
+	^ 'Testing'
+]
+
 { #category : #configuring }
 UnrestAbstractTestEndpoint >> configureDerivedEndpoint: anEndpoint [
 	(anEndpoint isKindOf: UnrestAbstractTestEndpoint)
 		ifTrue: [ headers associationsDo: [ :each | anEndpoint headers add: each ] ]
+]
+
+{ #category : #configuring }
+UnrestAbstractTestEndpoint >> configureOn: http [
+	super configureOn: http.
+	http headerAt: self class testHeaderName put: self class testHeaderValue 
 ]
 
 { #category : #accessing }
