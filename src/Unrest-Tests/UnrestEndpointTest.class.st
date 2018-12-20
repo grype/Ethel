@@ -16,15 +16,19 @@ UnrestEndpointTest >> setUp [
 
 { #category : #tests }
 UnrestEndpointTest >> stubHttp: aBlock [
-	| http response |
+	self stubHttp: aBlock response: (ZnResponse ok: (ZnEntity text: 'ok'))
+]
+
+{ #category : #tests }
+UnrestEndpointTest >> stubHttp: aBlock response: aResponse [
+	| http |
 
 	http := client createHttpClient.
-	response := ZnResponse ok: (ZnEntity text: 'ok').
-	http stub execute willReturn: [ http request ].
-	http stub response willReturn: response.
+	http stub execute willReturn: aResponse.
+	http stub response willReturn: aResponse.
 	client stub createHttpClient willReturn: http.
 	endpoint stub.
-	aBlock cull: http cull: response
+	aBlock cull: http cull: aResponse
 ]
 
 { #category : #tests }
@@ -36,6 +40,24 @@ UnrestEndpointTest >> testEndpointComposition [
 	self assert: ep unrest equals: endpoint unrest.
 	self assert: ep endpointPath equals: UnrestAnotherTestEndpoint endpointPath.
 	self assert: (ep headers keys includesAll: endpoint headers keys) description: 'Derived endpoint was not correctly conifgured'.
+]
+
+{ #category : #tests }
+UnrestEndpointTest >> testEnumeration [
+	| result cursor |
+
+	endpoint := client another.
+	cursor := endpoint cursor.
+	endpoint stub cursor willReturn: cursor.
+	
+	result := (endpoint offset to: endpoint offset + endpoint limit) asArray.
+
+	self
+		stubHttp: [ :http :response | 
+			endpoint offset should be: 0.
+			endpoint next: [ :responseResult | responseResult should equal: result ].
+			cursor offset should be: endpoint limit ]
+		response: (ZnResponse ok: (ZnEntity json: result asJson))
 ]
 
 { #category : #tests }

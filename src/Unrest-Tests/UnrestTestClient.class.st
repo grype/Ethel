@@ -14,7 +14,12 @@ UnrestTestClient class >> default [
 	^ self withUrl: self baseUrl 
 ]
 
-{ #category : #tests }
+{ #category : #endpoints }
+UnrestTestClient >> another [
+	^ self > UnrestAnotherTestEndpoint  
+]
+
+{ #category : #endpoints }
 UnrestTestClient >> test [
 	^ self > UnrestTestEndpoint 
 ]
