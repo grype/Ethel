@@ -25,13 +25,20 @@ UnrestAnotherTestEndpoint >> cursor [
 
 { #category : #enumerating }
 UnrestAnotherTestEndpoint >> enumerateWith: aCursor [
-	| response |
+	| response result contents |
 
 	offset := aCursor offset.
 	response := self test.
 	response isSuccess
-		ifTrue: [ aCursor offset: offset + limit ].
-	^ NeoJSONReader fromString: response contents
+		ifFalse: [ ^ nil ].
+
+	contents := response contents value.
+	result := contents isString
+		ifTrue: [ NeoJSONReader fromString: contents ]
+		ifFalse: [ contents ].
+	aCursor offset: offset + result size.
+	('cursor offset: {1}' format: {aCursor offset}) crLog.
+	^ result
 ]
 
 { #category : #initialization }
