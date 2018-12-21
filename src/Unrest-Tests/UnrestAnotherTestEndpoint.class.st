@@ -37,7 +37,6 @@ UnrestAnotherTestEndpoint >> enumerateWith: aCursor [
 		ifTrue: [ NeoJSONReader fromString: contents ]
 		ifFalse: [ contents ].
 	aCursor offset: offset + result size.
-	('cursor offset: {1}' format: {aCursor offset}) crLog.
 	^ result
 ]
 
