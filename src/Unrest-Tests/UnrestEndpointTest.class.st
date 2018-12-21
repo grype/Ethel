@@ -71,6 +71,23 @@ UnrestEndpointTest >> testEndpointComposition [
 ]
 
 { #category : #tests }
+UnrestEndpointTest >> testEnumerationDetect [
+	| expectedResult cursor http result |
+
+	endpoint := client another.
+	cursor := self stubbedCursor.
+	expectedResult := 1.
+	http := self
+		stubbedHttpWithResponse: (self okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ]).
+
+	endpoint offset should be: 0.
+	result := endpoint detect: [ :responseResult | responseResult odd ].
+	http should receive execute exactly: 1.
+	cursor offset should equal: cursor offset.
+	expectedResult should equal: result
+]
+
+{ #category : #tests }
 UnrestEndpointTest >> testEnumerationDo [
 	| expectedResult cursor http result |
 
@@ -101,6 +118,23 @@ UnrestEndpointTest >> testEnumerationNext [
 	endpoint next: [ :responseResult | responseResult should equal: expectedResult ].
 	cursor offset should be: endpoint limit.
 	http should receive execute
+]
+
+{ #category : #tests }
+UnrestEndpointTest >> testEnumerationSelect [
+	| expectedResult cursor http result |
+
+	endpoint := client another.
+	cursor := self stubbedCursor.
+	expectedResult := (endpoint offset to: cursor total - 1) asOrderedCollection select: #even.
+	http := self
+		stubbedHttpWithResponse: (self okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ]).
+
+	endpoint offset should be: 0.
+	result := endpoint select: [ :responseResult | responseResult even ].
+	http should receive execute exactly: (cursor total / endpoint limit) rounded.
+	cursor offset should equal: cursor total.
+	expectedResult should equal: result
 ]
 
 { #category : #tests }
