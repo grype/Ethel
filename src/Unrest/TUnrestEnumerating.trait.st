@@ -31,7 +31,7 @@ TUnrestEnumerating >> detect: aBlock [
 
 { #category : #enumerating }
 TUnrestEnumerating >> detect: aBlock ifFound: foundBlock [
-	^ self detect: aBlock ifFound: foundBlock ifNone: [  ]
+	^ self detect: aBlock ifFound: foundBlock ifNone: [ nil ]
 ]
 
 { #category : #enumerating }

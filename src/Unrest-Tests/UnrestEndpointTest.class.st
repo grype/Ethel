@@ -3,22 +3,24 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'client',
-		'endpoint'
+		'endpoint',
+		'cursor',
+		'http'
 	],
 	#category : #'Unrest-Tests-Core'
 }
 
-{ #category : #'tests-accessing' }
+{ #category : #stubbing }
 UnrestEndpointTest >> okJsonResponseWith: aValue [
 	^ ZnResponse ok: (ZnEntity json: aValue asJson)
 ]
 
-{ #category : #'tests-accessing' }
+{ #category : #stubbing }
 UnrestEndpointTest >> okResponse [
 	^ ZnResponse ok: (ZnEntity text: 'ok')
 ]
 
-{ #category : #'tests-accessing' }
+{ #category : #stubbing }
 UnrestEndpointTest >> okResponseWith: aValue [
 	^ ZnResponse ok: (ZnEntity with: aValue)
 ]
@@ -29,13 +31,26 @@ UnrestEndpointTest >> setUp [
 	endpoint := UnrestTestEndpoint on: client.
 ]
 
-{ #category : #'tests-accessing' }
+{ #category : #stubbing }
+UnrestEndpointTest >> stubForEnumeration [
+	endpoint := client another.
+	cursor := self stubbedCursor.
+	http := self
+		stubbedHttpWithResponse: (self okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ])
+]
+
+{ #category : #stubbing }
+UnrestEndpointTest >> stubForExecution [
+	http := self stubbedHttpWithResponse: self okResponse
+]
+
+{ #category : #stubbing }
 UnrestEndpointTest >> stubHttp: http withResponse: aResponse [
 	http stub execute willReturn: aResponse.
 	http stub response willReturn: aResponse
 ]
 
-{ #category : #'tests-accessing' }
+{ #category : #stubbing }
 UnrestEndpointTest >> stubbedCursor [
 	| cursor |
 	cursor := endpoint cursor.
@@ -43,12 +58,12 @@ UnrestEndpointTest >> stubbedCursor [
 	^ cursor
 ]
 
-{ #category : #'tests-accessing' }
+{ #category : #stubbing }
 UnrestEndpointTest >> stubbedHttp [
 	^ self stubbedHttpWithResponse: nil
 ]
 
-{ #category : #'error handling' }
+{ #category : #stubbing }
 UnrestEndpointTest >> stubbedHttpWithResponse: aResponse [
 	| http |
 
@@ -59,7 +74,7 @@ UnrestEndpointTest >> stubbedHttpWithResponse: aResponse [
 	^ http
 ]
 
-{ #category : #tests }
+{ #category : #'tests-composing' }
 UnrestEndpointTest >> testEndpointComposition [
 	| ep |
 
@@ -70,49 +85,63 @@ UnrestEndpointTest >> testEndpointComposition [
 	self assert: (ep headers keys includesAll: endpoint headers keys) description: 'Derived endpoint was not correctly conifgured'.
 ]
 
-{ #category : #tests }
+{ #category : #'tests-enumerating' }
 UnrestEndpointTest >> testEnumerationDetect [
-	| expectedResult cursor http result |
+	| expectedResult result |
 
-	endpoint := client another.
-	cursor := self stubbedCursor.
+	self stubForEnumeration.
 	expectedResult := 1.
-	http := self
-		stubbedHttpWithResponse: (self okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ]).
 
 	endpoint offset should be: 0.
 	result := endpoint detect: [ :responseResult | responseResult odd ].
 	http should receive execute exactly: 1.
 	cursor offset should equal: cursor offset.
-	expectedResult should equal: result
+	result should equal: expectedResult
 ]
 
-{ #category : #tests }
-UnrestEndpointTest >> testEnumerationDo [
-	| expectedResult cursor http result |
+{ #category : #'tests-enumerating' }
+UnrestEndpointTest >> testEnumerationDetectNotFound [
+	| result |
 
-	endpoint := client another.
-	cursor := self stubbedCursor.
+	self stubForEnumeration.
+
+	endpoint offset should be: 0.
+	result := endpoint detect: [ :responseResult | responseResult > cursor total ] ifNone: [ nil ].
+	http should receive execute exactly: (cursor total / endpoint limit) rounded.
+	cursor offset should equal: cursor offset.
+	result should be: nil
+]
+
+{ #category : #'tests-enumerating' }
+UnrestEndpointTest >> testEnumerationDetectRaiseNotFound [
+	self stubForEnumeration.
+	endpoint offset should be: 0.
+	[ endpoint detect: [ :responseResult | responseResult > cursor total ] ] should raise: NotFound.
+	http should receive execute exactly: (cursor total / endpoint limit) rounded.
+	cursor offset should equal: cursor offset
+]
+
+{ #category : #'tests-enumerating' }
+UnrestEndpointTest >> testEnumerationDo [
+	| expectedResult result |
+
+	self stubForEnumeration.
 	expectedResult := (endpoint offset to: cursor total - 1) asOrderedCollection.
-	http := self
-		stubbedHttpWithResponse: (self okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ]).
 	result := OrderedCollection new.
 
 	endpoint offset should be: 0.
 	endpoint do: [ :responseResult | result add: responseResult ].
 	http should receive execute exactly: (cursor total / endpoint limit) rounded.
 	cursor offset should equal: cursor total.
-	expectedResult should equal: result
+	result should equal: expectedResult
 ]
 
-{ #category : #tests }
+{ #category : #'tests-enumerating' }
 UnrestEndpointTest >> testEnumerationNext [
-	| expectedResult cursor http |
+	| expectedResult |
 
-	endpoint := client another.
-	cursor := self stubbedCursor.
+	self stubForEnumeration.
 	expectedResult := (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray.
-	http := self stubbedHttpWithResponse: (self okJsonResponseWith: expectedResult).
 
 	endpoint offset should be: 0.
 	endpoint next: [ :responseResult | responseResult should equal: expectedResult ].
@@ -120,24 +149,21 @@ UnrestEndpointTest >> testEnumerationNext [
 	http should receive execute
 ]
 
-{ #category : #tests }
+{ #category : #'tests-enumerating' }
 UnrestEndpointTest >> testEnumerationSelect [
-	| expectedResult cursor http result |
+	| expectedResult result |
 
-	endpoint := client another.
-	cursor := self stubbedCursor.
-	expectedResult := (endpoint offset to: cursor total - 1) asOrderedCollection select: #even.
-	http := self
-		stubbedHttpWithResponse: (self okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ]).
+	self stubForEnumeration.
+	expectedResult := ((endpoint offset to: cursor total - 1) select: #odd) asOrderedCollection.
 
 	endpoint offset should be: 0.
-	result := endpoint select: [ :responseResult | responseResult even ].
+	result := endpoint select: [ :responseResult | responseResult odd ].
 	http should receive execute exactly: (cursor total / endpoint limit) rounded.
-	cursor offset should equal: cursor total.
-	expectedResult should equal: result
+	cursor offset should equal: cursor offset.
+	result should equal: expectedResult
 ]
 
-{ #category : #tests }
+{ #category : #'tests-configuring' }
 UnrestEndpointTest >> testHttpConfiguration [
 	| http |
 	endpoint stub.
@@ -148,7 +174,7 @@ UnrestEndpointTest >> testHttpConfiguration [
 		equals: UnrestTestEndpoint testHeaderValue
 ]
 
-{ #category : #tests }
+{ #category : #'tests-configuring' }
 UnrestEndpointTest >> testHttpMethod [
 	| http |
 
@@ -159,48 +185,37 @@ UnrestEndpointTest >> testHttpMethod [
 			http request method asLowercase should equal: method asLowercase ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testKeywordWithAbsoluteMixedPathExecution [
-	| http |
-
-	http := self stubbedHttpWithResponse: self okResponse.
-
+	self stubForExecution.
 	endpoint getAbsoluteMixed: 'foo'.
 	http request url should
 		equal: (client baseUrl addPathSegments: (Path / 'absolute' / 'mixed' / 'foo' / 'path') segments)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testKeywordWithAbsolutePathExecution [
-	| http |
-	http := self stubbedHttpWithResponse: self okResponse.
+	self stubForExecution.
 	endpoint getAbsoluteKeyword: 'foo'.
 	http request url should equal: (client baseUrl addPathSegments: (Path / 'foo') segments)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testKeywordWithRelativeMixedPathExecution [
-	| http |
-	http := self stubbedHttpWithResponse: self okResponse.
-
+	self stubForExecution.
 	endpoint getRelativeMixed: 'foo'.
 	http request url should
-		equal:
-			(client baseUrl
-				addPathSegments: (endpoint endpointPath / 'relative' / 'mixed' / 'foo' / 'path') segments)
+		equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'relative' / 'mixed' / 'foo' / 'path') segments)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testKeywordWithRelativePathExecution [
-	| http |
-	http := self stubbedHttpWithResponse: self okResponse.
-
+	self stubForExecution.
 	endpoint getRelativeKeyword: 'foo'.
-	http request url should
-		equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'foo') segments)
+	http request url should equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'foo') segments)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-composing' }
 UnrestEndpointTest >> testPluggableEndpointComposition [
 	| ep |
 	ep := endpoint / 'pluggable'.
@@ -209,54 +224,42 @@ UnrestEndpointTest >> testPluggableEndpointComposition [
 	self assert: ep endpointPath equals: endpoint class endpointPath / 'pluggable'
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testUnaryExecution [
-	| http |
-	http := self stubbedHttpWithResponse: self okResponse.
-
+	self stubForExecution.
 	endpoint get.
 	http request url should equal: (client baseUrl addPathSegments: endpoint endpointPath segments)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testUnaryWithAbsoluteDeepPathExecution [
-	| http |
-
-	http := self stubbedHttpWithResponse: self okResponse.
-
+	self stubForExecution.
 	endpoint getAbsoluteDeep.
 	http request url should
 		equal: (client baseUrl addPathSegments: (Path / 'absolute' / 'deep' / 'path') segments)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testUnaryWithAbsolutePathExecution [
-	| http |
-
-	http := self stubbedHttpWithResponse: self okResponse.
-
+	self stubForExecution.
 	endpoint getAbsolute.
 	http request url should equal: (client baseUrl addPathSegments: (Path / 'absolute') segments)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testUnaryWithRelativeDeepPathExecution [
-	| http |
-
-	http := self stubbedHttpWithResponse: self okResponse.
-
+	self stubForExecution.
 	endpoint getRelativeDeep.
 	http request url should
 		equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'relative' / 'deep' / 'path') segments)
 ]
 
-{ #category : #tests }
+{ #category : #'tests-executing' }
 UnrestEndpointTest >> testUnaryWithRelativePathExecution [
-	| http |
-
-	http := self stubbedHttpWithResponse: self okResponse.
-
+	self stubForExecution.
 	endpoint getRelative.
 	http request url should
-		equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'relative') segments)
+		equal:
+			(client baseUrl
+				addPathSegments: (endpoint endpointPath / 'relative') segments)
 ]
