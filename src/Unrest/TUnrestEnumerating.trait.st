@@ -71,8 +71,13 @@ TUnrestEnumerating >> errorNotFound: anObject [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> next: aBlock [
-	aBlock cull: (self enumerateWith: self cursor)
+TUnrestEnumerating >> first [
+	^ (self enumerateWith: self cursor) ifNotNil: [ :values | values first ]
+]
+
+{ #category : #enumerating }
+TUnrestEnumerating >> next: aBlock using: aCursor [
+	aBlock cull: (self enumerateWith: aCursor)
 ]
 
 { #category : #enumerating }

@@ -137,6 +137,15 @@ UnrestEndpointTest >> testEnumerationDo [
 ]
 
 { #category : #'tests-enumerating' }
+UnrestEndpointTest >> testEnumerationFirst [
+	self stubForEnumeration.
+	endpoint offset should be: 0.
+	endpoint first should equal: 0.
+	cursor offset should be: endpoint limit.
+	http should receive execute
+]
+
+{ #category : #'tests-enumerating' }
 UnrestEndpointTest >> testEnumerationNext [
 	| expectedResult |
 
@@ -144,7 +153,7 @@ UnrestEndpointTest >> testEnumerationNext [
 	expectedResult := (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray.
 
 	endpoint offset should be: 0.
-	endpoint next: [ :responseResult | responseResult should equal: expectedResult ].
+	endpoint next: [ :responseResult | responseResult should equal: expectedResult ] using: endpoint cursor.
 	cursor offset should be: endpoint limit.
 	http should receive execute
 ]
