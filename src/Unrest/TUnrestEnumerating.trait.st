@@ -76,8 +76,8 @@ TUnrestEnumerating >> first [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> next: aBlock using: aCursor [
-	aBlock cull: (self enumerateWith: aCursor)
+TUnrestEnumerating >> next: aCursor [
+	^ self enumerateWith: aCursor
 ]
 
 { #category : #enumerating }
