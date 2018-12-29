@@ -60,6 +60,11 @@ TUnrestEnumerating >> do: aBlock [
 
 { #category : #enumerating }
 TUnrestEnumerating >> enumerateWith: aCursor [
+	^ self enumerateWith: aCursor limit: nil
+]
+
+{ #category : #enumerating }
+TUnrestEnumerating >> enumerateWith: aCursor limit: anInt [
 	^ self subclassResponsibility
 ]
 
@@ -72,11 +77,16 @@ TUnrestEnumerating >> errorNotFound: anObject [
 
 { #category : #enumerating }
 TUnrestEnumerating >> first [
-	^ (self enumerateWith: self cursor) ifNotNil: [ :values | values first ]
+	^ (self enumerateWith: self cursor limit: 1) ifNotNil: [ :values | values first ]
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> next: aCursor [
+TUnrestEnumerating >> next: anInt with: aCursor [
+	^ self enumerateWith: aCursor limit: anInt
+]
+
+{ #category : #enumerating }
+TUnrestEnumerating >> nextWith: aCursor [
 	^ self enumerateWith: aCursor
 ]
 

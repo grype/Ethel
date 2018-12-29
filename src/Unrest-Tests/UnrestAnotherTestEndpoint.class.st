@@ -24,10 +24,11 @@ UnrestAnotherTestEndpoint >> cursor [
 ]
 
 { #category : #enumerating }
-UnrestAnotherTestEndpoint >> enumerateWith: aCursor [
+UnrestAnotherTestEndpoint >> enumerateWith: aCursor limit: aLimit [
 	| response result contents |
 
 	offset := aCursor offset.
+	aLimit ifNotNil: [ limit := aLimit ].
 	response := self test.
 	response isSuccess
 		ifFalse: [ ^ nil ].

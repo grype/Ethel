@@ -154,7 +154,7 @@ UnrestEndpointTest >> testEnumerationNext [
 		asArray.
 
 	endpoint offset should be: 0.
-	(endpoint next: endpoint cursor) should equal: expectedResult.
+	(endpoint nextWith: endpoint cursor) should equal: expectedResult.
 	cursor offset should be: endpoint limit.
 	http should receive execute
 ]
