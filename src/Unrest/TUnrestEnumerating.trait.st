@@ -77,7 +77,12 @@ TUnrestEnumerating >> errorNotFound: anObject [
 
 { #category : #enumerating }
 TUnrestEnumerating >> first [
-	^ (self enumerateWith: self cursor limit: 1) ifNotNil: [ :values | values first ]
+	^ (self first: 1) ifNotNil: [ :values | values first ]
+]
+
+{ #category : #enumerating }
+TUnrestEnumerating >> first: aLimit [
+	^ self enumerateWith: self cursor limit: aLimit
 ]
 
 { #category : #enumerating }
