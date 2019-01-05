@@ -119,3 +119,15 @@ TUnrestEnumerating >> select: aBlock [
 				ifNotNil: [ :val | (val select: aBlock) ifNotNil: [ :selected | result addAll: selected ] ] ].
 	^ result
 ]
+
+{ #category : #enumerating }
+TUnrestEnumerating >> select: selectBlock thenCollect: collectBlock [
+	| result cursor |
+
+	result := OrderedCollection new.
+	cursor := self cursor.
+	[ cursor hasMore ]
+		whileTrue: [ (self enumerateWith: cursor)
+				ifNotNil: [ :val | (val select: selectBlock thenCollect: collectBlock) ifNotNil: [ :selected | result addAll: selected ] ] ].
+	^ result
+]
