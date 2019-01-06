@@ -19,6 +19,16 @@ TUnrestEnumerating >> collect: aBlock as: aClass [
 	^ result
 ]
 
+{ #category : #enumerating }
+TUnrestEnumerating >> collect: aBlock into: aCollection [
+	| cursor |
+
+	cursor := self cursor.
+	[ cursor hasMore ]
+		whileTrue: [ (self enumerateWith: cursor) ifNotNil: [ :val | aCollection fillFrom: val with: aBlock ] ].
+	^ aCollection
+]
+
 { #category : #accessing }
 TUnrestEnumerating >> cursor [
 	^ self subclassResponsibility
@@ -59,6 +69,16 @@ TUnrestEnumerating >> do: aBlock [
 ]
 
 { #category : #enumerating }
+TUnrestEnumerating >> do: aBlock separatedBy: separatorBlock [
+	| cursor |
+
+	cursor := self cursor.
+	[ cursor hasMore ]
+		whileTrue: [ (self enumerateWith: cursor)
+				ifNotNil: [ :val | val do: aBlock separatedBy: separatorBlock ] ]
+]
+
+{ #category : #enumerating }
 TUnrestEnumerating >> enumerateWith: aCursor [
 	^ self enumerateWith: aCursor limit: nil
 ]
@@ -83,6 +103,38 @@ TUnrestEnumerating >> first [
 { #category : #enumerating }
 TUnrestEnumerating >> first: aLimit [
 	^ self enumerateWith: self cursor limit: aLimit
+]
+
+{ #category : #enumerating }
+TUnrestEnumerating >> groupedBy: aBlock [
+	| cursor groups |
+
+	groups := PluggableDictionary integerDictionary.
+	cursor := self cursor.
+	[ cursor hasMore ]
+		whileTrue: [ (self enumerateWith: cursor)
+				ifNotNil: [ :val | 
+					val
+						do:
+							[ :each | (groups at: (aBlock value: each) ifAbsentPut: [ OrderedCollection new ]) add: each ] ] ].
+	^ groups
+]
+
+{ #category : #enumerating }
+TUnrestEnumerating >> groupedBy: aBlock having: aSelectionBlock [
+	^ (self groupedBy: aBlock) select: aSelectionBlock
+]
+
+{ #category : #enumerating }
+TUnrestEnumerating >> inject: thisValue into: binaryBlock [
+	| cursor nextValue |
+
+	nextValue := thisValue.
+	cursor := self cursor.
+	[ cursor hasMore ]
+		whileTrue: [ (self enumerateWith: cursor)
+				ifNotNil: [ :val | val do: [ :each | nextValue := binaryBlock value: nextValue value: each ] ] ].
+	^ nextValue
 ]
 
 { #category : #enumerating }

@@ -10,7 +10,9 @@ client contentWriter: [ :obj | ZnEntity json: obj asJson ].
 "
 Class {
 	#name : #UnrestPluggableEndpoint,
-	#superclass : #UnrestEndpoint,
+	#superclass : #Object,
+	#traits : 'TUnrestEndpoint',
+	#classTraits : 'TUnrestEndpoint classTrait',
 	#instVars : [
 		'path',
 		'data',
@@ -27,7 +29,6 @@ UnrestPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
 
 { #category : #configuring }
 UnrestPluggableEndpoint >> configureOn: http [
-	super configureOn: http.
 	data
 		ifNotNil: [ :aData | 
 			method = #get
