@@ -1,6 +1,8 @@
 Class {
 	#name : #UnrestTestEndpoint,
-	#superclass : #UnrestAbstractTestEndpoint,
+	#superclass : #Object,
+	#traits : 'TUnrestTestEndpoint',
+	#classTraits : 'TUnrestTestEndpoint classTrait',
 	#category : #'Unrest-Tests-Models'
 }
 

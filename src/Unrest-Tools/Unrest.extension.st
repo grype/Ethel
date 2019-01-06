@@ -64,7 +64,7 @@ Unrest >> buildTopologyOn: aBuilder [
 		methodsNames: [ :cls | 
 			cls methods
 				select:
-					[ :aMethod | (aMethod pragmas collect: #keyword) includesAny: UnrestEndpoint endpointPragmas ] ];
+					[ :aMethod | (aMethod pragmas collect: #keyword) includesAny: TUnrestEndpoint endpointPragmas ] ];
 		methodselector: [ :aMethod | 
 			'{1} ~> {2}'
 				format:

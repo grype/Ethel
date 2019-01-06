@@ -33,10 +33,12 @@ UnrestEndpointTest >> setUp [
 
 { #category : #stubbing }
 UnrestEndpointTest >> stubForEnumeration [
-	endpoint := client another.
+	endpoint := client collection.
 	cursor := self stubbedCursor.
 	http := self
-		stubbedHttpWithResponse: (self okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ])
+		stubbedHttpWithResponse:
+			(self
+				okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ])
 ]
 
 { #category : #stubbing }
@@ -52,10 +54,10 @@ UnrestEndpointTest >> stubHttp: http withResponse: aResponse [
 
 { #category : #stubbing }
 UnrestEndpointTest >> stubbedCursor [
-	| cursor |
-	cursor := endpoint cursor.
-	endpoint stub cursor willReturn: cursor.
-	^ cursor
+	| aCursor |
+	aCursor := endpoint cursor.
+	endpoint stub cursor willReturn: aCursor.
+	^ aCursor
 ]
 
 { #category : #stubbing }
@@ -78,11 +80,11 @@ UnrestEndpointTest >> stubbedHttpWithResponse: aResponse [
 UnrestEndpointTest >> testEndpointComposition [
 	| ep |
 
-	ep := endpoint > UnrestAnotherTestEndpoint.
-	self assert: ep class equals: UnrestAnotherTestEndpoint.
-	self assert: ep unrest equals: endpoint unrest.
-	self assert: ep endpointPath equals: UnrestAnotherTestEndpoint endpointPath.
-	self assert: (ep headers keys includesAll: endpoint headers keys) description: 'Derived endpoint was not correctly conifgured'.
+	ep := endpoint > UnrestCollectionTestEndpoint.
+	ep class should equal: UnrestCollectionTestEndpoint.
+	ep unrest should equal: endpoint unrest.
+	ep endpointPath should equal: UnrestCollectionTestEndpoint endpointPath.
+	(ep headers keys includesAll: endpoint headers keys) should be
 ]
 
 { #category : #'tests-enumerating' }
@@ -175,13 +177,12 @@ UnrestEndpointTest >> testEnumerationSelect [
 
 { #category : #'tests-configuring' }
 UnrestEndpointTest >> testHttpConfiguration [
-	| http |
 	endpoint stub.
 	http := client createHttpClient.
 	endpoint configureOn: http.
-	self
-		assert: (http request headers at: UnrestTestEndpoint testHeaderName ifAbsent: [ nil ])
-		equals: UnrestTestEndpoint testHeaderValue
+	http request headers should
+		include: UnrestTestEndpoint testHeaderValue
+		at: UnrestTestEndpoint testHeaderName
 ]
 
 { #category : #'tests-configuring' }
@@ -229,9 +230,9 @@ UnrestEndpointTest >> testKeywordWithRelativePathExecution [
 UnrestEndpointTest >> testPluggableEndpointComposition [
 	| ep |
 	ep := endpoint / 'pluggable'.
-	self assert: ep class equals: UnrestPluggableEndpoint.
-	self assert: ep unrest equals: endpoint unrest.
-	self assert: ep endpointPath equals: endpoint class endpointPath / 'pluggable'
+	ep class should equal: UnrestPluggableEndpoint.
+	ep unrest should equal: endpoint unrest.
+	ep endpointPath should equal: endpoint class endpointPath / 'pluggable'
 ]
 
 { #category : #'tests-executing' }

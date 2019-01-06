@@ -15,8 +15,8 @@ UnrestTestClient class >> default [
 ]
 
 { #category : #endpoints }
-UnrestTestClient >> another [
-	^ self > UnrestAnotherTestEndpoint  
+UnrestTestClient >> collection [
+	^ self > UnrestCollectionTestEndpoint  
 ]
 
 { #category : #endpoints }

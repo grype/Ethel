@@ -65,7 +65,7 @@ Unrest class >> associatedEndpointClasses [
 		collect: #value) asSet.
 	rootEndpointClass := (referencedClasses
 		flatCollect: [ :each | each withAllSuperclasses ])
-		select: [ :each | each superclass == UnrestEndpoint ].
+		select: [ :each | each traitComposition includesTrait: TUnrestEndpoint ].
 	^ (rootEndpointClass flatCollect: #withAllSubclasses)
 ]
 
@@ -81,7 +81,7 @@ Unrest class >> endpointMethodsOn: aClass [
 			aMethod
 				->
 					(aMethod allLiterals
-						select: [ :aLiteral | aLiteral value isClass and: [ aLiteral value inheritsFrom: UnrestEndpoint ] ]) ])
+						select: [ :aLiteral | aLiteral value isClass and: [ aLiteral value isUnrestEndpoint ] ]) ])
 		select: [ :each | each value isNotEmpty ]
 ]
 
@@ -147,19 +147,11 @@ Unrest >> createHttpClient [
 ]
 
 { #category : #execution }
-Unrest >> execute [
-	| sender |
-	self deprecated: 'Not used anymore'.
-	sender := thisContext sender.
-	(sender methodClass inheritsFrom: UnrestEndpoint) ifFalse: [ UnrestError signal: ('Cannot be executed by {1} because it is not an UnrestEndpoint!' format: { sender class greaseString}) ].
-	self execute: sender
-]
-
-{ #category : #execution }
 Unrest >> execute: anEndpoint [
 	| http result |
 
 	http := self createHttpClient.
+	anEndpoint prepareForExecutingOn: http.
 	anEndpoint configureOn: http.
 	self validateRequest: http request.
 	result := http execute.
