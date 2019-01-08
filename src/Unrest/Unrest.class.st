@@ -164,7 +164,7 @@ Unrest >> implementorsOfPath: aPath [
 	| pathsAndMethods |
 
 	pathsAndMethods := (self class associatedEndpointClasses
-		reject: [ :each | each isAbstract ])
+		reject: [ :each | each isAbstractEndpoint ])
 		flatCollect: [ :each | each referencingPathsWithMethods ].
 	^ pathsAndMethods
 		select: [ :each | each value = aPath ]

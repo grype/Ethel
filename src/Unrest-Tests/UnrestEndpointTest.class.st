@@ -77,6 +77,12 @@ UnrestEndpointTest >> stubbedHttpWithResponse: aResponse [
 ]
 
 { #category : #'tests-composing' }
+UnrestEndpointTest >> testAbstractEndpoint [
+	UnrestAbstractTestEndpoint isAbstractEndpoint should be.
+	UnrestTestEndpoint isAbstractEndpoint should not be
+]
+
+{ #category : #'tests-composing' }
 UnrestEndpointTest >> testEndpointComposition [
 	| ep |
 

@@ -51,6 +51,13 @@ TUnrestEndpoint classSide >> isAbstract [
 ]
 
 { #category : #testing }
+TUnrestEndpoint classSide >> isAbstractEndpoint [
+	^ [ self endpointPath isNil ]
+		on: Exception
+		do: [ :err | true ]
+]
+
+{ #category : #testing }
 TUnrestEndpoint classSide >> isEndpointMethod: aCompiledMethod [
 	^ aCompiledMethod pragmas
 		detect: [ :pragma | self endpointPragmas includes: pragma keyword ]

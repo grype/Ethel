@@ -2,7 +2,7 @@ Extension { #name : #Unrest }
 
 { #category : #'*Unrest-Tools' }
 Unrest >> allReferencingPaths [
-	^ ((self class associatedEndpointClasses reject: #isAbstract)
+	^ ((self class associatedEndpointClasses reject: #isAbstractEndpoint)
 		flatCollect: [ :aCls | aCls referencingPaths ]) asSet
 		flatCollect: [ :aPath | 
 			| p result |
