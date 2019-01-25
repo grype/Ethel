@@ -24,7 +24,8 @@ Class {
 
 { #category : #configuring }
 UnrestPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
-	anEndpoint headers: headers
+	headers isEmptyOrNil
+		ifFalse: [ anEndpoint headersAddAll: headers associations ]
 ]
 
 { #category : #configuring }
@@ -78,6 +79,11 @@ UnrestPluggableEndpoint >> headerAt: aPropertyName put: aValue [
 { #category : #accessing }
 UnrestPluggableEndpoint >> headers [
 	^ headers
+]
+
+{ #category : #headers }
+UnrestPluggableEndpoint >> headersAddAll: aKeyedCollection [
+	headers addAll: aKeyedCollection 
 ]
 
 { #category : #headers }
