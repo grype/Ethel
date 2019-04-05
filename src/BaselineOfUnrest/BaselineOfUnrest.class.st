@@ -19,5 +19,5 @@ BaselineOfUnrest >> baseline: spec [
 				with: [ spec requires: #('Unrest' 'Roassal2') ].
 			spec
 				group: 'default' with: #('Unrest');
-				group: 'development' with: #('Unrest' 'Unrest-Tools') ]
+				group: 'develop' with: #('Unrest' 'Unrest-Tools') ]
 ]
