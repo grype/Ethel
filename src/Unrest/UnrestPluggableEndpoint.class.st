@@ -1,12 +1,12 @@
 "
-I am a pluggable endpoint primarily used for scripting interactions with a RESTful service. Subclasses of ==Unrest== and ==UnrestEndpoint== create instances of me via #/ method. I provide flexible interface for configuring request headers and data and implement common HTTP methods like GET, POST, PUT, PATCH and DELETE.
+I am a pluggable endpoint primarily used for scripting interactions with a web-based service. Both ==Unrest== and ==TUnrestEndpoint== create instances of me via #/ method. I provide flexible interface for configuring request headers and data and implement common HTTP methods like GET, POST, PUT, PATCH and DELETE.
 
 From any client or endpoint, simply send #/ with a path argument. The newly created instance of me will capture the resulting path: 
 
 client := Unrest withUrl: 'http://example.com'.
 client contentWriter: [ :obj | ZnEntity json: obj asJson ].
-(client / 'examples') get. ""GET /examples""
-(client / 'examples') data: aNewExample; put. ""PUT {aNewExample asJson}""
+(client / #examples) get. ""GET /examples""
+(client / #examples) data: aNewExample; put. ""PUT {aNewExample asJson}""
 "
 Class {
 	#name : #UnrestPluggableEndpoint,

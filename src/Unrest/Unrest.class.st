@@ -1,7 +1,7 @@
 "
-I am a RESTful network client.
+I am a general purpose web-based API client.
 
-I can be used as-is for scripting purposes. However, if you'd like to make explicit a particular API - do subclass me. I use ZincHTTPComponents for actual transport, and collaborate with instances of ==UnrestEndpoint== for configuring and executing HTTP requests.
+I am good at talking to RESTful APIs and the like, and can be used as-is for scripting purposes. However, if you'd like to make explicit a particular web-based API - do subclass me. I use ZincHTTPComponents for actual transport, and collaborate with instances of ==UnrestEndpoint== for configuring and executing HTTP requests.
 
 Instantiate me #withUrl:
 
@@ -24,7 +24,7 @@ response := (client / 'things')
 	post.
 	
 When subclassing:
-	* override #configureHttpClient: when there's a need to configure http transport with data not specific to a particular endpoint - endpoints get to configure transport before being executed.
+	* override #configureHttpClient: when there's a need to configure http transport with data not specific to a particular endpoint - endpoints also get to configure transport before being executed.
 	* override #validateResponse: for custom error handling
 
 It also helps to provide access to all top-level endpoints from within the subclass like this:
@@ -35,9 +35,7 @@ UnrestSubclass>>thingsEndpoint
 This way you could chain endpoints starting with the client:
 
 client foo bar get. ""GET /foo/bar""
-client foo bar title: 'Title'; body: 'Body'; post.
-
-See comment on ==UnrestEndpoint== for creating custom endpoints.
+client foo bar title: 'Title'; body: 'Body'; post. ""POST /foo/bar {data from #bar endpoint}""
 
 Instance Variables
 	baseUrl:		<ZnUrl>
