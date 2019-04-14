@@ -1,3 +1,42 @@
+"
+I encapsulate basic behavior of a web-based API endpoint.
+
+An endpoint object is meant to capture a specific functionality or a limited set of similar functionalities of a web-based service. In its simplest form - it would define instance variables for configuring an endpoint, and define messages to execute various aspects of the endpoint. In RESTful terms - instance variables are nouns and messages are verbs.
+
+I work in tandem with ==Unrest== to configure an http transport and execute requests. There's also ==UnrestPluggableEndpoint== which is commonly used when scripting.
+
+Instance Variables
+	unrest:		<Unrest>
+
+Example:
+
+Object subclass: #MyEndpoint
+	uses: TUnrestEndpoint
+	instanceVariableNames: 'query limit'
+	classVariableNames: ''
+	package: 'MyPackage'
+
+MyEndoint class>>endpointPath
+	^ Path / 'search'
+	
+MyEndpoint>>configureOn: http
+	http addQuery: { #query -> query. #limit -> limit } asDictionary.
+
+MyEndpoint>>search
+	<endpoint>
+	<get>
+	^ self execute
+
+A few things to keep in my mind when subclassing:
+	1. On the class side define #endpointPath that return a path relative to ==Unrest>>baseUrl==. This is required for organizational reason. Return root path, if there's nothing more specific. You can override this on the instance side.
+	2. Override #configureOn: to configure HTTP prior to executing requests.
+	4. When defining request-executing methods, you may include any of the following pragmas:
+	   <endpoint> - Indicates request-executing method (used for organizing endpoint)
+	   <endpoint: 'some/path'> - Indicates executing method and overrides value returned by #endpointPath
+	   <get> or <Any HTTP method> - Specifies HTTP method, applied after #configureOn:
+	5. Call TUnrestEndpoint>>execute to initiate request
+	   
+"
 Trait {
 	#name : #TUnrestEndpoint,
 	#instVars : [
