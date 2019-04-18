@@ -74,13 +74,16 @@ Unrest class >> endpointMethods [
 
 { #category : #introspection }
 Unrest class >> endpointMethodsOn: aClass [
-	^ (aClass methods
+	"Returns a Set of methods that yield to an endpoint"
+
+	^ ((aClass methods reject: #isFromTrait)
 		collect: [ :aMethod | 
 			aMethod
 				->
 					(aMethod allLiterals
-						select: [ :aLiteral | aLiteral value isClass and: [ aLiteral value isUnrestEndpoint ] ]) ])
-		select: [ :each | each value isNotEmpty ]
+						select:
+							[ :aLiteral | aLiteral value isClass and: [ aLiteral value isUnrestEndpoint ] ]) ]
+		as: Set) select: [ :each | each value isNotEmpty ]
 ]
 
 { #category : #'instance creation' }
