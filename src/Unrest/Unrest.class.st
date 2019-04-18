@@ -56,6 +56,7 @@ Class {
 
 { #category : #introspection }
 Unrest class >> associatedEndpointClasses [
+	"Returns a Set of all endpoint classes that can be derived from the client's class"
 	| methods referencedClasses rootEndpointClass |
 
 	methods := self endpointMethods.
@@ -69,6 +70,7 @@ Unrest class >> associatedEndpointClasses [
 
 { #category : #introspection }
 Unrest class >> endpointMethods [
+	"Returns a Set of methods that yield to an endpoint"
 	^ self endpointMethodsOn: self
 ]
 
