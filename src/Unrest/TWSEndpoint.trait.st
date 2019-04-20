@@ -66,8 +66,8 @@ TWSEndpoint classSide >> isAbstractEndpoint [
 ]
 
 { #category : #'instance creation' }
-TWSEndpoint classSide >> on: unrestClient [
-	^ self basicNew initializeOn: unrestClient
+TWSEndpoint classSide >> on: wsClient [
+	^ self basicNew initializeOn: wsClient
 ]
 
 { #category : #accessing }
