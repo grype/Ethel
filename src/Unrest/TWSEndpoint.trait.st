@@ -45,43 +45,14 @@ Trait {
 	#category : #'Unrest-Core'
 }
 
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointHttpMethodFromContext: aContext validMethods: aListOfMethods [
-	| validMethods |
-	validMethods := aListOfMethods collect: [ :each | each asLowercase asSymbol ].
-	^ aContext method pragmas
-		detect: [ :each | validMethods includes: each keyword asLowercase asSymbol ]
-		ifFound: [ :val | val keyword ]
-		ifNone: [ nil ]
-]
-
 { #category : #accessing }
 TWSEndpoint classSide >> endpointPath [
 	^ self subclassResponsibility
 ]
 
 { #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointPathFromContext: aContext [
-	^ aContext method isWSEndpointMethod
-		ifTrue: [ aContext method wsEndpointPath ]
-		ifFalse: [ nil ]
-]
-
-{ #category : #'accessing-context' }
 TWSEndpoint classSide >> endpointPathPragma [
 	^ WSClient endpointPathPragma 
-]
-
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointTempsFromContext: aContext [
-	^ (aContext tempNames collect: [ :each | each -> (aContext tempNamed: each) ]) asDictionary
-]
-
-{ #category : #configuring }
-TWSEndpoint classSide >> endpointValuesFromContext: aContext [
-	^ aContext receiver class allSlots
-		ifEmpty: [ Dictionary new ]
-		ifNotEmpty: [ :val | (val groupedBy: #name) collect: [ :each | each first read: aContext receiver ] ]
 ]
 
 { #category : #testing }
@@ -181,16 +152,19 @@ TWSEndpoint >> prepareForExecutingOn: http [
 	| effectivePath contextValues segments |
 
 	effectivePath := self endpointPath.
-	contextValues := self class endpointValuesFromContext: thisContext.
+	contextValues := thisContext wsEndpointValues.
 
 	self executingContext
 		ifNotNil: [ :context | 
-			(self class endpointPathFromContext: context) ifNotNil: [ :val | effectivePath := val ].
-			(self class endpointHttpMethodFromContext: context validMethods: wsClient class supportedHttpMethods)
+			context wsEndpointPath ifNotNil: [ :val | effectivePath := val ].
+			(context
+				wsEndpointHttpMethodUsing: wsClient class supportedHttpMethods)
 				ifNotNil: [ :val | http method: val asUppercase asSymbol ].
-			(self class endpointTempsFromContext: context) ifNotEmpty: [ :val | contextValues addAll: val ] ].
+			context wsEndpointTemps
+				ifNotEmpty: [ :val | contextValues addAll: val ] ].
 
-	segments := effectivePath segments collect: [ :segment | segment format: contextValues ].
+	segments := effectivePath segments
+		collect: [ :segment | segment format: contextValues ].
 	http url: wsClient baseUrl / segments
 ]
 
