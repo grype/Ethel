@@ -47,16 +47,19 @@ Trait {
 
 { #category : #accessing }
 TWSEndpoint classSide >> endpointPath [
+	"Instance of Path that represents a logical endpoint whose behavior is encapsulated by the implementing class. This value can be overriden in two places: 1) instance side #endpointPath and 2) at a method level by declarating there a pragma with the keyword returned by #endpointPathPragma"
 	^ self subclassResponsibility
 ]
 
 { #category : #'accessing-context' }
 TWSEndpoint classSide >> endpointPathPragma [
+	"By default retuns keywords defined by the framework, but can be overriden at the level of the endpoint itself"
 	^ WSClient endpointPathPragma 
 ]
 
 { #category : #testing }
 TWSEndpoint classSide >> isAbstractEndpoint [
+	"Returns true if the endpoint is abstract - meaning, it does not implement any methods that execute requests (in other words - not marked with http method pragma like <get>..."
 	^ [ self endpointPath isNil ]
 		on: Exception
 		do: [ :err | true ]

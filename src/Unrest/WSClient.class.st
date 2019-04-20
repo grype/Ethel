@@ -70,11 +70,13 @@ WSClient class >> associatedEndpointClasses [
 
 { #category : #defaults }
 WSClient class >> endpointPathPragma [
+	"Pragma used by methods of an endpoint class that override its #endpointPath"
 	^ #endpoint:
 ]
 
 { #category : #http }
 WSClient class >> supportedHttpMethods [
+	"Returns array of supported HTTP methods. These are used to identify and verify executing endpoint methods - any such method should declare a corresponding pragma."
 	^ #(#get #post #put #patch #delete #options)
 ]
 
