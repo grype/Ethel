@@ -74,8 +74,9 @@ TWSEndpoint classSide >> referencingPaths [
 
 { #category : #accessing }
 TWSEndpoint classSide >> referencingPathsWithMethods [
-	^ ((WSClient endpointMethodsOn: self)
-		collect: [ :aMethod | aMethod -> aMethod wsEndpointPath pathString ]) asSet
+	^ (self wsEndpointMethods
+		collect: [ :aMethod | aMethod -> (aMethod key wsEndpointPath pathString) ])
+		asSet
 ]
 
 { #category : #'accessing-context' }

@@ -59,33 +59,13 @@ WSClient class >> associatedEndpointClasses [
 	"Returns a Set of all endpoint classes that can be derived from the client's class"
 	| methods referencedClasses rootEndpointClass |
 
-	methods := self endpointMethods.
+	methods := self wsEndpointMethods.
 	referencedClasses := ((methods flatCollect: [ :each | each value ])
 		collect: #value) asSet.
 	rootEndpointClass := (referencedClasses
 		flatCollect: [ :each | each withAllSuperclasses ])
 		select: [ :each | each traitComposition includesTrait: TWSEndpoint ].
 	^ (rootEndpointClass flatCollect: #withAllSubclasses)
-]
-
-{ #category : #introspection }
-WSClient class >> endpointMethods [
-	"Returns a Set of methods that yield to an endpoint"
-	^ self endpointMethodsOn: self
-]
-
-{ #category : #introspection }
-WSClient class >> endpointMethodsOn: aClass [
-	"Returns a Set of methods that yield to an endpoint"
-
-	^ ((aClass methods reject: #isFromTrait)
-		collect: [ :aMethod | 
-			aMethod
-				->
-					(aMethod allLiterals
-						select:
-							[ :aLiteral | aLiteral value isClass and: [ aLiteral value isWSEndpoint ] ]) ]
-		as: Set) select: [ :each | each value isNotEmpty ]
 ]
 
 { #category : #defaults }

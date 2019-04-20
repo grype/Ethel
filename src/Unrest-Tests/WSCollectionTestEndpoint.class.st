@@ -17,17 +17,6 @@ WSCollectionTestEndpoint class >> endpointPath [
 	^ Path / 'another-test'
 ]
 
-{ #category : #'as yet unclassified' }
-WSCollectionTestEndpoint class >> referencingPathsWithMethods [
-	^ ((WSClient endpointMethodsOn: self)
-		collect: [ :aMethod | 
-			aMethod
-				->
-					((aMethod key pragmaAt: #endpoint:)
-						ifNil: [ self endpointPath ]
-						ifNotNil: [ :val | self endpointPath / val arguments first ]) ]) asSet
-]
-
 { #category : #enumerating }
 WSCollectionTestEndpoint >> cursor [
 	^ WSTestCursor new
