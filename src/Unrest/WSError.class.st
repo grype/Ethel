@@ -1,10 +1,10 @@
 Class {
-	#name : #UnrestError,
+	#name : #WSError,
 	#superclass : #Error,
 	#category : #'Unrest-Core'
 }
 
 { #category : #private }
-UnrestError >> isResumable [
+WSError >> isResumable [
 	^ true
 ]

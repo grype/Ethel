@@ -1,8 +1,8 @@
 Class {
-	#name : #UnrestTestCursor,
+	#name : #WSTestCursor,
 	#superclass : #Object,
-	#traits : 'TUnrestEnumerationCursor',
-	#classTraits : 'TUnrestEnumerationCursor classTrait',
+	#traits : 'TWSEnumerationCursor',
+	#classTraits : 'TWSEnumerationCursor classTrait',
 	#instVars : [
 		'offset',
 		'total'
@@ -11,26 +11,26 @@ Class {
 }
 
 { #category : #enumerating }
-UnrestTestCursor >> hasMore [
+WSTestCursor >> hasMore [
 	^ offset < total
 ]
 
 { #category : #accessing }
-UnrestTestCursor >> offset [
+WSTestCursor >> offset [
 	^ offset
 ]
 
 { #category : #accessing }
-UnrestTestCursor >> offset: anObject [
+WSTestCursor >> offset: anObject [
 	offset := anObject
 ]
 
 { #category : #accessing }
-UnrestTestCursor >> total [
+WSTestCursor >> total [
 	^ total
 ]
 
 { #category : #accessing }
-UnrestTestCursor >> total: anObject [
+WSTestCursor >> total: anObject [
 	total := anObject
 ]

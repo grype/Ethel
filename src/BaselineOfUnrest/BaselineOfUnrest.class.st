@@ -11,14 +11,14 @@ BaselineOfUnrest >> baseline: spec [
 		for: #common
 		do: [ spec repository: 'github://grype/Unrest/src'.
 			self dependencies: spec.
-			spec package: #Unrest.
-			spec package: #'Unrest-Tests' with: [ spec requires: #('Unrest' 'Mocketry') ].
+			spec package: #WSClient.
+			spec package: #'Unrest-Tests' with: [ spec requires: #(#WSClient 'Mocketry') ].
 			spec
 				package: #'Unrest-Tools'
-				with: [ spec requires: #('Unrest' 'Roassal2') ].
+				with: [ spec requires: #(#WSClient 'Roassal2') ].
 			spec
-				group: 'default' with: #('Unrest' 'Unrest-Tests');
-				group: 'core' with: #('Unrest');
+				group: 'default' with: #(#WSClient 'Unrest-Tests');
+				group: 'core' with: #(#WSClient);
 				group: 'tools' with: #('Unrest-Tools') ]
 ]
 

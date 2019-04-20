@@ -46,17 +46,17 @@ ep collect: #yourself.
 etc...
 "
 Trait {
-	#name : #TUnrestEnumerating,
+	#name : #TWSEnumeration,
 	#category : #'Unrest-Core'
 }
 
 { #category : #enumerating }
-TUnrestEnumerating >> collect: aBlock [
+TWSEnumeration >> collect: aBlock [
 	^ self collect: aBlock as: OrderedCollection 
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> collect: aBlock as: aClass [
+TWSEnumeration >> collect: aBlock as: aClass [
 	| result cursor |
 
 	result := aClass new.
@@ -67,7 +67,7 @@ TUnrestEnumerating >> collect: aBlock as: aClass [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> collect: aBlock into: aCollection [
+TWSEnumeration >> collect: aBlock into: aCollection [
 	| cursor |
 
 	cursor := self cursor.
@@ -77,22 +77,22 @@ TUnrestEnumerating >> collect: aBlock into: aCollection [
 ]
 
 { #category : #accessing }
-TUnrestEnumerating >> cursor [
+TWSEnumeration >> cursor [
 	^ self subclassResponsibility
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> detect: aBlock [ 
+TWSEnumeration >> detect: aBlock [ 
 	^ self detect: aBlock ifNone: [ self errorNotFound: aBlock ]
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> detect: aBlock ifFound: foundBlock [
+TWSEnumeration >> detect: aBlock ifFound: foundBlock [
 	^ self detect: aBlock ifFound: foundBlock ifNone: [ nil ]
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> detect: aBlock ifFound: foundBlock ifNone: noneBlock [
+TWSEnumeration >> detect: aBlock ifFound: foundBlock ifNone: noneBlock [
 	| cursor |
 
 	cursor := self cursor.
@@ -103,12 +103,12 @@ TUnrestEnumerating >> detect: aBlock ifFound: foundBlock ifNone: noneBlock [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> detect: aBlock ifNone: exceptionBlock [
+TWSEnumeration >> detect: aBlock ifNone: exceptionBlock [
 	^ self detect: aBlock ifFound: [ :val | val ] ifNone: exceptionBlock 
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> do: aBlock [
+TWSEnumeration >> do: aBlock [
 	| cursor |
 
 	cursor := self cursor.
@@ -116,7 +116,7 @@ TUnrestEnumerating >> do: aBlock [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> do: aBlock separatedBy: separatorBlock [
+TWSEnumeration >> do: aBlock separatedBy: separatorBlock [
 	| cursor |
 
 	cursor := self cursor.
@@ -126,34 +126,34 @@ TUnrestEnumerating >> do: aBlock separatedBy: separatorBlock [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> enumerateWith: aCursor [
+TWSEnumeration >> enumerateWith: aCursor [
 	^ self enumerateWith: aCursor limit: nil
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> enumerateWith: aCursor limit: anInt [
+TWSEnumeration >> enumerateWith: aCursor limit: anInt [
 	^ self subclassResponsibility
 ]
 
 { #category : #'error handling' }
-TUnrestEnumerating >> errorNotFound: anObject [
+TWSEnumeration >> errorNotFound: anObject [
 	"Raise a NotFound exception."
 
 	NotFound signalFor: anObject
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> first [
+TWSEnumeration >> first [
 	^ (self first: 1) ifNotNil: [ :values | values first ]
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> first: aLimit [
+TWSEnumeration >> first: aLimit [
 	^ self enumerateWith: self cursor limit: aLimit
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> groupedBy: aBlock [
+TWSEnumeration >> groupedBy: aBlock [
 	| cursor groups |
 
 	groups := PluggableDictionary integerDictionary.
@@ -168,12 +168,12 @@ TUnrestEnumerating >> groupedBy: aBlock [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> groupedBy: aBlock having: aSelectionBlock [
+TWSEnumeration >> groupedBy: aBlock having: aSelectionBlock [
 	^ (self groupedBy: aBlock) select: aSelectionBlock
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> inject: thisValue into: binaryBlock [
+TWSEnumeration >> inject: thisValue into: binaryBlock [
 	| cursor nextValue |
 
 	nextValue := thisValue.
@@ -185,17 +185,17 @@ TUnrestEnumerating >> inject: thisValue into: binaryBlock [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> next: anInt with: aCursor [
+TWSEnumeration >> next: anInt with: aCursor [
 	^ self enumerateWith: aCursor limit: anInt
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> nextWith: aCursor [
+TWSEnumeration >> nextWith: aCursor [
 	^ self enumerateWith: aCursor
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> reject: aBlock [
+TWSEnumeration >> reject: aBlock [
 	| result cursor |
 
 	result := OrderedCollection new.
@@ -208,7 +208,7 @@ TUnrestEnumerating >> reject: aBlock [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> select: aBlock [
+TWSEnumeration >> select: aBlock [
 	| result cursor |
 
 	result := OrderedCollection new.
@@ -220,7 +220,7 @@ TUnrestEnumerating >> select: aBlock [
 ]
 
 { #category : #enumerating }
-TUnrestEnumerating >> select: selectBlock thenCollect: collectBlock [
+TWSEnumeration >> select: selectBlock thenCollect: collectBlock [
 	| result cursor |
 
 	result := OrderedCollection new.

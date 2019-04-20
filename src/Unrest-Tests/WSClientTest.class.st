@@ -1,5 +1,5 @@
 Class {
-	#name : #UnrestTest,
+	#name : #WSClientTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'client'
@@ -8,21 +8,21 @@ Class {
 }
 
 { #category : #running }
-UnrestTest >> setUp [
-	client := UnrestTestClient default
+WSClientTest >> setUp [
+	client := WSTestClient default
 ]
 
 { #category : #tests }
-UnrestTest >> testEndpointComposition [
+WSClientTest >> testEndpointComposition [
 	| ep |
-	ep := client > UnrestTestEndpoint.
-	ep class should equal: UnrestTestEndpoint.
-	ep unrest should equal: client.
-	ep endpointPath should equal: UnrestTestEndpoint endpointPath.
+	ep := client > WSTestEndpoint.
+	ep class should equal: WSTestEndpoint.
+	ep wsClient should equal: client.
+	ep endpointPath should equal: WSTestEndpoint endpointPath.
 ]
 
 { #category : #tests }
-UnrestTest >> testExecution [
+WSClientTest >> testExecution [
 	| ep http response |
 
 	http := ZnClient new.
@@ -46,36 +46,34 @@ UnrestTest >> testExecution [
 ]
 
 { #category : #tests }
-UnrestTest >> testHttpClientCreation [
+WSClientTest >> testHttpClientCreation [
 	client stub.
 	client createHttpClient.
 	client should receive configureHttpClient: (Instance of: ZnClient)
 ]
 
 { #category : #tests }
-UnrestTest >> testHttpMethodValidation [
-	client stub.
-	client allowedHttpMethods do: [ :each | (client validateMethod: each) should be ].
-	[ client validateMethod: #foo ] should raise: UnrestError
-]
-
-{ #category : #tests }
-UnrestTest >> testImplementorsOfPath [
+WSClientTest >> testImplementorsOfPath [
 	| implementors |
-	implementors := client implementorsOfPath: UnrestTestEndpoint endpointPath.
+	implementors := client implementorsOfPath: WSTestEndpoint endpointPath.
 	implementors isEmptyOrNil should not be
 ]
 
 { #category : #tests }
-UnrestTest >> testInitialization [
+WSClientTest >> testInitialization [
 	client baseUrl should equal: client class baseUrl 
 ]
 
 { #category : #tests }
-UnrestTest >> testPluggableEndpointComposition [
+WSClientTest >> testIsWSEndpoint [
+	client class isWSEndpoint should not
+]
+
+{ #category : #tests }
+WSClientTest >> testPluggableEndpointComposition [
 	| ep |
 	ep := client / 'pluggable'.
-	ep class should equal: UnrestPluggableEndpoint.
-	ep unrest should equal: client.
+	ep class should equal: WSPluggableEndpoint.
+	ep wsClient should equal: client.
 	ep endpointPath should equal: Path / 'pluggable'.
 ]

@@ -38,15 +38,15 @@ A few things to keep in my mind when subclassing:
 	   
 "
 Trait {
-	#name : #TUnrestEndpoint,
+	#name : #TWSEndpoint,
 	#instVars : [
-		'unrest'
+		'wsClient'
 	],
 	#category : #'Unrest-Core'
 }
 
 { #category : #'accessing-context' }
-TUnrestEndpoint classSide >> endpointHttpMethodFromContext: aContext validMethods: aListOfMethods [
+TWSEndpoint classSide >> endpointHttpMethodFromContext: aContext validMethods: aListOfMethods [
 	| validMethods |
 	validMethods := aListOfMethods collect: [ :each | each asLowercase asSymbol ].
 	^ aContext method pragmas
@@ -56,141 +56,128 @@ TUnrestEndpoint classSide >> endpointHttpMethodFromContext: aContext validMethod
 ]
 
 { #category : #accessing }
-TUnrestEndpoint classSide >> endpointPath [
+TWSEndpoint classSide >> endpointPath [
 	^ self subclassResponsibility
 ]
 
 { #category : #'accessing-context' }
-TUnrestEndpoint classSide >> endpointPathFromContext: aContext [
-	^ (aContext method pragmaAt: #endpoint:) ifNotNil: [ :pragma | pragma arguments first ]
-]
-
-{ #category : #defaults }
-TUnrestEndpoint classSide >> endpointPragmas [
-	^ #(#endpoint #endpoint:)
+TWSEndpoint classSide >> endpointPathFromContext: aContext [
+	^ aContext method isWSEndpointMethod
+		ifTrue: [ aContext method wsEndpointPath ]
+		ifFalse: [ nil ]
 ]
 
 { #category : #'accessing-context' }
-TUnrestEndpoint classSide >> endpointTempsFromContext: aContext [
+TWSEndpoint classSide >> endpointPathPragma [
+	^ WSClient endpointPathPragma 
+]
+
+{ #category : #'accessing-context' }
+TWSEndpoint classSide >> endpointTempsFromContext: aContext [
 	^ (aContext tempNames collect: [ :each | each -> (aContext tempNamed: each) ]) asDictionary
 ]
 
 { #category : #configuring }
-TUnrestEndpoint classSide >> endpointValuesFromContext: aContext [
+TWSEndpoint classSide >> endpointValuesFromContext: aContext [
 	^ aContext receiver class allSlots
 		ifEmpty: [ Dictionary new ]
 		ifNotEmpty: [ :val | (val groupedBy: #name) collect: [ :each | each first read: aContext receiver ] ]
 ]
 
 { #category : #testing }
-TUnrestEndpoint classSide >> isAbstract [
+TWSEndpoint classSide >> isAbstractEndpoint [
 	^ [ self endpointPath isNil ]
 		on: Exception
 		do: [ :err | true ]
-]
-
-{ #category : #testing }
-TUnrestEndpoint classSide >> isAbstractEndpoint [
-	^ [ self endpointPath isNil ]
-		on: Exception
-		do: [ :err | true ]
-]
-
-{ #category : #testing }
-TUnrestEndpoint classSide >> isEndpointMethod: aCompiledMethod [
-	^ aCompiledMethod pragmas
-		detect: [ :pragma | self endpointPragmas includes: pragma keyword ]
-		ifFound: [ true ]
-		ifNone: [ false ]
 ]
 
 { #category : #'instance creation' }
-TUnrestEndpoint classSide >> on: unrestClient [
+TWSEndpoint classSide >> on: unrestClient [
 	^ self basicNew initializeOn: unrestClient
 ]
 
 { #category : #accessing }
-TUnrestEndpoint classSide >> referencingPaths [
+TWSEndpoint classSide >> referencingPaths [
 	^ self referencingPathsWithMethods collect: #value
 ]
 
 { #category : #accessing }
-TUnrestEndpoint classSide >> referencingPathsWithMethods [
-	^ ((Unrest endpointMethodsOn: self)
-		collect: [ :aMethod | 
-			aMethod
-				->
-					((aMethod key pragmaAt: #endpoint:)
-						ifNil: [ self endpointPath ]
-						ifNotNil: [ :val | self endpointPath / val arguments first ]) ]) asSet
+TWSEndpoint classSide >> referencingPathsWithMethods [
+	^ ((WSClient endpointMethodsOn: self)
+		collect: [ :aMethod | aMethod -> aMethod wsEndpointPath pathString ]) asSet
+]
+
+{ #category : #'accessing-context' }
+TWSEndpoint classSide >> supportedHttpMethods [
+	^ WSClient supportedHttpMethods 
 ]
 
 { #category : #icons }
-TUnrestEndpoint classSide >> systemIconName [
+TWSEndpoint classSide >> systemIconName [
 	^ self isTrait
 		ifTrue: [ super systemIconName ]
 		ifFalse: [ #hierarchy ]
 ]
 
 { #category : #endpoints }
-TUnrestEndpoint >> / aString [
+TWSEndpoint >> / aString [
 	"Creates a new generic endpoint by appending a new path."
 
-	^ (self > UnrestPluggableEndpoint)
+	^ (self > WSPluggableEndpoint)
 		path: self endpointPath / aString;
 		yourself
 ]
 
 { #category : #endpoints }
-TUnrestEndpoint >> > endPointClass [
+TWSEndpoint >> > endPointClass [
 	"Creates a new endpoint of specified class."
 
 	| newEndpoint |
 
-	newEndpoint := endPointClass on: unrest.
+	newEndpoint := endPointClass on: wsClient.
 	self configureDerivedEndpoint: newEndpoint.
 	^ newEndpoint 
 ]
 
 { #category : #configuring }
-TUnrestEndpoint >> configureDerivedEndpoint: anEndpoint [
+TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
 	"Configures newly derived endpoint"
 ]
 
 { #category : #configuring }
-TUnrestEndpoint >> configureOn: http [
+TWSEndpoint >> configureOn: http [
 	"Configures http transport prior to execution"
 ]
 
 { #category : #accessing }
-TUnrestEndpoint >> endpointPath [
+TWSEndpoint >> endpointPath [
 	^ self class endpointPath 
 ]
 
 { #category : #executing }
-TUnrestEndpoint >> execute [
-	^ unrest execute: self
+TWSEndpoint >> execute [
+	^ wsClient execute: self
 ]
 
 { #category : #executing }
-TUnrestEndpoint >> executingContext [
+TWSEndpoint >> executingContext [
 	| sender |
 
 	sender := thisContext sender.
-	[ sender isNotNil and: [ (self class isEndpointMethod: sender method) not ] ]
+	[ sender isNotNil and: [ sender method isWSEndpointMethod not ] ]
 		whileTrue: [ sender := sender sender ].
 
 	^ sender
 ]
 
 { #category : #initialization }
-TUnrestEndpoint >> initializeOn: aClient [
+TWSEndpoint >> initializeOn: aClient [
 	self initialize.
-	unrest := aClient
+	wsClient := aClient
 ]
 
 { #category : #configuring }
-TUnrestEndpoint >> prepareForExecutingOn: http [
+TWSEndpoint >> prepareForExecutingOn: http [
 	| effectivePath contextValues segments |
 
 	effectivePath := self endpointPath.
@@ -198,16 +185,16 @@ TUnrestEndpoint >> prepareForExecutingOn: http [
 
 	self executingContext
 		ifNotNil: [ :context | 
-			(self class endpointPathFromContext: context) ifNotNil: [ :val | effectivePath := effectivePath / val ].
-			(self class endpointHttpMethodFromContext: context validMethods: unrest allowedHttpMethods)
+			(self class endpointPathFromContext: context) ifNotNil: [ :val | effectivePath := val ].
+			(self class endpointHttpMethodFromContext: context validMethods: wsClient class supportedHttpMethods)
 				ifNotNil: [ :val | http method: val asUppercase asSymbol ].
 			(self class endpointTempsFromContext: context) ifNotEmpty: [ :val | contextValues addAll: val ] ].
 
 	segments := effectivePath segments collect: [ :segment | segment format: contextValues ].
-	http url: unrest baseUrl / segments
+	http url: wsClient baseUrl / segments
 ]
 
 { #category : #accessing }
-TUnrestEndpoint >> unrest [
-	^ unrest
+TWSEndpoint >> wsClient [
+	^ wsClient
 ]

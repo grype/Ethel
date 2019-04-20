@@ -9,10 +9,10 @@ client contentWriter: [ :obj | ZnEntity json: obj asJson ].
 (client / #examples) data: aNewExample; put. ""PUT {aNewExample asJson}""
 "
 Class {
-	#name : #UnrestPluggableEndpoint,
+	#name : #WSPluggableEndpoint,
 	#superclass : #Object,
-	#traits : 'TUnrestEndpoint',
-	#classTraits : 'TUnrestEndpoint classTrait',
+	#traits : 'TWSEndpoint',
+	#classTraits : 'TWSEndpoint classTrait',
 	#instVars : [
 		'path',
 		'data',
@@ -22,14 +22,23 @@ Class {
 	#category : #'Unrest-Core'
 }
 
+{ #category : #endpoints }
+WSPluggableEndpoint >> / aString [
+	"Creates a new generic endpoint by appending a new path."
+
+	^ (self > WSPluggableEndpoint)
+		path: self endpointPath / aString;
+		yourself
+]
+
 { #category : #configuring }
-UnrestPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
+WSPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
 	headers isEmptyOrNil
 		ifFalse: [ anEndpoint headersAddAll: headers associations ]
 ]
 
 { #category : #configuring }
-UnrestPluggableEndpoint >> configureOn: http [
+WSPluggableEndpoint >> configureOn: http [
 	data
 		ifNotNil: [ :aData | 
 			method = #get
@@ -41,93 +50,111 @@ UnrestPluggableEndpoint >> configureOn: http [
 ]
 
 { #category : #accessing }
-UnrestPluggableEndpoint >> data [
+WSPluggableEndpoint >> data [
 	^ data
 ]
 
 { #category : #accessing }
-UnrestPluggableEndpoint >> data: anObject [
+WSPluggableEndpoint >> data: anObject [
 	data := anObject
 ]
 
 { #category : #api }
-UnrestPluggableEndpoint >> delete [
+WSPluggableEndpoint >> delete [
 	^ self executeHttpMethod: #delete
 ]
 
 { #category : #accessing }
-UnrestPluggableEndpoint >> endpointPath [
+WSPluggableEndpoint >> endpointPath [
 	^ path
 ]
 
 { #category : #api }
-UnrestPluggableEndpoint >> executeHttpMethod: aMethod [
+WSPluggableEndpoint >> executeHttpMethod: aMethod [
 	method := aMethod.
 	^ unrest execute: self
 ]
 
 { #category : #api }
-UnrestPluggableEndpoint >> get [
+WSPluggableEndpoint >> get [
 	^ self executeHttpMethod: #get
 ]
 
 { #category : #headers }
-UnrestPluggableEndpoint >> headerAt: aPropertyName put: aValue [
+WSPluggableEndpoint >> headerAt: aPropertyName put: aValue [
 	headers at: aPropertyName put: aValue
 ]
 
 { #category : #accessing }
-UnrestPluggableEndpoint >> headers [
+WSPluggableEndpoint >> headers [
 	^ headers
 ]
 
 { #category : #headers }
-UnrestPluggableEndpoint >> headersAddAll: aKeyedCollection [
+WSPluggableEndpoint >> headersAddAll: aKeyedCollection [
 	headers addAll: aKeyedCollection 
 ]
 
 { #category : #headers }
-UnrestPluggableEndpoint >> headersRemoveAll [
+WSPluggableEndpoint >> headersRemoveAll [
 	headers removeAll
 ]
 
 { #category : #headers }
-UnrestPluggableEndpoint >> headersRemoveAt: aName [
+WSPluggableEndpoint >> headersRemoveAt: aName [
 	headers remove: aName ifAbsent: [  ]
 ]
 
 { #category : #initialization }
-UnrestPluggableEndpoint >> initialize [
+WSPluggableEndpoint >> initialize [
 	super initialize.
 	self initializeHeaders.
 ]
 
 { #category : #initialization }
-UnrestPluggableEndpoint >> initializeHeaders [
+WSPluggableEndpoint >> initializeHeaders [
 	headers := Dictionary new
 ]
 
 { #category : #api }
-UnrestPluggableEndpoint >> patch [
+WSPluggableEndpoint >> patch [
 	^ self executeHttpMethod: #patch
 ]
 
 { #category : #accessing }
-UnrestPluggableEndpoint >> path [
+WSPluggableEndpoint >> path [
 	^ path
 ]
 
 { #category : #accessing }
-UnrestPluggableEndpoint >> path: anObject [
+WSPluggableEndpoint >> path: anObject [
 	path := anObject
 ]
 
 { #category : #api }
-UnrestPluggableEndpoint >> post [
+WSPluggableEndpoint >> post [
 	^ self executeHttpMethod: #post
 ]
 
+{ #category : #configuring }
+WSPluggableEndpoint >> prepareForExecutingOn: http [
+	| effectivePath contextValues segments |
+
+	effectivePath := self endpointPath.
+	contextValues := self class endpointValuesFromContext: thisContext.
+
+	self executingContext
+		ifNotNil: [ :context | 
+			(self class endpointPathFromContext: context) ifNotNil: [ :val | effectivePath := effectivePath / val ].
+			(self class endpointHttpMethodFromContext: context validMethods: wsClient class supportedHttpMethods)
+				ifNotNil: [ :val | http method: val asUppercase asSymbol ].
+			(self class endpointTempsFromContext: context) ifNotEmpty: [ :val | contextValues addAll: val ] ].
+
+	segments := effectivePath segments collect: [ :segment | segment format: contextValues ].
+	http url: wsClient baseUrl / segments
+]
+
 { #category : #api }
-UnrestPluggableEndpoint >> put [
+WSPluggableEndpoint >> put [
 	^ self executeHttpMethod: #put
 ]

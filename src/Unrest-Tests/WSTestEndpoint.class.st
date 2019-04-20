@@ -1,53 +1,64 @@
 Class {
-	#name : #UnrestTestEndpoint,
+	#name : #WSTestEndpoint,
 	#superclass : #Object,
-	#traits : 'TUnrestTestEndpoint',
-	#classTraits : 'TUnrestTestEndpoint classTrait',
+	#traits : 'TWSTestEndpoint',
+	#classTraits : 'TWSTestEndpoint classTrait',
 	#category : #'Unrest-Tests-Models'
 }
 
 { #category : #accessing }
-UnrestTestEndpoint class >> endpointPath [
+WSTestEndpoint class >> endpointPath [
 	^ Path / 'test'
 ]
 
+{ #category : #'as yet unclassified' }
+WSTestEndpoint class >> referencingPathsWithMethods [
+	^ ((WSClient endpointMethodsOn: self)
+		collect: [ :aMethod | 
+			aMethod
+				->
+					((aMethod key pragmaAt: #endpoint:)
+						ifNil: [ self endpointPath ]
+						ifNotNil: [ :val | self endpointPath / val arguments first ]) ]) asSet
+]
+
 { #category : #api }
-UnrestTestEndpoint >> delete [
+WSTestEndpoint >> delete [
 	<endpoint>
 	<delete>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> get [
+WSTestEndpoint >> get [
 	<endpoint>
 	<get>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> getAbsolute [
+WSTestEndpoint >> getAbsolute [
 	<endpoint: '/absolute'>
 	<get>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> getAbsoluteDeep [
+WSTestEndpoint >> getAbsoluteDeep [
 	<endpoint: '/absolute/deep/path'>
 	<get>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> getAbsoluteKeyword: anArgument [
+WSTestEndpoint >> getAbsoluteKeyword: anArgument [
 	<endpoint: '/{anArgument}'>
 	<get>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> getAbsoluteMixed: anArgument [
+WSTestEndpoint >> getAbsoluteMixed: anArgument [
 	<endpoint: '/absolute/{local}/{anArgument}/path'>
 	<get>
 	| local |
@@ -56,28 +67,28 @@ UnrestTestEndpoint >> getAbsoluteMixed: anArgument [
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> getRelative [
+WSTestEndpoint >> getRelative [
 	<endpoint: 'relative'>
 	<get>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> getRelativeDeep [
+WSTestEndpoint >> getRelativeDeep [
 	<endpoint: 'relative/deep/path'>
 	<get>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> getRelativeKeyword: anArgument [
+WSTestEndpoint >> getRelativeKeyword: anArgument [
 	<endpoint: '{anArgument}'>
 	<get>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> getRelativeMixed: anArgument [
+WSTestEndpoint >> getRelativeMixed: anArgument [
 	<endpoint: 'relative/{local}/{anArgument}/path'>
 	<get>
 	| local |
@@ -86,28 +97,28 @@ UnrestTestEndpoint >> getRelativeMixed: anArgument [
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> options [
+WSTestEndpoint >> options [
 	<endpoint>
 	<options>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> patch [
+WSTestEndpoint >> patch [
 	<endpoint>
 	<patch>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> post [
+WSTestEndpoint >> post [
 	<endpoint>
 	<post>
 	^ self execute
 ]
 
 { #category : #api }
-UnrestTestEndpoint >> put [
+WSTestEndpoint >> put [
 	<endpoint>
 	<put>
 	^ self execute

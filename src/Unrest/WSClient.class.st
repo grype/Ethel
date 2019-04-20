@@ -1,7 +1,7 @@
 "
 I am a general purpose web-based API client.
 
-I am good at talking to RESTful APIs and the like, and can be used as-is for scripting purposes. However, if you'd like to make explicit a particular web-based API - do subclass me. I use ZincHTTPComponents for actual transport, and collaborate with instances of ==UnrestEndpoint== for configuring and executing HTTP requests.
+I am good at talking to RESTful APIs and the like, and can be used as-is for scripting purposes. However, if you'd like to make explicit a particular web-based API - do subclass me. I use ZincHTTPComponents for actual transport, and collaborate with instances implementing ==WSEndpoint== for configuring and executing HTTP requests.
 
 Instantiate me #withUrl:
 
@@ -44,7 +44,7 @@ Instance Variables
 
 "
 Class {
-	#name : #Unrest,
+	#name : #WSClient,
 	#superclass : #Object,
 	#instVars : [
 		'baseUrl',
@@ -55,7 +55,7 @@ Class {
 }
 
 { #category : #introspection }
-Unrest class >> associatedEndpointClasses [
+WSClient class >> associatedEndpointClasses [
 	"Returns a Set of all endpoint classes that can be derived from the client's class"
 	| methods referencedClasses rootEndpointClass |
 
@@ -64,18 +64,18 @@ Unrest class >> associatedEndpointClasses [
 		collect: #value) asSet.
 	rootEndpointClass := (referencedClasses
 		flatCollect: [ :each | each withAllSuperclasses ])
-		select: [ :each | each traitComposition includesTrait: TUnrestEndpoint ].
+		select: [ :each | each traitComposition includesTrait: TWSEndpoint ].
 	^ (rootEndpointClass flatCollect: #withAllSubclasses)
 ]
 
 { #category : #introspection }
-Unrest class >> endpointMethods [
+WSClient class >> endpointMethods [
 	"Returns a Set of methods that yield to an endpoint"
 	^ self endpointMethodsOn: self
 ]
 
 { #category : #introspection }
-Unrest class >> endpointMethodsOn: aClass [
+WSClient class >> endpointMethodsOn: aClass [
 	"Returns a Set of methods that yield to an endpoint"
 
 	^ ((aClass methods reject: #isFromTrait)
@@ -84,65 +84,70 @@ Unrest class >> endpointMethodsOn: aClass [
 				->
 					(aMethod allLiterals
 						select:
-							[ :aLiteral | aLiteral value isClass and: [ aLiteral value isUnrestEndpoint ] ]) ]
+							[ :aLiteral | aLiteral value isClass and: [ aLiteral value isWSEndpoint ] ]) ]
 		as: Set) select: [ :each | each value isNotEmpty ]
 ]
 
+{ #category : #defaults }
+WSClient class >> endpointPathPragma [
+	^ #endpoint:
+]
+
+{ #category : #http }
+WSClient class >> supportedHttpMethods [
+	^ #(#get #post #put #patch #delete #options)
+]
+
 { #category : #'instance creation' }
-Unrest class >> withUrl: aUrl [
+WSClient class >> withUrl: aUrl [
 	^ self basicNew initializeWithUrl: aUrl
 ]
 
 { #category : #endpoints }
-Unrest >> / aString [
+WSClient >> / aString [
 	"Creates a new generic endpoint."
-	^ (UnrestPluggableEndpoint on: self) path: (Path / aString); yourself
+	^ (WSPluggableEndpoint on: self) path: (Path / aString); yourself
 ]
 
 { #category : #endpoints }
-Unrest >> > endPointClass [
+WSClient >> > endPointClass [
 	"Creates a new endpoint of specified class."
 	^ endPointClass on: self
 ]
 
-{ #category : #http }
-Unrest >> allowedHttpMethods [
-	^ #(#get #post #put #patch #delete #options)
-]
-
 { #category : #accessing }
-Unrest >> baseUrl [
+WSClient >> baseUrl [
 	^ baseUrl
 ]
 
 { #category : #http }
-Unrest >> configureHttpClient: http [
+WSClient >> configureHttpClient: http [
 	contentReader ifNotNil: [ :val | http contentReader: val ].
 	contentWriter ifNotNil: [ :val | http contentWriter: val ]
 ]
 
 { #category : #accessing }
-Unrest >> contentReader [
+WSClient >> contentReader [
 	^ contentReader
 ]
 
 { #category : #accessing }
-Unrest >> contentReader: anObject [
+WSClient >> contentReader: anObject [
 	contentReader := anObject
 ]
 
 { #category : #accessing }
-Unrest >> contentWriter [
+WSClient >> contentWriter [
 	^ contentWriter
 ]
 
 { #category : #accessing }
-Unrest >> contentWriter: anObject [
+WSClient >> contentWriter: anObject [
 	contentWriter := anObject
 ]
 
 { #category : #http }
-Unrest >> createHttpClient [
+WSClient >> createHttpClient [
 	| client |
 	client := ZnClient new.
 	self configureHttpClient: client.
@@ -150,7 +155,7 @@ Unrest >> createHttpClient [
 ]
 
 { #category : #execution }
-Unrest >> execute: anEndpoint [
+WSClient >> execute: anEndpoint [
 	| http result |
 
 	http := self createHttpClient.
@@ -163,7 +168,7 @@ Unrest >> execute: anEndpoint [
 ]
 
 { #category : #accessing }
-Unrest >> implementorsOfPath: aPath [
+WSClient >> implementorsOfPath: aPath [
 	| pathsAndMethods |
 
 	pathsAndMethods := (self class associatedEndpointClasses
@@ -175,31 +180,21 @@ Unrest >> implementorsOfPath: aPath [
 ]
 
 { #category : #initialization }
-Unrest >> initializeWithUrl: aUrl [
+WSClient >> initializeWithUrl: aUrl [
 	self initialize.
 	baseUrl := aUrl asUrl
 ]
 
 { #category : #http }
-Unrest >> validateMethod: aMethod [
-	| method |
-	method := aMethod asLowercase.
-	^ (self allowedHttpMethods includes: method)
-		ifTrue: [ method asSymbol ]
-		ifFalse:
-			[ UnrestError signal: ('Tried to perform invalid Method "{1}"' format: {aMethod}) ]
+WSClient >> validateRequest: aRequest [
+	(aRequest method isNotNil and: [ aRequest url isNotNil ]) ifFalse: [ WSError signal: 'Invalid HTTP Request' ]
 ]
 
 { #category : #http }
-Unrest >> validateRequest: aRequest [
-	(aRequest method isNotNil and: [ aRequest url isNotNil ]) ifFalse: [ UnrestError signal: 'Invalid HTTP Request' ]
-]
-
-{ #category : #http }
-Unrest >> validateResponse: aResponse [
+WSClient >> validateResponse: aResponse [
 	aResponse isSuccess
 		ifTrue: [ ^ true ].
-	UnrestError
+	WSError
 		signal:
 			('{1}: {2}'
 				format:

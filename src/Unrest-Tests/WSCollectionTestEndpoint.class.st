@@ -1,8 +1,8 @@
 Class {
-	#name : #UnrestCollectionTestEndpoint,
+	#name : #WSCollectionTestEndpoint,
 	#superclass : #Object,
-	#traits : 'TUnrestTestEndpoint + TUnrestEnumerating',
-	#classTraits : 'TUnrestTestEndpoint classTrait + TUnrestEnumerating classTrait',
+	#traits : 'TWSTestEndpoint + TWSEnumeration',
+	#classTraits : 'TWSTestEndpoint classTrait + TWSEnumeration classTrait',
 	#instVars : [
 		'offset',
 		'limit',
@@ -13,20 +13,31 @@ Class {
 }
 
 { #category : #accessing }
-UnrestCollectionTestEndpoint class >> endpointPath [
+WSCollectionTestEndpoint class >> endpointPath [
 	^ Path / 'another-test'
 ]
 
+{ #category : #'as yet unclassified' }
+WSCollectionTestEndpoint class >> referencingPathsWithMethods [
+	^ ((WSClient endpointMethodsOn: self)
+		collect: [ :aMethod | 
+			aMethod
+				->
+					((aMethod key pragmaAt: #endpoint:)
+						ifNil: [ self endpointPath ]
+						ifNotNil: [ :val | self endpointPath / val arguments first ]) ]) asSet
+]
+
 { #category : #enumerating }
-UnrestCollectionTestEndpoint >> cursor [
-	^ UnrestTestCursor new
+WSCollectionTestEndpoint >> cursor [
+	^ WSTestCursor new
 		offset: offset;
 		total: limit * 2.5;
 		yourself
 ]
 
 { #category : #enumerating }
-UnrestCollectionTestEndpoint >> enumerateWith: aCursor limit: aLimit [
+WSCollectionTestEndpoint >> enumerateWith: aCursor limit: aLimit [
 	| response result contents |
 
 	offset := aCursor offset.
@@ -44,34 +55,34 @@ UnrestCollectionTestEndpoint >> enumerateWith: aCursor limit: aLimit [
 ]
 
 { #category : #initialization }
-UnrestCollectionTestEndpoint >> initialize [
+WSCollectionTestEndpoint >> initialize [
 	super initialize.
 	limit := 2.
 	offset := 0
 ]
 
 { #category : #accessing }
-UnrestCollectionTestEndpoint >> limit [
+WSCollectionTestEndpoint >> limit [
 	^ limit
 ]
 
 { #category : #accessing }
-UnrestCollectionTestEndpoint >> limit: anObject [
+WSCollectionTestEndpoint >> limit: anObject [
 	limit := anObject
 ]
 
 { #category : #accessing }
-UnrestCollectionTestEndpoint >> offset [
+WSCollectionTestEndpoint >> offset [
 	^ offset
 ]
 
 { #category : #accessing }
-UnrestCollectionTestEndpoint >> offset: anObject [
+WSCollectionTestEndpoint >> offset: anObject [
 	offset := anObject
 ]
 
 { #category : #printing }
-UnrestCollectionTestEndpoint >> printOn: aStream [
+WSCollectionTestEndpoint >> printOn: aStream [
 	"Append a sequence of characters to aStream that identify the receiver."
 
 	super printOn: aStream.
@@ -84,12 +95,12 @@ UnrestCollectionTestEndpoint >> printOn: aStream [
 ]
 
 { #category : #accessing }
-UnrestCollectionTestEndpoint >> size [
+WSCollectionTestEndpoint >> size [
 	^ offset
 ]
 
 { #category : #tests }
-UnrestCollectionTestEndpoint >> test [
+WSCollectionTestEndpoint >> test [
 	<endpoint>
 	<get>
 	^ self execute

@@ -1,7 +1,7 @@
-Extension { #name : #Unrest }
+Extension { #name : #WSClient }
 
 { #category : #'*Unrest-Tools' }
-Unrest >> allReferencingPaths [
+WSClient >> allReferencingPaths [
 	^ ((self class associatedEndpointClasses reject: #isAbstractEndpoint)
 		flatCollect: [ :aCls | aCls referencingPaths ]) asSet
 		flatCollect: [ :aPath | 
@@ -16,7 +16,7 @@ Unrest >> allReferencingPaths [
 ]
 
 { #category : #'*Unrest-Tools' }
-Unrest >> buildMapOn: aBuilder [
+WSClient >> buildMapOn: aBuilder [
 	| paths |
 
 	paths := self allReferencingPaths sorted: [ :a :b | a pathString < b pathString ].
@@ -42,45 +42,44 @@ Unrest >> buildMapOn: aBuilder [
 ]
 
 { #category : #'*Unrest-Tools' }
-Unrest >> buildTopologyOn: aBuilder [
+WSClient >> buildTopologyOn: aBuilder [
 	| endpoints colors allHttpMethods |
 
 	endpoints := self class associatedEndpointClasses.
-	allHttpMethods := self allowedHttpMethods collect: #asLowercase.
 
-	colors := RTColorPalette qualitative colors: allHttpMethods size scheme: 'Set2'.
+	allHttpMethods := self class supportedHttpMethods
+		collect: #asLowercase.
+
+	colors := RTColorPalette qualitative
+		colors: allHttpMethods size
+		scheme: 'Set2'.
+
 	aBuilder methodShape
 		color: [ :method | 
 			((method pragmas collect: [ :p | p keyword asLowercase asSymbol ])
-				intersection: self allowedHttpMethods)
+				intersection: self class supportedHttpMethods)
 				ifEmpty: [ nil ]
-				ifNotEmpty:
-					[ :foundPragmaMethods | colors at: (allHttpMethods indexOf: foundPragmaMethods first asLowercase) ] ].
-
+				ifNotEmpty: [ :foundPragmaMethods | 
+					colors
+						at: (allHttpMethods indexOf: foundPragmaMethods first asLowercase) ] ].
 	aBuilder
 		addObjects: endpoints;
 		classname: #name;
 		instanceVariables: #instVarNames;
-		methodsNames: [ :cls | 
-			cls methods
-				select:
-					[ :aMethod | (aMethod pragmas collect: #keyword) includesAny: TUnrestEndpoint endpointPragmas ] ];
+		methodsNames: [ :cls | cls methods select: #isWSEndpointMethod ];
 		methodselector: [ :aMethod | 
 			'{1} ~> {2}'
 				format:
 					{aMethod selector.
-					((aMethod pragmaAt: #endpoint:)
-						ifNil: [ aMethod methodClass endpointPath pathString ]
-						ifNotNil: [ :p | (aMethod methodClass endpointPath / p arguments first) pathString ])} ];
+					aMethod wsEndpointPath} ];
 		attributeselector: #yourself;
 		superclass: #superclass.
-
 	aBuilder treeLayout.
 	aBuilder build
 ]
 
 { #category : #'*Unrest-Tools' }
-Unrest >> gtMapIn: aComposite [
+WSClient >> gtMapIn: aComposite [
 	<gtInspectorPresentationOrder: 11>
 	^ aComposite roassal2
 		title: ['Map' translated];
@@ -89,7 +88,7 @@ Unrest >> gtMapIn: aComposite [
 ]
 
 { #category : #'*Unrest-Tools' }
-Unrest >> gtTopologyIn: aComposite [
+WSClient >> gtTopologyIn: aComposite [
 	<gtInspectorPresentationOrder: 12>
 	^ aComposite roassal2
 		title: ['Topology' translated];

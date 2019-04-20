@@ -9,5 +9,5 @@ Class {
 
 { #category : #'code-critics' }
 ManifestUnrest class >> ruleRBUtilityMethodsRuleV1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#Unrest #validateRequest: #false)) #'2018-08-06T19:17:12.83524-07:00') )
+	^ #(#(#(#RGMethodDefinition #(#WSClient #validateRequest: #false)) #'2018-08-06T19:17:12.83524-07:00') )
 ]

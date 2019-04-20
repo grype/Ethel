@@ -1,39 +1,39 @@
 Trait {
-	#name : #TUnrestTestEndpoint,
+	#name : #TWSTestEndpoint,
 	#instVars : [
 		'headers'
 	],
-	#traits : 'TUnrestEndpoint',
-	#classTraits : 'TUnrestEndpoint classTrait',
+	#traits : 'TWSEndpoint',
+	#classTraits : 'TWSEndpoint classTrait',
 	#category : #'Unrest-Tests-Models'
 }
 
 { #category : #tests }
-TUnrestTestEndpoint classSide >> testHeaderName [
+TWSTestEndpoint classSide >> testHeaderName [
 	^ #'X-Test'
 ]
 
 { #category : #tests }
-TUnrestTestEndpoint classSide >> testHeaderValue [
+TWSTestEndpoint classSide >> testHeaderValue [
 	^ 'Testing'
 ]
 
 { #category : #configuring }
-TUnrestTestEndpoint >> configureDerivedEndpoint: anEndpoint [
+TWSTestEndpoint >> configureDerivedEndpoint: anEndpoint [
 	self headers associationsDo: [ :each | anEndpoint headers add: each ]
 ]
 
 { #category : #configuring }
-TUnrestTestEndpoint >> configureOn: http [
+TWSTestEndpoint >> configureOn: http [
 	http headerAt: self class testHeaderName put: self class testHeaderValue 
 ]
 
 { #category : #accessing }
-TUnrestTestEndpoint >> headers [
+TWSTestEndpoint >> headers [
 	^ headers ifNil: [ headers := Dictionary new ]
 ]
 
 { #category : #accessing }
-TUnrestTestEndpoint >> headers: anObject [
+TWSTestEndpoint >> headers: anObject [
 	headers := anObject
 ]

@@ -1,5 +1,5 @@
 Class {
-	#name : #UnrestEndpointTest,
+	#name : #WSEndpointTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'client',
@@ -11,28 +11,28 @@ Class {
 }
 
 { #category : #stubbing }
-UnrestEndpointTest >> okJsonResponseWith: aValue [
+WSEndpointTest >> okJsonResponseWith: aValue [
 	^ ZnResponse ok: (ZnEntity json: aValue asJson)
 ]
 
 { #category : #stubbing }
-UnrestEndpointTest >> okResponse [
+WSEndpointTest >> okResponse [
 	^ ZnResponse ok: (ZnEntity text: 'ok')
 ]
 
 { #category : #stubbing }
-UnrestEndpointTest >> okResponseWith: aValue [
+WSEndpointTest >> okResponseWith: aValue [
 	^ ZnResponse ok: (ZnEntity with: aValue)
 ]
 
 { #category : #running }
-UnrestEndpointTest >> setUp [
-	client := UnrestTestClient default.
-	endpoint := UnrestTestEndpoint on: client.
+WSEndpointTest >> setUp [
+	client := WSTestClient default.
+	endpoint := WSTestEndpoint on: client.
 ]
 
 { #category : #stubbing }
-UnrestEndpointTest >> stubForEnumeration [
+WSEndpointTest >> stubForEnumeration [
 	endpoint := client collection.
 	cursor := self stubbedCursor.
 	http := self
@@ -42,18 +42,18 @@ UnrestEndpointTest >> stubForEnumeration [
 ]
 
 { #category : #stubbing }
-UnrestEndpointTest >> stubForExecution [
+WSEndpointTest >> stubForExecution [
 	http := self stubbedHttpWithResponse: self okResponse
 ]
 
 { #category : #stubbing }
-UnrestEndpointTest >> stubHttp: http withResponse: aResponse [
+WSEndpointTest >> stubHttp: http withResponse: aResponse [
 	http stub execute willReturn: aResponse.
 	http stub response willReturn: aResponse
 ]
 
 { #category : #stubbing }
-UnrestEndpointTest >> stubbedCursor [
+WSEndpointTest >> stubbedCursor [
 	| aCursor |
 	aCursor := endpoint cursor.
 	endpoint stub cursor willReturn: aCursor.
@@ -61,12 +61,12 @@ UnrestEndpointTest >> stubbedCursor [
 ]
 
 { #category : #stubbing }
-UnrestEndpointTest >> stubbedHttp [
+WSEndpointTest >> stubbedHttp [
 	^ self stubbedHttpWithResponse: nil
 ]
 
 { #category : #stubbing }
-UnrestEndpointTest >> stubbedHttpWithResponse: aResponse [
+WSEndpointTest >> stubbedHttpWithResponse: aResponse [
 	| http |
 
 	http := client createHttpClient.
@@ -77,24 +77,24 @@ UnrestEndpointTest >> stubbedHttpWithResponse: aResponse [
 ]
 
 { #category : #'tests-composing' }
-UnrestEndpointTest >> testAbstractEndpoint [
-	UnrestAbstractTestEndpoint isAbstractEndpoint should be.
-	UnrestTestEndpoint isAbstractEndpoint should not be
+WSEndpointTest >> testAbstractEndpoint [
+	WSAbstractTestEndpoint isAbstractEndpoint should be.
+	WSTestEndpoint isAbstractEndpoint should not be
 ]
 
 { #category : #'tests-composing' }
-UnrestEndpointTest >> testEndpointComposition [
+WSEndpointTest >> testEndpointComposition [
 	| ep |
 
-	ep := endpoint > UnrestCollectionTestEndpoint.
-	ep class should equal: UnrestCollectionTestEndpoint.
-	ep unrest should equal: endpoint unrest.
-	ep endpointPath should equal: UnrestCollectionTestEndpoint endpointPath.
+	ep := endpoint > WSCollectionTestEndpoint.
+	ep class should equal: WSCollectionTestEndpoint.
+	ep wsClient should equal: endpoint wsClient.
+	ep endpointPath should equal: WSCollectionTestEndpoint endpointPath.
 	(ep headers keys includesAll: endpoint headers keys) should be
 ]
 
 { #category : #'tests-enumerating' }
-UnrestEndpointTest >> testEnumerationDetect [
+WSEndpointTest >> testEnumerationDetect [
 	| expectedResult result |
 
 	self stubForEnumeration.
@@ -108,7 +108,7 @@ UnrestEndpointTest >> testEnumerationDetect [
 ]
 
 { #category : #'tests-enumerating' }
-UnrestEndpointTest >> testEnumerationDetectNotFound [
+WSEndpointTest >> testEnumerationDetectNotFound [
 	| result |
 
 	self stubForEnumeration.
@@ -121,7 +121,7 @@ UnrestEndpointTest >> testEnumerationDetectNotFound [
 ]
 
 { #category : #'tests-enumerating' }
-UnrestEndpointTest >> testEnumerationDetectRaiseNotFound [
+WSEndpointTest >> testEnumerationDetectRaiseNotFound [
 	self stubForEnumeration.
 	endpoint offset should be: 0.
 	[ endpoint detect: [ :responseResult | responseResult > cursor total ] ] should raise: NotFound.
@@ -130,7 +130,7 @@ UnrestEndpointTest >> testEnumerationDetectRaiseNotFound [
 ]
 
 { #category : #'tests-enumerating' }
-UnrestEndpointTest >> testEnumerationDo [
+WSEndpointTest >> testEnumerationDo [
 	| expectedResult result |
 
 	self stubForEnumeration.
@@ -145,7 +145,7 @@ UnrestEndpointTest >> testEnumerationDo [
 ]
 
 { #category : #'tests-enumerating' }
-UnrestEndpointTest >> testEnumerationFirst [
+WSEndpointTest >> testEnumerationFirst [
 	self stubForEnumeration.
 	endpoint offset should be: 0.
 	endpoint first should equal: 0.
@@ -154,7 +154,7 @@ UnrestEndpointTest >> testEnumerationFirst [
 ]
 
 { #category : #'tests-enumerating' }
-UnrestEndpointTest >> testEnumerationNext [
+WSEndpointTest >> testEnumerationNext [
 	| expectedResult |
 
 	self stubForEnumeration.
@@ -168,7 +168,7 @@ UnrestEndpointTest >> testEnumerationNext [
 ]
 
 { #category : #'tests-enumerating' }
-UnrestEndpointTest >> testEnumerationSelect [
+WSEndpointTest >> testEnumerationSelect [
 	| expectedResult result |
 
 	self stubForEnumeration.
@@ -182,28 +182,45 @@ UnrestEndpointTest >> testEnumerationSelect [
 ]
 
 { #category : #'tests-configuring' }
-UnrestEndpointTest >> testHttpConfiguration [
+WSEndpointTest >> testHttpConfiguration [
 	endpoint stub.
 	http := client createHttpClient.
 	endpoint configureOn: http.
 	http request headers should
-		include: UnrestTestEndpoint testHeaderValue
-		at: UnrestTestEndpoint testHeaderName
+		include: WSTestEndpoint testHeaderValue
+		at: WSTestEndpoint testHeaderName
 ]
 
 { #category : #'tests-configuring' }
-UnrestEndpointTest >> testHttpMethod [
-	| http |
+WSEndpointTest >> testHttpMethod [
+	| stubbedHttp |
 
-	http := self stubbedHttpWithResponse: self okResponse.
-	client allowedHttpMethods
+	stubbedHttp := self stubbedHttpWithResponse: self okResponse.
+	client class supportedHttpMethods
 		do: [ :method | 
 			endpoint perform: method.
-			http request method asLowercase should equal: method asLowercase ]
+			stubbedHttp request method asLowercase should equal: method asLowercase ]
+]
+
+{ #category : #'tests-other' }
+WSEndpointTest >> testIsWSEndpoint [
+	endpoint class isWSEndpoint should
+]
+
+{ #category : #'tests-other' }
+WSEndpointTest >> testIsWSEndpointMethod [
+	| httpMethods |
+
+	httpMethods := endpoint class supportedHttpMethods.
+	endpoint class methods
+		do: [ :aMethod | 
+			(httpMethods includes: aMethod selector)
+				ifTrue: [ aMethod isWSEndpointMethod should ]
+				ifFalse: [ aMethod isWSEndpointMethod should not ] ]
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testKeywordWithAbsoluteMixedPathExecution [
+WSEndpointTest >> testKeywordWithAbsoluteMixedPathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteMixed: 'foo'.
 	http request url should
@@ -211,14 +228,14 @@ UnrestEndpointTest >> testKeywordWithAbsoluteMixedPathExecution [
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testKeywordWithAbsolutePathExecution [
+WSEndpointTest >> testKeywordWithAbsolutePathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteKeyword: 'foo'.
 	http request url should equal: (client baseUrl addPathSegments: (Path / 'foo') segments)
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testKeywordWithRelativeMixedPathExecution [
+WSEndpointTest >> testKeywordWithRelativeMixedPathExecution [
 	self stubForExecution.
 	endpoint getRelativeMixed: 'foo'.
 	http request url should
@@ -226,30 +243,30 @@ UnrestEndpointTest >> testKeywordWithRelativeMixedPathExecution [
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testKeywordWithRelativePathExecution [
+WSEndpointTest >> testKeywordWithRelativePathExecution [
 	self stubForExecution.
 	endpoint getRelativeKeyword: 'foo'.
 	http request url should equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'foo') segments)
 ]
 
 { #category : #'tests-composing' }
-UnrestEndpointTest >> testPluggableEndpointComposition [
+WSEndpointTest >> testPluggableEndpointComposition [
 	| ep |
 	ep := endpoint / 'pluggable'.
-	ep class should equal: UnrestPluggableEndpoint.
-	ep unrest should equal: endpoint unrest.
+	ep class should equal: WSPluggableEndpoint.
+	ep wsClient should equal: endpoint wsClient.
 	ep endpointPath should equal: endpoint class endpointPath / 'pluggable'
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testUnaryExecution [
+WSEndpointTest >> testUnaryExecution [
 	self stubForExecution.
 	endpoint get.
 	http request url should equal: (client baseUrl addPathSegments: endpoint endpointPath segments)
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testUnaryWithAbsoluteDeepPathExecution [
+WSEndpointTest >> testUnaryWithAbsoluteDeepPathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteDeep.
 	http request url should
@@ -257,14 +274,14 @@ UnrestEndpointTest >> testUnaryWithAbsoluteDeepPathExecution [
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testUnaryWithAbsolutePathExecution [
+WSEndpointTest >> testUnaryWithAbsolutePathExecution [
 	self stubForExecution.
 	endpoint getAbsolute.
 	http request url should equal: (client baseUrl addPathSegments: (Path / 'absolute') segments)
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testUnaryWithRelativeDeepPathExecution [
+WSEndpointTest >> testUnaryWithRelativeDeepPathExecution [
 	self stubForExecution.
 	endpoint getRelativeDeep.
 	http request url should
@@ -272,11 +289,23 @@ UnrestEndpointTest >> testUnaryWithRelativeDeepPathExecution [
 ]
 
 { #category : #'tests-executing' }
-UnrestEndpointTest >> testUnaryWithRelativePathExecution [
+WSEndpointTest >> testUnaryWithRelativePathExecution [
 	self stubForExecution.
 	endpoint getRelative.
 	http request url should
 		equal:
 			(client baseUrl
 				addPathSegments: (endpoint endpointPath / 'relative') segments)
+]
+
+{ #category : #'tests-other' }
+WSEndpointTest >> testWSEndpointHttpMethod [
+	| httpMethods |
+
+	httpMethods := endpoint class supportedHttpMethods.
+	endpoint class methods
+		do: [ :aMethod | 
+			(httpMethods includes: aMethod selector)
+				ifTrue: [ aMethod wsEndpointHttpMethod = aMethod selector ]
+				ifFalse: [ aMethod isWSEndpointMethod should not ] ]
 ]
