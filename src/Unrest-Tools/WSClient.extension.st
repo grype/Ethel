@@ -1,21 +1,6 @@
 Extension { #name : #WSClient }
 
 { #category : #'*Unrest-Tools' }
-WSClient >> allReferencingPaths [
-	^ ((self class associatedEndpointClasses reject: #isAbstractEndpoint)
-		flatCollect: [ :aCls | aCls referencingPaths ]) asSet
-		flatCollect: [ :aPath | 
-			| p result |
-
-			result := Set with: aPath.
-			p := aPath parent.
-			[ p isRoot ]
-				whileFalse: [ result add: p.
-					p := p parent ].
-			result ]
-]
-
-{ #category : #'*Unrest-Tools' }
 WSClient >> buildMapOn: aBuilder [
 	| paths |
 
