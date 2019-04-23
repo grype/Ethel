@@ -76,12 +76,6 @@ TWSEndpointTest >> stubbedHttpWithResponse: aResponse [
 	^ http
 ]
 
-{ #category : #'tests-composing' }
-TWSEndpointTest >> testAbstractEndpoint [
-	WSAbstractTestEndpoint isAbstractEndpoint should be.
-	WSTestEndpoint isAbstractEndpoint should not be
-]
-
 { #category : #'tests-configuring' }
 TWSEndpointTest >> testConfigureOn [
 	endpoint stub.

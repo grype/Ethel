@@ -54,20 +54,6 @@ Class {
 	#category : #'Unrest-Core'
 }
 
-{ #category : #introspection }
-WSClient class >> derivedEndpointClasses [
-	"Returns a Set of all endpoint classes that can be derived from the client"
-
-	| methods referencedClasses rootEndpointClass |
-
-	methods := self wsEndpointReferences.
-	referencedClasses := (methods flatCollect: #value) asSet.
-	rootEndpointClass := (referencedClasses
-		flatCollect: [ :each | each withAllSuperclasses ])
-		select: [ :each | each traitComposition includesTrait: TWSEndpoint ].
-	^ rootEndpointClass flatCollect: #withAllSubclasses
-]
-
 { #category : #defaults }
 WSClient class >> endpointPathPragma [
 	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
@@ -76,7 +62,7 @@ WSClient class >> endpointPathPragma [
 
 { #category : #accessing }
 WSClient class >> pathReferences [
-	^ (self derivedEndpointClasses flatCollect: #pathReferences) asSet
+	^ (self derivedWSEndpoints flatCollect: #pathReferences) asSet
 ]
 
 { #category : #http }
@@ -158,8 +144,7 @@ WSClient >> execute: anEndpoint [
 WSClient >> implementorsOfPath: aPath [
 	| pathsAndMethods |
 
-	pathsAndMethods := (self class derivedEndpointClasses
-		reject: [ :each | each isAbstractEndpoint ])
+	pathsAndMethods := self class derivedEndpointClasses
 		flatCollect: [ :each | each pathReferences ].
 	^ pathsAndMethods
 		select: [ :each | each value = aPath ]

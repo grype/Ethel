@@ -4,7 +4,7 @@ Extension { #name : #WSClient }
 WSClient >> buildMapOn: aBuilder [
 	| paths |
 
-	paths := self class pathReferences sorted: [ :a :b | a pathString < b pathString ].
+	paths := (self class pathReferences collect: #value) sorted: [ :a :b | a pathString < b pathString ].
 
 	aBuilder view canvas color: (Color colorFrom: '#EEE').
 	aBuilder
@@ -28,27 +28,21 @@ WSClient >> buildMapOn: aBuilder [
 
 { #category : #'*Unrest-Tools' }
 WSClient >> buildTopologyOn: aBuilder [
-	| endpoints colors allHttpMethods |
+	| endpoints colors allHttpMethods lb |
 
-	endpoints := self class derivedEndpointClasses.
+	endpoints := self class derivedWSEndpoints.
 
 	allHttpMethods := self class supportedHttpMethods
 		collect: #asLowercase.
 
 	colors := RTColorPalette qualitative
 		colors: allHttpMethods size
-		scheme: 'Set2'.
+		scheme: 'Dark2'.
 
 	aBuilder methodShape
-		color: [ :method | 
-			((method pragmas collect: [ :p | p keyword asLowercase asSymbol ])
-				intersection: self class supportedHttpMethods)
-				ifEmpty: [ nil ]
-				ifNotEmpty: [ :foundPragmaMethods | 
-					colors
-						at: (allHttpMethods indexOf: foundPragmaMethods first asLowercase) ] ].
+		color:
+			[ :method | colors at: (allHttpMethods indexOf: method wsEndpointHttpMethod) ].
 	aBuilder
-		addObjects: endpoints;
 		classname: #name;
 		instanceVariables: #instVarNames;
 		methodsNames: [ :cls | cls methods select: #isWSEndpointExecutionMethod ];
@@ -59,8 +53,40 @@ WSClient >> buildTopologyOn: aBuilder [
 					aMethod wsEndpointPath} ];
 		attributeselector: #yourself;
 		superclass: #superclass.
-	aBuilder treeLayout.
-	aBuilder build
+	aBuilder addObjects: endpoints.
+	aBuilder layout tree.
+
+	lb := RTLegendBuilder new.
+	lb view: aBuilder view.
+	lb left.
+	lb
+		nestDo: [ :n :e :g | 
+			n
+				padding: 10;
+				on: e nest: g;
+				resizeWithoutRecursion: e for: g ].
+
+	lb backgroundShape
+		box;
+		borderColor: Color white;
+		color: Color transparent;
+		borderWidth: 2.
+
+	allHttpMethods
+		withIndexDo:
+			[ :aMethod :i | lb addColoredText: aMethod asString color: (colors at: i) ].
+	lb build
+]
+
+{ #category : #'*Unrest-Tools' }
+WSClient >> gtDerivedEndpointClassesIn: aComposite [
+	<gtInspectorPresentationOrder: 12>
+	^ aComposite list
+		title: [ 'Endpoint classes' translated ];
+		beMultiple;
+		allowsSearch;
+		display: [ self class derivedWSEndpoints ];
+		when: [ self class derivedWSEndpoints isEmptyOrNil not ]
 ]
 
 { #category : #'*Unrest-Tools' }

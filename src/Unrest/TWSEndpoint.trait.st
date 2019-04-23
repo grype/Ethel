@@ -57,14 +57,6 @@ TWSEndpoint classSide >> endpointPathPragma [
 	^ WSClient endpointPathPragma 
 ]
 
-{ #category : #testing }
-TWSEndpoint classSide >> isAbstractEndpoint [
-	"Returns true if the endpoint is abstract - meaning, it does not implement any methods that execute requests (in other words - not marked with http method pragma like <get>..."
-	^ [ self endpointPath isNil ]
-		on: Exception
-		do: [ :err | true ]
-]
-
 { #category : #'instance creation' }
 TWSEndpoint classSide >> on: wsClient [
 	^ self basicNew initializeOn: wsClient
@@ -134,7 +126,7 @@ TWSEndpoint >> executingContext [
 	| sender |
 
 	sender := thisContext sender.
-	[ sender isNotNil and: [ sender method isWSEndpointMethod not ] ]
+	[ sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ]
 		whileTrue: [ sender := sender sender ].
 
 	^ sender

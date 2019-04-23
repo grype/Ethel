@@ -20,12 +20,16 @@ WSClientTest >> testCreateHttpClient [
 ]
 
 { #category : #tests }
-WSClientTest >> testDerivedEndpointClasses [
+WSClientTest >> testDerivedWSEndpoints [
 	| derived |
 
-	derived := client class derivedEndpointClasses.
+	derived := client class derivedWSEndpoints.
 	derived should
-		equal: (Set with: WSTestEndpoint with: WSCollectionTestEndpoint)
+		equal:
+			(Set
+				with: WSTestEndpoint
+				with: WSCollectionTestEndpoint
+				with: WSPluggableEndpoint)
 ]
 
 { #category : #tests }
