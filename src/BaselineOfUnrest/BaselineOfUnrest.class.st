@@ -29,5 +29,8 @@ BaselineOfUnrest >> dependencies: spec [
 		with: [ spec repository: 'github://ObjectProfile/Roassal2/src' ].
 	spec
 		baseline: 'Mocketry'
-		with: [ spec repository: 'github://dionisiydk/Mocketry:v4.0.x' ]
+		with: [ spec repository: 'github://dionisiydk/Mocketry:v4.0.x' ].
+	spec
+		baseline: 'NeoJSON';
+		with: [ spec repository: 'github://svenvc/NeoJSON/repository' ]
 ]
