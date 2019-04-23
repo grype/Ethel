@@ -1,5 +1,5 @@
 Class {
-	#name : #WSEndpointTest,
+	#name : #TWSEndpointTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'client',
@@ -11,28 +11,28 @@ Class {
 }
 
 { #category : #stubbing }
-WSEndpointTest >> okJsonResponseWith: aValue [
+TWSEndpointTest >> okJsonResponseWith: aValue [
 	^ ZnResponse ok: (ZnEntity json: aValue asJson)
 ]
 
 { #category : #stubbing }
-WSEndpointTest >> okResponse [
+TWSEndpointTest >> okResponse [
 	^ ZnResponse ok: (ZnEntity text: 'ok')
 ]
 
 { #category : #stubbing }
-WSEndpointTest >> okResponseWith: aValue [
+TWSEndpointTest >> okResponseWith: aValue [
 	^ ZnResponse ok: (ZnEntity with: aValue)
 ]
 
 { #category : #running }
-WSEndpointTest >> setUp [
+TWSEndpointTest >> setUp [
 	client := WSTestClient default.
 	endpoint := WSTestEndpoint on: client.
 ]
 
 { #category : #stubbing }
-WSEndpointTest >> stubForEnumeration [
+TWSEndpointTest >> stubForEnumeration [
 	endpoint := client collection.
 	cursor := self stubbedCursor.
 	http := self
@@ -42,18 +42,18 @@ WSEndpointTest >> stubForEnumeration [
 ]
 
 { #category : #stubbing }
-WSEndpointTest >> stubForExecution [
+TWSEndpointTest >> stubForExecution [
 	http := self stubbedHttpWithResponse: self okResponse
 ]
 
 { #category : #stubbing }
-WSEndpointTest >> stubHttp: http withResponse: aResponse [
+TWSEndpointTest >> stubHttp: http withResponse: aResponse [
 	http stub execute willReturn: aResponse.
 	http stub response willReturn: aResponse
 ]
 
 { #category : #stubbing }
-WSEndpointTest >> stubbedCursor [
+TWSEndpointTest >> stubbedCursor [
 	| aCursor |
 	aCursor := endpoint cursor.
 	endpoint stub cursor willReturn: aCursor.
@@ -61,12 +61,12 @@ WSEndpointTest >> stubbedCursor [
 ]
 
 { #category : #stubbing }
-WSEndpointTest >> stubbedHttp [
+TWSEndpointTest >> stubbedHttp [
 	^ self stubbedHttpWithResponse: nil
 ]
 
 { #category : #stubbing }
-WSEndpointTest >> stubbedHttpWithResponse: aResponse [
+TWSEndpointTest >> stubbedHttpWithResponse: aResponse [
 	| http |
 
 	http := client createHttpClient.
@@ -77,13 +77,13 @@ WSEndpointTest >> stubbedHttpWithResponse: aResponse [
 ]
 
 { #category : #'tests-composing' }
-WSEndpointTest >> testAbstractEndpoint [
+TWSEndpointTest >> testAbstractEndpoint [
 	WSAbstractTestEndpoint isAbstractEndpoint should be.
 	WSTestEndpoint isAbstractEndpoint should not be
 ]
 
 { #category : #'tests-composing' }
-WSEndpointTest >> testEndpointComposition [
+TWSEndpointTest >> testEndpointComposition [
 	| ep |
 
 	ep := endpoint > WSCollectionTestEndpoint.
@@ -93,8 +93,13 @@ WSEndpointTest >> testEndpointComposition [
 	(ep headers keys includesAll: endpoint headers keys) should be
 ]
 
+{ #category : #tests }
+TWSEndpointTest >> testEndpointPath [
+	endpoint endpointPath should equal: endpoint class endpointPath
+]
+
 { #category : #'tests-enumerating' }
-WSEndpointTest >> testEnumerationDetect [
+TWSEndpointTest >> testEnumerationDetect [
 	| expectedResult result |
 
 	self stubForEnumeration.
@@ -108,7 +113,7 @@ WSEndpointTest >> testEnumerationDetect [
 ]
 
 { #category : #'tests-enumerating' }
-WSEndpointTest >> testEnumerationDetectNotFound [
+TWSEndpointTest >> testEnumerationDetectNotFound [
 	| result |
 
 	self stubForEnumeration.
@@ -121,7 +126,7 @@ WSEndpointTest >> testEnumerationDetectNotFound [
 ]
 
 { #category : #'tests-enumerating' }
-WSEndpointTest >> testEnumerationDetectRaiseNotFound [
+TWSEndpointTest >> testEnumerationDetectRaiseNotFound [
 	self stubForEnumeration.
 	endpoint offset should be: 0.
 	[ endpoint detect: [ :responseResult | responseResult > cursor total ] ] should raise: NotFound.
@@ -130,7 +135,7 @@ WSEndpointTest >> testEnumerationDetectRaiseNotFound [
 ]
 
 { #category : #'tests-enumerating' }
-WSEndpointTest >> testEnumerationDo [
+TWSEndpointTest >> testEnumerationDo [
 	| expectedResult result |
 
 	self stubForEnumeration.
@@ -145,7 +150,7 @@ WSEndpointTest >> testEnumerationDo [
 ]
 
 { #category : #'tests-enumerating' }
-WSEndpointTest >> testEnumerationFirst [
+TWSEndpointTest >> testEnumerationFirst [
 	self stubForEnumeration.
 	endpoint offset should be: 0.
 	endpoint first should equal: 0.
@@ -154,7 +159,7 @@ WSEndpointTest >> testEnumerationFirst [
 ]
 
 { #category : #'tests-enumerating' }
-WSEndpointTest >> testEnumerationNext [
+TWSEndpointTest >> testEnumerationNext [
 	| expectedResult |
 
 	self stubForEnumeration.
@@ -168,7 +173,7 @@ WSEndpointTest >> testEnumerationNext [
 ]
 
 { #category : #'tests-enumerating' }
-WSEndpointTest >> testEnumerationSelect [
+TWSEndpointTest >> testEnumerationSelect [
 	| expectedResult result |
 
 	self stubForEnumeration.
@@ -182,7 +187,7 @@ WSEndpointTest >> testEnumerationSelect [
 ]
 
 { #category : #'tests-configuring' }
-WSEndpointTest >> testHttpConfiguration [
+TWSEndpointTest >> testHttpConfiguration [
 	endpoint stub.
 	http := client createHttpClient.
 	endpoint configureOn: http.
@@ -192,7 +197,7 @@ WSEndpointTest >> testHttpConfiguration [
 ]
 
 { #category : #'tests-configuring' }
-WSEndpointTest >> testHttpMethod [
+TWSEndpointTest >> testHttpMethod [
 	| stubbedHttp |
 
 	stubbedHttp := self stubbedHttpWithResponse: self okResponse.
@@ -203,12 +208,12 @@ WSEndpointTest >> testHttpMethod [
 ]
 
 { #category : #'tests-other' }
-WSEndpointTest >> testIsWSEndpoint [
+TWSEndpointTest >> testIsWSEndpoint [
 	endpoint class isWSEndpoint should
 ]
 
 { #category : #'tests-other' }
-WSEndpointTest >> testIsWSEndpointMethod [
+TWSEndpointTest >> testIsWSEndpointMethod [
 	| httpMethods |
 
 	httpMethods := endpoint class supportedHttpMethods.
@@ -220,7 +225,7 @@ WSEndpointTest >> testIsWSEndpointMethod [
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testKeywordWithAbsoluteMixedPathExecution [
+TWSEndpointTest >> testKeywordWithAbsoluteMixedPathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteMixed: 'foo'.
 	http request url should
@@ -228,14 +233,14 @@ WSEndpointTest >> testKeywordWithAbsoluteMixedPathExecution [
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testKeywordWithAbsolutePathExecution [
+TWSEndpointTest >> testKeywordWithAbsolutePathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteKeyword: 'foo'.
 	http request url should equal: (client baseUrl addPathSegments: (Path / 'foo') segments)
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testKeywordWithRelativeMixedPathExecution [
+TWSEndpointTest >> testKeywordWithRelativeMixedPathExecution [
 	self stubForExecution.
 	endpoint getRelativeMixed: 'foo'.
 	http request url should
@@ -243,14 +248,24 @@ WSEndpointTest >> testKeywordWithRelativeMixedPathExecution [
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testKeywordWithRelativePathExecution [
+TWSEndpointTest >> testKeywordWithRelativePathExecution [
 	self stubForExecution.
 	endpoint getRelativeKeyword: 'foo'.
 	http request url should equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'foo') segments)
 ]
 
+{ #category : #tests }
+TWSEndpointTest >> testPathReferences [
+	| execMethods refs |
+
+	execMethods := (endpoint class methods
+		select: [ :each | each category = #'private-executing' ]) asSet.
+	refs := endpoint class pathReferences asSet.
+	(refs collect: #key) should equal: execMethods
+]
+
 { #category : #'tests-composing' }
-WSEndpointTest >> testPluggableEndpointComposition [
+TWSEndpointTest >> testPluggableEndpointComposition [
 	| ep |
 	ep := endpoint / 'pluggable'.
 	ep class should equal: WSPluggableEndpoint.
@@ -259,14 +274,14 @@ WSEndpointTest >> testPluggableEndpointComposition [
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testUnaryExecution [
+TWSEndpointTest >> testUnaryExecution [
 	self stubForExecution.
 	endpoint get.
 	http request url should equal: (client baseUrl addPathSegments: endpoint endpointPath segments)
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testUnaryWithAbsoluteDeepPathExecution [
+TWSEndpointTest >> testUnaryWithAbsoluteDeepPathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteDeep.
 	http request url should
@@ -274,14 +289,14 @@ WSEndpointTest >> testUnaryWithAbsoluteDeepPathExecution [
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testUnaryWithAbsolutePathExecution [
+TWSEndpointTest >> testUnaryWithAbsolutePathExecution [
 	self stubForExecution.
 	endpoint getAbsolute.
 	http request url should equal: (client baseUrl addPathSegments: (Path / 'absolute') segments)
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testUnaryWithRelativeDeepPathExecution [
+TWSEndpointTest >> testUnaryWithRelativeDeepPathExecution [
 	self stubForExecution.
 	endpoint getRelativeDeep.
 	http request url should
@@ -289,7 +304,7 @@ WSEndpointTest >> testUnaryWithRelativeDeepPathExecution [
 ]
 
 { #category : #'tests-executing' }
-WSEndpointTest >> testUnaryWithRelativePathExecution [
+TWSEndpointTest >> testUnaryWithRelativePathExecution [
 	self stubForExecution.
 	endpoint getRelative.
 	http request url should
@@ -299,7 +314,7 @@ WSEndpointTest >> testUnaryWithRelativePathExecution [
 ]
 
 { #category : #'tests-other' }
-WSEndpointTest >> testWSEndpointHttpMethod [
+TWSEndpointTest >> testWSEndpointHttpMethod [
 	| httpMethods |
 
 	httpMethods := endpoint class supportedHttpMethods.
