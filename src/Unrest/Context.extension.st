@@ -14,7 +14,7 @@ Context >> wsEndpointHttpMethodUsing: aListOfMethods [
 
 { #category : #'*Unrest' }
 Context >> wsEndpointPath [
-	^ self method isWSEndpointMethod
+	^ self method isWSEndpointExecutionMethod
 		ifTrue: [ self method wsEndpointPath ]
 		ifFalse: [ nil ]
 ]

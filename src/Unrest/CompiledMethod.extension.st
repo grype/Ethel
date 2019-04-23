@@ -1,7 +1,7 @@
 Extension { #name : #CompiledMethod }
 
 { #category : #'*Unrest' }
-CompiledMethod >> isWSEndpointMethod [
+CompiledMethod >> isWSEndpointExecutionMethod [
 	^ self wsEndpointHttpMethod isNotNil 
 ]
 
@@ -24,4 +24,12 @@ CompiledMethod >> wsEndpointPath [
 	^ (self pragmaAt: self methodClass endpointPathPragma)
 		ifNil: [ self methodClass endpointPath ]
 		ifNotNil: [ :val | self methodClass endpointPath / val arguments first ]
+]
+
+{ #category : #'*Unrest' }
+CompiledMethod >> wsEndpointReferences [
+	^ self allLiterals
+		select:
+			[ :aLiteral | aLiteral value isClass and: [ aLiteral value isWSEndpoint ] ]
+		thenCollect: #value
 ]

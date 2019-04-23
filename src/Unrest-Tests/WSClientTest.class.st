@@ -13,6 +13,22 @@ WSClientTest >> setUp [
 ]
 
 { #category : #tests }
+WSClientTest >> testCreateHttpClient [
+	| http |
+	http := client createHttpClient.
+	http should beKindOf: ZnClient 
+]
+
+{ #category : #tests }
+WSClientTest >> testDerivedEndpointClasses [
+	| derived |
+
+	derived := client class derivedEndpointClasses.
+	derived should
+		equal: (Set with: WSTestEndpoint with: WSCollectionTestEndpoint)
+]
+
+{ #category : #tests }
 WSClientTest >> testEndpointComposition [
 	| ep |
 	ep := client > WSTestEndpoint.
@@ -22,7 +38,7 @@ WSClientTest >> testEndpointComposition [
 ]
 
 { #category : #tests }
-WSClientTest >> testExecution [
+WSClientTest >> testExecute [
 	| ep http response |
 
 	http := ZnClient new.
@@ -70,10 +86,29 @@ WSClientTest >> testIsWSEndpoint [
 ]
 
 { #category : #tests }
+WSClientTest >> testPathReferences [
+	| paths |
+
+	paths := client class pathReferences.
+	paths should
+		equal:
+			WSTestEndpoint pathReferences
+				, WSCollectionTestEndpoint pathReferences
+]
+
+{ #category : #tests }
 WSClientTest >> testPluggableEndpointComposition [
 	| ep |
 	ep := client / 'pluggable'.
 	ep class should equal: WSPluggableEndpoint.
 	ep wsClient should equal: client.
 	ep endpointPath should equal: Path / 'pluggable'.
+]
+
+{ #category : #tests }
+WSClientTest >> testWithUrl [
+	| url tempClient |
+	url := 'https://example.com/foo/bar' asUrl.
+	tempClient := WSClient withUrl: url.
+	tempClient baseUrl should equal: url
 ]

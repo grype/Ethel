@@ -5,7 +5,7 @@ I am good at talking to RESTful APIs and the like, and can be used as-is for scr
 
 Instantiate me #withUrl:
 
-client := Unrest withUrl: 'https://api.example.com/v1'.
+client := WSClient withUrl: 'https://api.example.com/v1'.
 
 By default I don't provide any special content reader or writer. If, for example, you're dealing
 with reading JSON responses, you can configure me with:
@@ -14,23 +14,23 @@ client contentWriter: [ :obj | ZnEntity json: obj asJson ].
 
 From there, you're typically traversing endpoints and executing requests:
 
-response := (client / 'things') get. ""GET /things""
+response := (client / #things) get. ""GET /things""
 
 When scripting, I create instances of ==UnrestPluggableEndpoint==, which provides ways for setting custom headers and data, as well as convenience methods for various HTTP methods.
 
-response := (client / 'things') 
+response := (client / #things) 
 	headerAt: #Authorization put: '...';
 	data: aThing;
 	post.
 	
 When subclassing:
-	* override #configureHttpClient: when there's a need to configure http transport with data not specific to a particular endpoint - endpoints also get to configure transport before being executed.
+	* override #configureHttpClient: when there's a need to configure http transport with data not specific to a particular endpoint - endpoints also get to configure transport before executing a request.
 	* override #validateResponse: for custom error handling
 
 It also helps to provide access to all top-level endpoints from within the subclass like this:
 
-UnrestSubclass>>thingsEndpoint
-	^ self > (ThingsEndpoint on: self)
+MyClient>>things
+	^ self / ThingsEndpoint
 	
 This way you could chain endpoints starting with the client:
 
@@ -55,23 +55,28 @@ Class {
 }
 
 { #category : #introspection }
-WSClient class >> associatedEndpointClasses [
-	"Returns a Set of all endpoint classes that can be derived from the client's class"
+WSClient class >> derivedEndpointClasses [
+	"Returns a Set of all endpoint classes that can be derived from the client"
+
 	| methods referencedClasses rootEndpointClass |
 
-	methods := self wsEndpointMethods.
-	referencedClasses := ((methods flatCollect: [ :each | each value ])
-		collect: #value) asSet.
+	methods := self wsEndpointReferences.
+	referencedClasses := (methods flatCollect: #value) asSet.
 	rootEndpointClass := (referencedClasses
 		flatCollect: [ :each | each withAllSuperclasses ])
 		select: [ :each | each traitComposition includesTrait: TWSEndpoint ].
-	^ (rootEndpointClass flatCollect: #withAllSubclasses)
+	^ rootEndpointClass flatCollect: #withAllSubclasses
 ]
 
 { #category : #defaults }
 WSClient class >> endpointPathPragma [
-	"Pragma used by methods of an endpoint class that override its #endpointPath"
+	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
 	^ #endpoint:
+]
+
+{ #category : #accessing }
+WSClient class >> pathReferences [
+	^ (self derivedEndpointClasses flatCollect: #pathReferences) asSet
 ]
 
 { #category : #http }
@@ -95,21 +100,6 @@ WSClient >> / aString [
 WSClient >> > endPointClass [
 	"Creates a new endpoint of specified class."
 	^ endPointClass on: self
-]
-
-{ #category : #accessing }
-WSClient >> allReferencingPaths [
-	^ ((self class associatedEndpointClasses reject: #isAbstractEndpoint)
-		flatCollect: [ :aCls | aCls referencingPaths ]) asSet
-		flatCollect: [ :aPath | 
-			| p result |
-
-			result := Set with: aPath.
-			p := aPath parent.
-			[ p isRoot ]
-				whileFalse: [ result add: p.
-					p := p parent ].
-			result ]
 ]
 
 { #category : #accessing }
@@ -168,12 +158,12 @@ WSClient >> execute: anEndpoint [
 WSClient >> implementorsOfPath: aPath [
 	| pathsAndMethods |
 
-	pathsAndMethods := (self class associatedEndpointClasses
+	pathsAndMethods := (self class derivedEndpointClasses
 		reject: [ :each | each isAbstractEndpoint ])
-		flatCollect: [ :each | each referencingPathsWithMethods ].
+		flatCollect: [ :each | each pathReferences ].
 	^ pathsAndMethods
 		select: [ :each | each value = aPath ]
-		thenCollect: [ :each | each key key ]
+		thenCollect: [ :each | each key ]
 ]
 
 { #category : #initialization }

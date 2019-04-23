@@ -4,7 +4,7 @@ Extension { #name : #WSClient }
 WSClient >> buildMapOn: aBuilder [
 	| paths |
 
-	paths := self allReferencingPaths sorted: [ :a :b | a pathString < b pathString ].
+	paths := self class pathReferences sorted: [ :a :b | a pathString < b pathString ].
 
 	aBuilder view canvas color: (Color colorFrom: '#EEE').
 	aBuilder
@@ -30,7 +30,7 @@ WSClient >> buildMapOn: aBuilder [
 WSClient >> buildTopologyOn: aBuilder [
 	| endpoints colors allHttpMethods |
 
-	endpoints := self class associatedEndpointClasses.
+	endpoints := self class derivedEndpointClasses.
 
 	allHttpMethods := self class supportedHttpMethods
 		collect: #asLowercase.
@@ -51,7 +51,7 @@ WSClient >> buildTopologyOn: aBuilder [
 		addObjects: endpoints;
 		classname: #name;
 		instanceVariables: #instVarNames;
-		methodsNames: [ :cls | cls methods select: #isWSEndpointMethod ];
+		methodsNames: [ :cls | cls methods select: #isWSEndpointExecutionMethod ];
 		methodselector: [ :aMethod | 
 			'{1} ~> {2}'
 				format:

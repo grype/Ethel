@@ -215,8 +215,8 @@ WSEndpointTest >> testIsWSEndpointMethod [
 	endpoint class methods
 		do: [ :aMethod | 
 			(httpMethods includes: aMethod selector)
-				ifTrue: [ aMethod isWSEndpointMethod should ]
-				ifFalse: [ aMethod isWSEndpointMethod should not ] ]
+				ifTrue: [ aMethod isWSEndpointExecutionMethod should ]
+				ifFalse: [ aMethod isWSEndpointExecutionMethod should not ] ]
 ]
 
 { #category : #'tests-executing' }
@@ -307,5 +307,5 @@ WSEndpointTest >> testWSEndpointHttpMethod [
 		do: [ :aMethod | 
 			(httpMethods includes: aMethod selector)
 				ifTrue: [ aMethod wsEndpointHttpMethod = aMethod selector ]
-				ifFalse: [ aMethod isWSEndpointMethod should not ] ]
+				ifFalse: [ aMethod isWSEndpointExecutionMethod should not ] ]
 ]

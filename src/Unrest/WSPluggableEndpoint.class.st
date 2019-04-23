@@ -72,7 +72,18 @@ WSPluggableEndpoint >> endpointPath [
 { #category : #api }
 WSPluggableEndpoint >> executeHttpMethod: aMethod [
 	method := aMethod.
-	^ unrest execute: self
+	^ wsClient execute: self
+]
+
+{ #category : #executing }
+WSPluggableEndpoint >> executingContext [
+	| sender |
+
+	sender := thisContext sender.
+	[ sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ]
+		whileTrue: [ sender := sender sender ].
+
+	^ sender
 ]
 
 { #category : #api }

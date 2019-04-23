@@ -71,14 +71,9 @@ TWSEndpoint classSide >> on: wsClient [
 ]
 
 { #category : #accessing }
-TWSEndpoint classSide >> referencingPaths [
-	^ self referencingPathsWithMethods collect: #value
-]
-
-{ #category : #accessing }
-TWSEndpoint classSide >> referencingPathsWithMethods [
-	^ (self wsEndpointMethods
-		collect: [ :aMethod | aMethod -> (aMethod key wsEndpointPath) ])
+TWSEndpoint classSide >> pathReferences [
+	^ (self wsEndpointExecutingMethods
+		collect: [ :aMethod | aMethod -> (aMethod wsEndpointPath) ])
 		asSet
 ]
 
