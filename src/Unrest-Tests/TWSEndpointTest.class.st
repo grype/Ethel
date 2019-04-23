@@ -82,6 +82,16 @@ TWSEndpointTest >> testAbstractEndpoint [
 	WSTestEndpoint isAbstractEndpoint should not be
 ]
 
+{ #category : #'tests-configuring' }
+TWSEndpointTest >> testConfigureOn [
+	endpoint stub.
+	http := client createHttpClient.
+	endpoint configureOn: http.
+	http request headers should
+		include: WSTestEndpoint testHeaderValue
+		at: WSTestEndpoint testHeaderName
+]
+
 { #category : #'tests-composing' }
 TWSEndpointTest >> testEndpointComposition [
 	| ep |
@@ -187,16 +197,6 @@ TWSEndpointTest >> testEnumerationSelect [
 ]
 
 { #category : #'tests-configuring' }
-TWSEndpointTest >> testHttpConfiguration [
-	endpoint stub.
-	http := client createHttpClient.
-	endpoint configureOn: http.
-	http request headers should
-		include: WSTestEndpoint testHeaderValue
-		at: WSTestEndpoint testHeaderName
-]
-
-{ #category : #'tests-configuring' }
 TWSEndpointTest >> testHttpMethod [
 	| stubbedHttp |
 
@@ -252,6 +252,14 @@ TWSEndpointTest >> testKeywordWithRelativePathExecution [
 	self stubForExecution.
 	endpoint getRelativeKeyword: 'foo'.
 	http request url should equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'foo') segments)
+]
+
+{ #category : #tests }
+TWSEndpointTest >> testOn [
+	| tempEndpoint |
+
+	tempEndpoint := WSTestEndpoint on: client.
+	tempEndpoint wsClient should equal: client
 ]
 
 { #category : #tests }
