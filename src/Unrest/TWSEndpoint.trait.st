@@ -82,23 +82,19 @@ TWSEndpoint classSide >> systemIconName [
 ]
 
 { #category : #endpoints }
-TWSEndpoint >> / aString [
-	"Creates a new generic endpoint by appending a new path."
+TWSEndpoint >> / aStringOrEndpoint [
+	| ep |
 
-	^ (self > WSPluggableEndpoint)
-		path: self endpointPath / aString;
-		yourself
-]
+	ep := aStringOrEndpoint isWSEndpoint
+		ifTrue: [ self wsClient / aStringOrEndpoint ]
+		ifFalse: [ | path |
 
-{ #category : #endpoints }
-TWSEndpoint >> > endPointClass [
-	"Creates a new endpoint of specified class."
-
-	| newEndpoint |
-
-	newEndpoint := endPointClass on: wsClient.
-	self configureDerivedEndpoint: newEndpoint.
-	^ newEndpoint 
+			path := (aStringOrEndpoint isKindOf: Path)
+				ifTrue: [ self endpointPath resolvePath: aStringOrEndpoint ]
+				ifFalse: [ self endpointPath / aStringOrEndpoint ].
+			self wsClient / path ].
+	self configureDerivedEndpoint: ep.
+	^ ep
 ]
 
 { #category : #configuring }

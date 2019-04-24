@@ -54,6 +54,11 @@ Class {
 	#category : #'Unrest-Core'
 }
 
+{ #category : #accessing }
+WSClient class >> derivedEndpoints [
+	^ self derivedWSEndpoints
+]
+
 { #category : #defaults }
 WSClient class >> endpointPathPragma [
 	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
@@ -62,7 +67,7 @@ WSClient class >> endpointPathPragma [
 
 { #category : #accessing }
 WSClient class >> pathReferences [
-	^ (self derivedWSEndpoints flatCollect: #pathReferences) asSet
+	^ (self derivedEndpoints flatCollect: #pathReferences) asSet
 ]
 
 { #category : #http }
@@ -77,15 +82,14 @@ WSClient class >> withUrl: aUrl [
 ]
 
 { #category : #endpoints }
-WSClient >> / aString [
-	"Creates a new generic endpoint."
-	^ (WSPluggableEndpoint on: self) path: (Path / aString); yourself
-]
-
-{ #category : #endpoints }
-WSClient >> > endPointClass [
-	"Creates a new endpoint of specified class."
-	^ endPointClass on: self
+WSClient >> / aPathObject [
+	^ aPathObject isWSEndpoint
+		ifTrue: [ aPathObject on: self ]
+		ifFalse: [ self
+				endpointForPath:
+					((aPathObject isKindOf: Path)
+						ifTrue: [ aPathObject ]
+						ifFalse: [ Path / aPathObject asString ]) ]
 ]
 
 { #category : #accessing }
@@ -127,6 +131,21 @@ WSClient >> createHttpClient [
 	^ client
 ]
 
+{ #category : #endpoints }
+WSClient >> endpointForPath: aPath [
+	| endpoints |
+
+	endpoints := self class derivedEndpoints
+		select: [ :aClass | aClass endpointPath = aPath ].
+	endpoints size > 1
+		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ].
+	^ endpoints
+		ifEmpty: [ (WSPluggableEndpoint on: self)
+				path: aPath;
+				yourself ]
+		ifNotEmpty: [ :val | val anyOne on: self ]
+]
+
 { #category : #execution }
 WSClient >> execute: anEndpoint [
 	| http result |
@@ -141,10 +160,10 @@ WSClient >> execute: anEndpoint [
 ]
 
 { #category : #accessing }
-WSClient >> implementorsOfPath: aPath [
+WSClient >> executorsOfPath: aPath [
 	| pathsAndMethods |
 
-	pathsAndMethods := self class derivedEndpointClasses
+	pathsAndMethods := self class derivedEndpoints
 		flatCollect: [ :each | each pathReferences ].
 	^ pathsAndMethods
 		select: [ :each | each value = aPath ]

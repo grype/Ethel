@@ -22,15 +22,6 @@ Class {
 	#category : #'Unrest-Core'
 }
 
-{ #category : #endpoints }
-WSPluggableEndpoint >> / aString [
-	"Creates a new generic endpoint by appending a new path."
-
-	^ (self > WSPluggableEndpoint)
-		path: self endpointPath / aString;
-		yourself
-]
-
 { #category : #configuring }
 WSPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
 	headers isEmptyOrNil

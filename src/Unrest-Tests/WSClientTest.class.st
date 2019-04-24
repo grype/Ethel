@@ -20,22 +20,33 @@ WSClientTest >> testCreateHttpClient [
 ]
 
 { #category : #tests }
+WSClientTest >> testDerivedEndpoints [
+	| derived |
+
+	derived := client class derivedEndpoints.
+	derived should
+		equal:
+			(Set new
+				add: WSTestEndpoint;
+				add: WSCollectionTestEndpoint;
+				add: WSDetachedEmptyTestEndpoint;
+				add: WSDetachedTestEndpoint;
+				yourself)
+]
+
+{ #category : #tests }
 WSClientTest >> testDerivedWSEndpoints [
 	| derived |
 
 	derived := client class derivedWSEndpoints.
 	derived should
-		equal:
-			(Set
-				with: WSTestEndpoint
-				with: WSCollectionTestEndpoint
-				with: WSPluggableEndpoint)
+		equal: (Set with: WSTestEndpoint with: WSCollectionTestEndpoint)
 ]
 
 { #category : #tests }
 WSClientTest >> testEndpointComposition [
 	| ep |
-	ep := client > WSTestEndpoint.
+	ep := client / WSTestEndpoint.
 	ep class should equal: WSTestEndpoint.
 	ep wsClient should equal: client.
 	ep endpointPath should equal: WSTestEndpoint endpointPath.
@@ -66,17 +77,17 @@ WSClientTest >> testExecute [
 ]
 
 { #category : #tests }
+WSClientTest >> testExecutorsOfPath [
+	| implementors |
+	implementors := client executorsOfPath: WSTestEndpoint endpointPath.
+	implementors isEmptyOrNil should not be
+]
+
+{ #category : #tests }
 WSClientTest >> testHttpClientCreation [
 	client stub.
 	client createHttpClient.
 	client should receive configureHttpClient: (Instance of: ZnClient)
-]
-
-{ #category : #tests }
-WSClientTest >> testImplementorsOfPath [
-	| implementors |
-	implementors := client implementorsOfPath: WSTestEndpoint endpointPath.
-	implementors isEmptyOrNil should not be
 ]
 
 { #category : #tests }
@@ -95,9 +106,7 @@ WSClientTest >> testPathReferences [
 
 	paths := client class pathReferences.
 	paths should
-		equal:
-			WSTestEndpoint pathReferences
-				, WSCollectionTestEndpoint pathReferences
+		equal: (client class derivedEndpoints flatCollect: #pathReferences)
 ]
 
 { #category : #tests }

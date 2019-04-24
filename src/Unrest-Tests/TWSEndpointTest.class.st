@@ -90,7 +90,7 @@ TWSEndpointTest >> testConfigureOn [
 TWSEndpointTest >> testEndpointComposition [
 	| ep |
 
-	ep := endpoint > WSCollectionTestEndpoint.
+	ep := endpoint / WSCollectionTestEndpoint.
 	ep class should equal: WSCollectionTestEndpoint.
 	ep wsClient should equal: endpoint wsClient.
 	ep endpointPath should equal: WSCollectionTestEndpoint endpointPath.
