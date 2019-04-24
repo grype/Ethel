@@ -96,6 +96,11 @@ WSTestEndpoint >> getRelativeMixed: anArgument [
 	^ self execute
 ]
 
+{ #category : #'accessing structure variables' }
+WSTestEndpoint >> nested [
+	^ self / WSNestedTestEndpoint 
+]
+
 { #category : #'private-executing' }
 WSTestEndpoint >> options [
 	<endpoint>
