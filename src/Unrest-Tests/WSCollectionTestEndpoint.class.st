@@ -101,7 +101,6 @@ WSCollectionTestEndpoint >> size [
 
 { #category : #tests }
 WSCollectionTestEndpoint >> test [
-	<endpoint>
 	<get>
 	^ self execute
 ]
