@@ -13,7 +13,6 @@ WSTestEndpoint class >> endpointPath [
 
 { #category : #'private-executing' }
 WSTestEndpoint >> delete [
-	<endpoint>
 	<delete>
 	^ self execute
 ]
@@ -31,35 +30,34 @@ WSTestEndpoint >> executingContext [
 
 { #category : #'private-executing' }
 WSTestEndpoint >> get [
-	<endpoint>
 	<get>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getAbsolute [
-	<endpoint: '/absolute'>
+	<path: '/absolute'>
 	<get>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getAbsoluteDeep [
-	<endpoint: '/absolute/deep/path'>
+	<path: '/absolute/deep/path'>
 	<get>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getAbsoluteKeyword: anArgument [
-	<endpoint: '/{anArgument}'>
+	<path: '/{anArgument}'>
 	<get>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getAbsoluteMixed: anArgument [
-	<endpoint: '/absolute/{local}/{anArgument}/path'>
+	<path: '/absolute/{local}/{anArgument}/path'>
 	<get>
 	| local |
 	local := 'mixed'.
@@ -68,28 +66,28 @@ WSTestEndpoint >> getAbsoluteMixed: anArgument [
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getRelative [
-	<endpoint: 'relative'>
+	<path: 'relative'>
 	<get>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getRelativeDeep [
-	<endpoint: 'relative/deep/path'>
+	<path: 'relative/deep/path'>
 	<get>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getRelativeKeyword: anArgument [
-	<endpoint: '{anArgument}'>
+	<path: '{anArgument}'>
 	<get>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getRelativeMixed: anArgument [
-	<endpoint: 'relative/{local}/{anArgument}/path'>
+	<path: 'relative/{local}/{anArgument}/path'>
 	<get>
 	| local |
 	local := 'mixed'.
@@ -103,28 +101,24 @@ WSTestEndpoint >> nested [
 
 { #category : #'private-executing' }
 WSTestEndpoint >> options [
-	<endpoint>
 	<options>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> patch [
-	<endpoint>
 	<patch>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> post [
-	<endpoint>
 	<post>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> put [
-	<endpoint>
 	<put>
 	^ self execute
 ]

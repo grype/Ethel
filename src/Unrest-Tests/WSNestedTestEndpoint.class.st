@@ -11,7 +11,6 @@ WSNestedTestEndpoint class >> endpointPath [
 
 { #category : #'private-executing' }
 WSNestedTestEndpoint >> get [
-	<endpoint>
 	<get>
 	^ self execute
 ]

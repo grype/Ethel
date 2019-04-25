@@ -62,7 +62,7 @@ WSClient class >> derivedEndpoints [
 { #category : #defaults }
 WSClient class >> endpointPathPragma [
 	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
-	^ #endpoint:
+	^ #path:
 ]
 
 { #category : #accessing }

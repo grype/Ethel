@@ -6,6 +6,11 @@ CompiledMethod >> isWSEndpointExecutionMethod [
 ]
 
 { #category : #'*Unrest' }
+CompiledMethod >> isWSEndpointReferencingMethod [
+	^ self wsEndpointReferences isEmptyOrNil not
+]
+
+{ #category : #'*Unrest' }
 CompiledMethod >> wsEndpointHttpMethod [
 	| methods |
 
@@ -28,8 +33,5 @@ CompiledMethod >> wsEndpointPath [
 
 { #category : #'*Unrest' }
 CompiledMethod >> wsEndpointReferences [
-	^ self allLiterals
-		select:
-			[ :aLiteral | aLiteral value isClass and: [ aLiteral value isWSEndpoint ] ]
-		thenCollect: #value
+	^ self referencedClasses select: #isWSEndpoint
 ]
