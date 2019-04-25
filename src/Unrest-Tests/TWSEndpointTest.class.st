@@ -10,6 +10,22 @@ Class {
 	#category : #'Unrest-Tests-Core'
 }
 
+{ #category : #'tests-composing' }
+TWSEndpointTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
+	aDestination class should equal: aClass.
+	aDestination wsClient should equal: aSource wsClient.
+	aDestination endpointPath should equal: aClass endpointPath.
+	(aDestination headers keys includesAll: aSource headers keys) should be
+]
+
+{ #category : #'tests-composing' }
+TWSEndpointTest >> ensureEndpoint: aDestination derivedPluggableEndpointFrom: aSource usingPath: aPath [
+	aDestination class should equal: WSPluggableEndpoint.
+	aDestination wsClient should equal: aSource wsClient.
+	aDestination endpointPath should equal: aPath.
+	(aDestination headers keys includesAll: aSource headers keys) should be
+]
+
 { #category : #stubbing }
 TWSEndpointTest >> okJsonResponseWith: aValue [
 	^ ZnResponse ok: (ZnEntity json: aValue asJson)
@@ -87,14 +103,47 @@ TWSEndpointTest >> testConfigureOn [
 ]
 
 { #category : #'tests-composing' }
-TWSEndpointTest >> testEndpointComposition [
-	| ep |
+TWSEndpointTest >> testEndpointCompositionWithClass [
+	self
+		ensureEndpoint: endpoint / WSCollectionTestEndpoint
+		derivedFrom: endpoint
+		as: WSCollectionTestEndpoint.
 
-	ep := endpoint / WSCollectionTestEndpoint.
-	ep class should equal: WSCollectionTestEndpoint.
-	ep wsClient should equal: endpoint wsClient.
-	ep endpointPath should equal: WSCollectionTestEndpoint endpointPath.
-	(ep headers keys includesAll: endpoint headers keys) should be
+	self
+		ensureEndpoint: endpoint / #this / #goes / #nowhere / WSCollectionTestEndpoint
+		derivedFrom: endpoint
+		as: WSCollectionTestEndpoint
+]
+
+{ #category : #'tests-composing' }
+TWSEndpointTest >> testEndpointCompositionWithPath [
+	self
+		ensureEndpoint: endpoint / (Path * #nested)
+		derivedFrom: endpoint
+		as: WSNestedTestEndpoint.
+
+	self
+		ensureEndpoint: endpoint / (Path / #test / #nested)
+		derivedFrom: endpoint
+		as: WSNestedTestEndpoint.
+
+	self
+		ensureEndpoint: endpoint / (Path / #nested)
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #nested.
+
+	self
+		ensureEndpoint: endpoint / (Path / #test)
+		derivedFrom: endpoint
+		as: WSTestEndpoint
+]
+
+{ #category : #'tests-composing' }
+TWSEndpointTest >> testEndpointCompositionWithString [
+	self
+		ensureEndpoint: endpoint / #nested
+		derivedFrom: endpoint
+		as: WSNestedTestEndpoint
 ]
 
 { #category : #tests }

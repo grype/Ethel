@@ -88,7 +88,7 @@ WSClient >> / aPathObject [
 		ifFalse: [ self
 				endpointForPath:
 					((aPathObject isKindOf: Path)
-						ifTrue: [ aPathObject ]
+						ifTrue: [ aPathObject asResolvedBy: Path root ]
 						ifFalse: [ Path / aPathObject asString ]) ]
 ]
 

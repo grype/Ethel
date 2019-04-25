@@ -7,6 +7,20 @@ Class {
 	#category : #'Unrest-Tests-Core'
 }
 
+{ #category : #tests }
+WSClientTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
+	aDestination class should equal: aClass.
+	aDestination wsClient should equal: aSource.
+	aDestination endpointPath should equal: aClass endpointPath
+]
+
+{ #category : #tests }
+WSClientTest >> ensureEndpoint: aDestination derivedPluggableEndpointFrom: aSource usingPath: aPath [
+	aDestination class should equal: WSPluggableEndpoint.
+	aDestination wsClient should equal: aSource.
+	aDestination endpointPath should equal: aPath
+]
+
 { #category : #running }
 WSClientTest >> setUp [
 	client := WSTestClient default
@@ -44,12 +58,57 @@ WSClientTest >> testDerivedWSEndpoints [
 ]
 
 { #category : #tests }
-WSClientTest >> testEndpointComposition [
-	| ep |
-	ep := client / WSTestEndpoint.
-	ep class should equal: WSTestEndpoint.
-	ep wsClient should equal: client.
-	ep endpointPath should equal: WSTestEndpoint endpointPath.
+WSClientTest >> testEndpointCompositionWithClass [
+	self
+		ensureEndpoint: client / WSTestEndpoint
+		derivedFrom: client
+		as: WSTestEndpoint.
+
+	self
+		ensureEndpoint: client / #nowhere / #in / #particular
+		derivedPluggableEndpointFrom: client
+		usingPath: Path / #nowhere / #in / #particular
+]
+
+{ #category : #tests }
+WSClientTest >> testEndpointCompositionWithPath [
+	self
+		ensureEndpoint: client / (Path / #test)
+		derivedFrom: client
+		as: WSTestEndpoint.
+
+	self
+		ensureEndpoint: client / (Path * #test)
+		derivedFrom: client
+		as: WSTestEndpoint.
+
+	self
+		ensureEndpoint: client / (Path / #nothing / #here)
+		derivedPluggableEndpointFrom: client
+		usingPath: Path / #nothing / #here
+]
+
+{ #category : #tests }
+WSClientTest >> testEndpointCompositionWithString [
+	self
+		ensureEndpoint: client / #test
+		derivedFrom: client
+		as: WSTestEndpoint.
+
+	self
+		ensureEndpoint: client / #test / #nested
+		derivedFrom: client
+		as: WSNestedTestEndpoint.
+
+	self
+		ensureEndpoint: client / 'test/nested'
+		derivedFrom: client
+		as: WSNestedTestEndpoint.
+
+	self
+		ensureEndpoint: client / #nothing / #here
+		derivedPluggableEndpointFrom: client
+		usingPath: Path / #nothing / #here
 ]
 
 { #category : #tests }
