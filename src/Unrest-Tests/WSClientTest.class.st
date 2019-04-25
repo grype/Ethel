@@ -45,6 +45,7 @@ WSClientTest >> testDerivedEndpoints [
 				add: WSCollectionTestEndpoint;
 				add: WSDetachedEmptyTestEndpoint;
 				add: WSDetachedTestEndpoint;
+				add: WSNestedTestEndpoint;
 				yourself)
 ]
 
@@ -54,7 +55,12 @@ WSClientTest >> testDerivedWSEndpoints [
 
 	derived := client class derivedWSEndpoints.
 	derived should
-		equal: (Set with: WSTestEndpoint with: WSCollectionTestEndpoint)
+		equal:
+			(Set new
+				add: WSTestEndpoint;
+				add: WSCollectionTestEndpoint;
+				add: WSNestedTestEndpoint;
+				yourself)
 ]
 
 { #category : #tests }
