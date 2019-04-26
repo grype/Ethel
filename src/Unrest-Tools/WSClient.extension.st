@@ -30,7 +30,7 @@ WSClient >> buildMapOn: aBuilder [
 WSClient >> buildTopologyOn: aBuilder [
 	| endpoints colors allHttpMethods lb |
 
-	endpoints := self class derivedEndpoints.
+	endpoints := self class endpoints.
 
 	allHttpMethods := self class supportedHttpMethods
 		collect: #asLowercase.
@@ -85,8 +85,8 @@ WSClient >> gtDerivedEndpointClassesIn: aComposite [
 		title: [ 'Endpoint classes' translated ];
 		beMultiple;
 		allowsSearch;
-		display: [ self class derivedEndpoints ];
-		when: [ self class derivedEndpoints isEmptyOrNil not ]
+		display: [ self class endpoints ];
+		when: [ self class endpoints isEmptyOrNil not ]
 ]
 
 { #category : #'*Unrest-Tools' }

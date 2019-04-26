@@ -15,8 +15,8 @@ WSTestClient class >> default [
 ]
 
 { #category : #accessing }
-WSTestClient class >> derivedEndpoints [
-	^ super derivedEndpoints
+WSTestClient class >> endpoints [
+	^ super endpoints
 		, (self package classes select: #isWSEndpoint) reject: #isTrait
 ]
 

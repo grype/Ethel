@@ -54,11 +54,6 @@ Class {
 	#category : #'Unrest-Core'
 }
 
-{ #category : #accessing }
-WSClient class >> derivedEndpoints [
-	^ self derivedWSEndpoints
-]
-
 { #category : #defaults }
 WSClient class >> endpointPathPragma [
 	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
@@ -66,8 +61,14 @@ WSClient class >> endpointPathPragma [
 ]
 
 { #category : #accessing }
+WSClient class >> endpoints [
+	"Return collection of endpoint classes associated with this client type. By default, this returns all of the endpoint classes that this class mentions"
+	^ self derivedWSEndpoints
+]
+
+{ #category : #accessing }
 WSClient class >> pathReferences [
-	^ (self derivedEndpoints flatCollect: #pathReferences) asSet
+	^ (self endpoints flatCollect: #pathReferences) asSet
 ]
 
 { #category : #http }
@@ -135,7 +136,7 @@ WSClient >> createHttpClient [
 WSClient >> endpointForPath: aPath [
 	| endpoints |
 
-	endpoints := self class derivedEndpoints
+	endpoints := self class endpoints
 		select: [ :aClass | aClass endpointPath = aPath ].
 	endpoints size > 1
 		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ].
@@ -163,10 +164,10 @@ WSClient >> execute: anEndpoint [
 WSClient >> executorsOfPath: aPath [
 	| pathsAndMethods |
 
-	pathsAndMethods := self class derivedEndpoints
+	pathsAndMethods := self class endpoints
 		flatCollect: [ :each | each pathReferences ].
 	^ pathsAndMethods
-		select: [ :each | each value = aPath ]
+		select: [ :each | each value matches: aPath ]
 		thenCollect: [ :each | each key ]
 ]
 

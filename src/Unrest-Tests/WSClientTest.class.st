@@ -34,22 +34,6 @@ WSClientTest >> testCreateHttpClient [
 ]
 
 { #category : #tests }
-WSClientTest >> testDerivedEndpoints [
-	| derived |
-
-	derived := client class derivedEndpoints.
-	derived should
-		equal:
-			(Set new
-				add: WSTestEndpoint;
-				add: WSCollectionTestEndpoint;
-				add: WSDetachedEmptyTestEndpoint;
-				add: WSDetachedTestEndpoint;
-				add: WSNestedTestEndpoint;
-				yourself)
-]
-
-{ #category : #tests }
 WSClientTest >> testDerivedWSEndpoints [
 	| derived |
 
@@ -118,6 +102,22 @@ WSClientTest >> testEndpointCompositionWithString [
 ]
 
 { #category : #tests }
+WSClientTest >> testEndpoints [
+	| derived |
+
+	derived := client class endpoints.
+	derived should
+		equal:
+			(Set new
+				add: WSTestEndpoint;
+				add: WSCollectionTestEndpoint;
+				add: WSDetachedEmptyTestEndpoint;
+				add: WSDetachedTestEndpoint;
+				add: WSNestedTestEndpoint;
+				yourself)
+]
+
+{ #category : #tests }
 WSClientTest >> testExecute [
 	| ep http response |
 
@@ -171,7 +171,7 @@ WSClientTest >> testPathReferences [
 
 	paths := client class pathReferences.
 	paths should
-		equal: (client class derivedEndpoints flatCollect: #pathReferences)
+		equal: (client class endpoints flatCollect: #pathReferences)
 ]
 
 { #category : #tests }
