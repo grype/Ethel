@@ -137,7 +137,7 @@ WSClient >> endpointForPath: aPath [
 	| endpoints |
 
 	endpoints := self class endpoints
-		select: [ :aClass | aClass endpointPath = aPath ].
+		select: [ :aClass | aClass endpointPath matches: aPath ].
 	endpoints size > 1
 		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ].
 	^ endpoints
