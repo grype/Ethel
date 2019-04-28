@@ -45,7 +45,7 @@ WSPluggableEndpoint >> configureOn: http [
 				ifTrue: [ http queryAddAll: aData ]
 				ifFalse: [ http contents: aData ] ].
 
-	http method: method greaseString asUppercase asSymbol.
+	http method: method asString asUppercase asSymbol.
 	http headerAddAll: headers
 ]
 
