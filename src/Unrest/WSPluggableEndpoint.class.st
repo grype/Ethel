@@ -1,12 +1,21 @@
 "
-I am a pluggable endpoint primarily used for scripting interactions with a web-based service. Both ==Unrest== and ==TUnrestEndpoint== create instances of me via #/ method. I provide flexible interface for configuring request headers and data and implement common HTTP methods like GET, POST, PUT, PATCH and DELETE.
+I am a pluggable endpoint primarily used for scripting interactions with a web-based service. Both ==WSClient== and ==TWSEndpoint== create instances of me via #/ method. I provide flexible interface for configuring request headers and data and implement common HTTP methods like GET, POST, PUT, PATCH and DELETE.
 
-From any client or endpoint, simply send #/ with a path argument. The newly created instance of me will capture the resulting path: 
+Sending #/ message with a path argument to an instance of ==WSClient== or ==TWSEndpoing== will first look for a concrete endpoint class fir that path. If none could be found, a pluggable instance will be returned, capturing the final path.
 
-client := Unrest withUrl: 'http://example.com'.
-client contentWriter: [ :obj | ZnEntity json: obj asJson ].
-(client / #examples) get. ""GET /examples""
-(client / #examples) data: aNewExample; put. ""PUT {aNewExample asJson}""
+[[[
+			client := WSClient withUrl: 'http://example.com'.
+			client contentWriter: [ :obj | ZnEntity json: obj asJson ].
+			(client / #examples) get. ""GET /examples""
+			(client / #examples) data: aNewExample; put. ""PUT /examples {aNewExample asJson}""
+]]]
+
+To explicitly create a pluggable instance:
+
+[[[
+			client := WSClient withUrl: 'http://example.com'.
+			(client / WSPluggableEndpoint) path: Path / #examples; get.
+]]]
 "
 Class {
 	#name : #WSPluggableEndpoint,
