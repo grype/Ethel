@@ -72,7 +72,8 @@ WSClient class >> endpointPathPragma [
 
 { #category : #accessing }
 WSClient class >> endpoints [
-	"Return collection of endpoint classes associated with this client type. By default, this returns all of the endpoint classes that this class mentions"
+	"Return collection of endpoint classes associated with this client type. 
+	By default, this returns all of the endpoint classes referenced by this and by all discovered classes"
 	^ self derivedWSEndpoints
 ]
 
@@ -86,6 +87,7 @@ WSClient class >> jsonWithUrl: aUrl [
 
 { #category : #accessing }
 WSClient class >> pathReferences [
+	"Returns all path references found in related endpoint classes"
 	^ (self endpoints flatCollect: #pathReferences) asSet
 ]
 

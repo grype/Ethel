@@ -1,49 +1,53 @@
 "
-I encapsulate generic behavior of an enumerating endpoint.
-
-I provide a collection-like interface to an endpoint. This is often useful when dealing with paginating endpoints.
+I encapsulate generic behavior of an enumerating endpoint and provide a collection-like interface to an endpoint. This is often useful when dealing with paginating endpoints.
 
 Example:
-	
-""Define paging cursor to track page number and generate accesors for the two ivars. #hasMore is used by ==TUnrestEnumerating== to determine whether there are anymore requests to make. We'll be setting that ivar ourselves when we handle responses""
 
-Object subclass: #PagingCursor
-	uses: TUnrestEnumerationCursor 
-	instanceVariableNames: 'page hasMore'
-	classVariableNames: ''
-	package: 'MyPackage'
-	
-""Define simple search endpoint and accessors for all its ivars, so that we can configure the endpoint as appropriate...""
+[[[
 
-Object subclass: #SearchEndpoint
-	uses: TUnrestEndpoint + TUnrestEnumerating
-	instanceVariableNames: 'query limit page pageSize'
-	classVariableNames: ''
-	package: 'MyPackage'
-	
-""Following ==TUnrestEnumerating== create and return new cursor via #cursor, and a single enumerating request via #enumerateWith:limit:""
+""Define paging cursor - we'll track current page number via #page ivar, and set #hasMore ivar to true when we detect end of results during enumeration""
+			
+			Object subclass: #PagingCursor
+				uses: TUnrestEnumerationCursor 
+				instanceVariableNames: 'page hasMore'
+				classVariableNames: ''
+				package: 'MyPackage'
+			
+""Define simple search endpoint""
+			
+			Object subclass: #SearchEndpoint
+			uses: TUnrestEndpoint + TUnrestEnumerating
+			instanceVariableNames: 'query limit page pageSize'
+			classVariableNames: ''
+			package: 'MyPackage'
+			
+""Return new cursor via #cursor""
+			
+			SearchEndpoint>>cursor
+				^ PagingCursor new
+			
+""Enumeration is done inside #enumerateWith:limit:""
+			
+			SearchEndpoint>>enumerateWith: aCursor limit: anInt
+				| results |
+				page := aCursor page.
+				anInt ifNotNil: [ :val | pageSize := val ].
+				results := self execute. 	""Assuming #execute returns a lits of results""
+				aCursor page: aCursor page + 1.  ""Increment page number""
+				aCursor hasMore: (results isNotNil and: [ results size == pageSize ]).  ""Determine whether there's more results to fetch""
+				^ results
+]]]
 
-SearchEndpoint>>cursor
-	^ PagingCursor new
-	
-SearchEndpoint>>enumerateWith: aCursor limit: anInt
-	| results |
-	page := aCursor page.
-	anInt ifNotNil: [ :val | pageSize := val ].
-	results := self execute. 	""Assuming #execute returns a lits of results""
-	aCursor page: aCursor page + 1.
-	aCursor hasMore: (results isNotNil and: [ results size == pageSize ]).
-	^ results
+Now we can enumerate search results like we would a collection:
 
-Now we can enumerate search results like a collection:
-
-ep := (SearchEndpoint on: client) query: 'something'; limit: 100; yourself.
-ep do: [ :each | Transcript crLog: each asString ].
-ep collect: [ :each | Something from: each ].
-ep detect: [ :each | each includesSubstring: 'something' ] ifFound: [ :found | Transcript crLog: found ].
-ep reject: [ :each | each endsWith: 'er' ].
-ep collect: #yourself.
-etc...
+[[[
+			ep := (client / SearchEndpoint) query: 'something'; limit: 100; yourself.
+			ep do: [ :each | Transcript crLog: each asString ].
+			ep collect: [ :each | Something from: each ].
+			ep detect: [ :each | each includesSubstring: 'something' ] ifFound: [ :found | Transcript crLog: found ].
+			ep reject: [ :each | each endsWith: 'er' ].
+			ep collect: #yourself.
+]]]
 "
 Trait {
 	#name : #TWSEnumeration,
