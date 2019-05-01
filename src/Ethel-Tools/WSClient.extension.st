@@ -5,6 +5,7 @@ WSClient >> buildMapOn: aBuilder [
 	| paths |
 
 	paths := (self class pathReferences collect: #value) sorted: [ :a :b | a pathString < b pathString ].
+	paths := paths flatCollect: [ :each | each withParents  ].
 
 	aBuilder view canvas color: (Color colorFrom: '#EEE').
 	aBuilder
@@ -28,9 +29,9 @@ WSClient >> buildMapOn: aBuilder [
 
 { #category : #'*Ethel-Tools' }
 WSClient >> buildTopologyOn: aBuilder [
-	| endpoints colors allHttpMethods lb |
+	| endpointClasses colors allHttpMethods lb |
 
-	endpoints := self class endpoints.
+	endpointClasses := (self class endpoints flatCollect: [ :each | each withAllSuperclasses ]) select: #isWSEndpoint.
 
 	allHttpMethods := self class supportedHttpMethods
 		collect: #asLowercase.
@@ -53,7 +54,7 @@ WSClient >> buildTopologyOn: aBuilder [
 					aMethod wsEndpointPath pathString } ];
 		attributeselector: #yourself;
 		superclass: #superclass.
-	aBuilder addObjects: endpoints.
+	aBuilder addObjects: endpointClasses.
 	aBuilder layout tree.
 
 	lb := RTLegendBuilder new.
