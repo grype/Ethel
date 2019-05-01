@@ -157,6 +157,22 @@ TWSEnumeration >> first: aLimit [
 ]
 
 { #category : #enumerating }
+TWSEnumeration >> flatCollect: aBlock [
+	^ self flatCollect: aBlock as: OrderedCollection 
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> flatCollect: aBlock as: aClass [
+	| result cursor |
+
+	result := aClass new.
+	cursor := self cursor.
+	[ cursor hasMore ]
+		whileTrue: [ (self enumerateWith: cursor) ifNotNil: [ :val | result addAll: (val flatCollect: aBlock) ] ].
+	^ result
+]
+
+{ #category : #enumerating }
 TWSEnumeration >> groupedBy: aBlock [
 	| cursor groups |
 
