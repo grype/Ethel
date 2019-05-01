@@ -20,13 +20,14 @@ To explicitly create a pluggable instance:
 Class {
 	#name : #WSPluggableEndpoint,
 	#superclass : #Object,
-	#traits : 'TWSEndpoint',
-	#classTraits : 'TWSEndpoint classTrait',
+	#traits : 'TWSEndpoint + TWSEnumeration',
+	#classTraits : 'TWSEndpoint classTrait + TWSEnumeration classTrait',
 	#instVars : [
 		'path',
 		'data',
 		'method',
-		'headers'
+		'headers',
+		'enumerationBlock'
 	],
 	#category : #'Ethel-Core'
 }
@@ -50,6 +51,11 @@ WSPluggableEndpoint >> configureOn: http [
 ]
 
 { #category : #accessing }
+WSPluggableEndpoint >> cursor [
+	^ WSPluggableCursor new
+]
+
+{ #category : #accessing }
 WSPluggableEndpoint >> data [
 	^ data
 ]
@@ -67,6 +73,22 @@ WSPluggableEndpoint >> delete [
 { #category : #accessing }
 WSPluggableEndpoint >> endpointPath [
 	^ path
+]
+
+{ #category : #enumerating }
+WSPluggableEndpoint >> enumerateWith: aCursor limit: anInt [
+	enumerationBlock ifNil: [ ^ nil ].
+	^ enumerationBlock cull: self cull: aCursor cull: anInt
+]
+
+{ #category : #accessing }
+WSPluggableEndpoint >> enumerationBlock [
+	^ enumerationBlock
+]
+
+{ #category : #accessing }
+WSPluggableEndpoint >> enumerationBlock: anObject [
+	enumerationBlock := anObject
 ]
 
 { #category : #api }
