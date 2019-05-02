@@ -2,25 +2,42 @@ Extension { #name : #WSClient }
 
 { #category : #'*Ethel-Tools' }
 WSClient >> buildMapOn: aBuilder [
-	| paths |
+	| references path |
 
-	paths := (self class pathReferences collect: #value) sorted: [ :a :b | a pathString < b pathString ].
-	paths := paths flatCollect: [ :each | each withParents  ].
+	references := ((self class pathReferences
+		collect: [ :each | each value -> each key ])
+		sorted: [ :a :b | a key pathString < b key pathString ])
+		asDictionary.
+
+	references
+		keysAndValuesDo: [ :aPath :anImpl | 
+			(aPath withParents copyWithout: aPath)
+				do: [ :parent | references at: parent ifAbsentPut: self / parent ] ].
+	references at: Path root put: self.
 
 	aBuilder view canvas color: (Color colorFrom: '#EEE').
 	aBuilder
-		explore: Path root
-		using: [ :aPath | 
-			aPath isRoot
-				ifTrue: [ paths select: [ :each | each size = 1 ] ]
-				ifFalse: [ paths
-						select: [ :each | 
-							each segments size = (aPath segments size + 1)
-								and: [ each segments beginsWith: aPath segments ] ] ] ].
+		explore: self
+		using: [ :anImpl | 
+			anImpl == self
+				ifTrue: [ references associations
+						select: [ :each | each key size = 1 ]
+						thenCollect: #value ]
+				ifFalse: [ path := anImpl isWSEndpoint
+						ifTrue: [ anImpl endpointPath ]
+						ifFalse: [ anImpl wsEndpointPath ].
+					references associations
+						select: [ :assoc | 
+							assoc key segments size = (path segments size + 1)
+								and: [ assoc key segments beginsWith: path segments ] ]
+						thenCollect: #value ] ].
 	aBuilder rightward.
 	aBuilder gap: 120 @ 0.
 	aBuilder labelShape
-		text: [ :aPath | 
+		text: [ :anImpl | 
+			| aPath |
+
+			aPath := references keyAtValue: anImpl.
 			aPath isRoot
 				ifTrue: [ self baseUrl ]
 				ifFalse: [ aPath segments last ] ].
