@@ -288,6 +288,20 @@ TWSEnumeration >> select: aBlock [
 ]
 
 { #category : #enumerating }
+TWSEnumeration >> select: aBlock max: aLimit [
+	| result |
+
+	result := OrderedCollection new.
+	self
+		enumerate: [ :val | 
+			(val select: aBlock) ifNotNil: [ :selected | result addAll: selected ].
+			result size >= aLimit
+				ifTrue: [ ^ result first: aLimit ] ]
+		limit: aLimit.
+	^ result
+]
+
+{ #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenCollect: collectBlock [
 	| result |
 
@@ -296,6 +310,22 @@ TWSEnumeration >> select: selectBlock thenCollect: collectBlock [
 		enumerate: [ :val | 
 			(val select: selectBlock thenCollect: collectBlock)
 				ifNotNil: [ :selected | result addAll: selected ] ].
+
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: selectBlock thenCollect: collectBlock max: aLimit [
+	| result |
+
+	result := OrderedCollection new.
+	self
+		enumerate: [ :val | 
+			(val select: selectBlock thenCollect: collectBlock)
+				ifNotNil: [ :selected | result addAll: selected ].
+			result size >= aLimit
+				ifTrue: [ ^ result first: aLimit ] ]
+		limit: aLimit.
 
 	^ result
 ]
@@ -314,5 +344,19 @@ TWSEnumeration >> select: selectBlock thenFlatCollect: collectBlock [
 		enumerate: [ :val | 
 			((val select: selectBlock) flatCollect: collectBlock)
 				ifNotNil: [ :selected | result addAll: selected ] ].
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: selectBlock thenFlatCollect: collectBlock max: aLimit [
+	| result |
+
+	result := OrderedCollection new.
+	self
+		enumerate: [ :val | 
+			((val select: selectBlock) flatCollect: collectBlock)
+				ifNotNil: [ :selected | result addAll: selected ].
+			result size >= aLimit
+				ifTrue: [ ^ result first: aLimit ] ].
 	^ result
 ]
