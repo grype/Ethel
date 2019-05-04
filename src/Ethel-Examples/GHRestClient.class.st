@@ -39,3 +39,9 @@ GHRestClient >> initializeWithConfiguration: aConfig [
 	self initialize.
 	config := aConfig
 ]
+
+{ #category : #execution }
+GHRestClient >> performExecuteOn: http [
+	WrapperSignal emit: http.
+	^ super performExecuteOn: http
+]

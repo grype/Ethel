@@ -75,12 +75,6 @@ WSPluggableEndpoint >> endpointPath [
 	^ path
 ]
 
-{ #category : #enumerating }
-WSPluggableEndpoint >> enumerateWith: aCursor limit: anInt [
-	enumerationBlock ifNil: [ ^ nil ].
-	^ enumerationBlock cull: self cull: aCursor cull: anInt
-]
-
 { #category : #accessing }
 WSPluggableEndpoint >> enumerationBlock [
 	^ enumerationBlock
@@ -147,6 +141,12 @@ WSPluggableEndpoint >> initialize [
 { #category : #initialization }
 WSPluggableEndpoint >> initializeHeaders [
 	headers := Dictionary new
+]
+
+{ #category : #enumerating }
+WSPluggableEndpoint >> next: aLimit with: aCursor [
+	enumerationBlock ifNil: [ ^ nil ].
+	^ enumerationBlock cull: self cull: aCursor cull: aLimit
 ]
 
 { #category : #api }

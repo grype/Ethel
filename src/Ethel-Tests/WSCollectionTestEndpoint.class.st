@@ -25,24 +25,6 @@ WSCollectionTestEndpoint >> cursor [
 		yourself
 ]
 
-{ #category : #enumerating }
-WSCollectionTestEndpoint >> enumerateWith: aCursor limit: aLimit [
-	| response result contents |
-
-	offset := aCursor offset.
-	aLimit ifNotNil: [ limit := aLimit ].
-	response := self test.
-	response isSuccess
-		ifFalse: [ ^ nil ].
-
-	contents := response contents value.
-	result := contents isString
-		ifTrue: [ NeoJSONReader fromString: contents ]
-		ifFalse: [ contents ].
-	aCursor offset: offset + result size.
-	^ result
-]
-
 { #category : #executing }
 WSCollectionTestEndpoint >> executingContext [
 	| sender |
@@ -69,6 +51,24 @@ WSCollectionTestEndpoint >> limit [
 { #category : #accessing }
 WSCollectionTestEndpoint >> limit: anObject [
 	limit := anObject
+]
+
+{ #category : #enumerating }
+WSCollectionTestEndpoint >> next: aLimit with: aCursor [
+	| response result contents |
+
+	offset := aCursor offset.
+	aLimit ifNotNil: [ limit := aLimit ].
+	response := self test.
+	response isSuccess
+		ifFalse: [ ^ nil ].
+
+	contents := response contents value.
+	result := contents isString
+		ifTrue: [ NeoJSONReader fromString: contents ]
+		ifFalse: [ contents ].
+	aCursor offset: offset + result size.
+	^ result
 ]
 
 { #category : #accessing }

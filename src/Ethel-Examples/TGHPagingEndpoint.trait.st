@@ -21,20 +21,25 @@ TGHPagingEndpoint >> cursor [
 ]
 
 { #category : #enumerating }
-TGHPagingEndpoint >> enumerateStep [
-	^ self subclassResponsibility
+TGHPagingEndpoint >> maxPageSize [
+	^ 3
 ]
 
 { #category : #enumerating }
-TGHPagingEndpoint >> enumerateWith: aCursor limit: aLimit [
+TGHPagingEndpoint >> next: aLimit with: aCursor [
 	| result |
 
 	page := aCursor page.
-	pageSize := aCursor pageSize.
-	aLimit ifNotNil: [ :val | pageSize := aLimit ].
-	result := self enumerateStep.
+	pageSize := (aLimit ifNil: [ aCursor pageSize ])
+		min: self maxPageSize.
+	result := self nextPage.
 	(result isNotNil and: [ result size >= pageSize ])
 		ifTrue: [ aCursor advance ]
 		ifFalse: [ aCursor hasMore: false ].
 	^ result
+]
+
+{ #category : #enumerating }
+TGHPagingEndpoint >> nextPage [
+	^ self subclassResponsibility
 ]

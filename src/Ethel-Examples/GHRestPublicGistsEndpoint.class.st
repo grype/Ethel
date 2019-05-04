@@ -18,12 +18,7 @@ GHRestPublicGistsEndpoint >> configureOn: http [
 ]
 
 { #category : #enumerating }
-GHRestPublicGistsEndpoint >> enumerateStep [
-	^ self get
-]
-
-{ #category : #listing }
-GHRestPublicGistsEndpoint >> get [
+GHRestPublicGistsEndpoint >> nextPage [
 	<get>
 	^ self execute
 ]

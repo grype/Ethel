@@ -61,22 +61,16 @@ TWSEnumeration >> collect: aBlock [
 
 { #category : #enumerating }
 TWSEnumeration >> collect: aBlock as: aClass [
-	| result cursor |
+	| result |
 
 	result := aClass new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor) ifNotNil: [ :val | result addAll: (val collect: aBlock) ] ].
+	self enumerate: [ :val | result addAll: (val collect: aBlock) ].
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> collect: aBlock into: aCollection [
-	| cursor |
-
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor) ifNotNil: [ :val | aCollection fillFrom: val with: aBlock ] ].
+	self enumerate: [ :val | aCollection fillFrom: val with: aBlock ].
 	^ aCollection
 ]
 
@@ -112,12 +106,12 @@ TWSEnumeration >> detect: aBlock ifFound: foundBlock [
 
 { #category : #enumerating }
 TWSEnumeration >> detect: aBlock ifFound: foundBlock ifNone: noneBlock [
-	| cursor |
-
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :values | values detect: aBlock ifFound: [ :val | ^ foundBlock cull: val ] ifNone: [  ] ] ].
+	self
+		enumerate: [ :values | 
+			values
+				detect: aBlock
+				ifFound: [ :val | ^ foundBlock cull: val ]
+				ifNone: [  ] ].
 	^ noneBlock value
 ]
 
@@ -128,30 +122,34 @@ TWSEnumeration >> detect: aBlock ifNone: exceptionBlock [
 
 { #category : #enumerating }
 TWSEnumeration >> do: aBlock [
-	| cursor |
-
-	cursor := self cursor.
-	[ cursor hasMore ] whileTrue: [ (self enumerateWith: cursor) ifNotNil: [ :val | val do: aBlock ] ]
+	self enumerate: [ :val | val do: aBlock ]
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> do: aBlock separatedBy: separatorBlock [
-	| cursor |
-
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | val do: aBlock separatedBy: separatorBlock ] ]
+	self enumerate: [ :val | val do: aBlock separatedBy: separatorBlock ]
 ]
 
-{ #category : #enumerating }
-TWSEnumeration >> enumerateWith: aCursor [
-	^ self enumerateWith: aCursor limit: nil
+{ #category : #'private - enumerating' }
+TWSEnumeration >> enumerate: aBlock [ 
+	self enumerate: aBlock with: self cursor
 ]
 
-{ #category : #enumerating }
-TWSEnumeration >> enumerateWith: aCursor limit: anInt [
-	^ self subclassResponsibility
+{ #category : #'private - enumerating' }
+TWSEnumeration >> enumerate: aBlock limit: aLimit [
+	self enumerate: aBlock with: self cursor limit: aLimit
+]
+
+{ #category : #'private - enumerating' }
+TWSEnumeration >> enumerate: aBlock with: aCursor [
+	[ aCursor hasMore ]
+		whileTrue: [ (self nextWith: aCursor) ifNotNil: aBlock ]
+]
+
+{ #category : #'private - enumerating' }
+TWSEnumeration >> enumerate: aBlock with: aCursor limit: aLimit [
+	[ aCursor hasMore ]
+		whileTrue: [ (self next: aLimit with: aCursor) ifNotNil: aBlock ]
 ]
 
 { #category : #'error handling' }
@@ -168,7 +166,7 @@ TWSEnumeration >> first [
 
 { #category : #enumerating }
 TWSEnumeration >> first: aLimit [
-	^ self enumerateWith: self cursor limit: aLimit
+	^ self next: aLimit with: self cursor
 ]
 
 { #category : #enumerating }
@@ -178,27 +176,25 @@ TWSEnumeration >> flatCollect: aBlock [
 
 { #category : #enumerating }
 TWSEnumeration >> flatCollect: aBlock as: aClass [
-	| result cursor |
+	| result |
 
 	result := aClass new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor) ifNotNil: [ :val | result addAll: (val flatCollect: aBlock) ] ].
+	self enumerate: [ :val | result addAll: (val flatCollect: aBlock) ].
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> groupedBy: aBlock [
-	| cursor groups |
+	| groups |
 
 	groups := PluggableDictionary integerDictionary.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | 
-					val
-						do:
-							[ :each | (groups at: (aBlock value: each) ifAbsentPut: [ OrderedCollection new ]) add: each ] ] ].
+	self
+		enumerate: [ :val | 
+			val
+				do: [ :each | 
+					(groups
+						at: (aBlock value: each)
+						ifAbsentPut: [ OrderedCollection new ]) add: each ] ].
 	^ groups
 ]
 
@@ -209,130 +205,114 @@ TWSEnumeration >> groupedBy: aBlock having: aSelectionBlock [
 
 { #category : #enumerating }
 TWSEnumeration >> inject: thisValue into: binaryBlock [
-	| cursor nextValue |
+	| nextValue |
 
 	nextValue := thisValue.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | val do: [ :each | nextValue := binaryBlock value: nextValue value: each ] ] ].
+	self
+		enumerate: [ :val | 
+			val
+				do: [ :each | nextValue := binaryBlock value: nextValue value: each ] ].
+
 	^ nextValue
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> next: anInt with: aCursor [
-	^ self enumerateWith: aCursor limit: anInt
+	^ self subclassResponsibility
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> nextWith: aCursor [
-	^ self enumerateWith: aCursor
+	^ self next: nil with: aCursor
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock [
-	| result cursor |
+	| result |
 
 	result := OrderedCollection new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | (val reject: aBlock) ifNotNil: [ :selected | result addAll: selected ] ] ].
-
+	self
+		enumerate:
+			[ :val | (val reject: aBlock) ifNotNil: [ :selected | result addAll: selected ] ].
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock thenCollect: collectBlock [
-	| result cursor |
+	| result |
 
 	result := OrderedCollection new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | 
-					(val reject: aBlock thenCollect: collectBlock)
-						ifNotNil: [ :selected | result addAll: selected ] ] ].
+	self
+		enumerate: [ :val | 
+			(val reject: aBlock thenCollect: collectBlock)
+				ifNotNil: [ :selected | result addAll: selected ] ].
 
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock thenDo: doBlock [
-	| result cursor |
+	| result |
 
 	result := OrderedCollection new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | 
-					(val reject: aBlock thenDo: doBlock)
-						ifNotNil: [ :selected | result addAll: selected ] ] ].
+	self
+		enumerate: [ :val | 
+			(val reject: aBlock thenDo: doBlock)
+				ifNotNil: [ :selected | result addAll: selected ] ].
 
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock thenFlatCollect: collectBlock [
-	| result cursor |
+	| result |
 
 	result := OrderedCollection new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | 
-					((val reject: aBlock) flatCollect: collectBlock)
-						ifNotNil: [ :selected | result addAll: selected ] ] ].
+	self
+		enumerate: [ :val | 
+			((val reject: aBlock) flatCollect: collectBlock)
+				ifNotNil: [ :selected | result addAll: selected ] ].
 
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: aBlock [
-	| result cursor |
+	| result |
 
 	result := OrderedCollection new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | (val select: aBlock) ifNotNil: [ :selected | result addAll: selected ] ] ].
+	self
+		enumerate:
+			[ :val | (val select: aBlock) ifNotNil: [ :selected | result addAll: selected ] ].
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenCollect: collectBlock [
-	| result cursor |
+	| result |
 
 	result := OrderedCollection new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | (val select: selectBlock thenCollect: collectBlock) ifNotNil: [ :selected | result addAll: selected ] ] ].
+	self
+		enumerate: [ :val | 
+			(val select: selectBlock thenCollect: collectBlock)
+				ifNotNil: [ :selected | result addAll: selected ] ].
+
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenDo: doBlock [
-	| result cursor |
-
-	result := OrderedCollection new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | (val select: selectBlock thenCollect: doBlock) ifNotNil: [ :selected | result addAll: selected ] ] ].
-	^ result
+	self enumerate: [ :val | val select: selectBlock thenDo: doBlock ]
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenFlatCollect: collectBlock [
-	| result cursor |
+	| result |
 
 	result := OrderedCollection new.
-	cursor := self cursor.
-	[ cursor hasMore ]
-		whileTrue: [ (self enumerateWith: cursor)
-				ifNotNil: [ :val | 
-					((val select: selectBlock) flatCollect: collectBlock)
-						ifNotNil: [ :selected | result addAll: selected ] ] ].
+	self
+		enumerate: [ :val | 
+			((val select: selectBlock) flatCollect: collectBlock)
+				ifNotNil: [ :selected | result addAll: selected ] ].
 	^ result
 ]

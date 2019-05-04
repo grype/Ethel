@@ -177,7 +177,7 @@ WSClient >> execute: anEndpoint [
 	anEndpoint prepareForExecutingOn: http.
 	anEndpoint configureOn: http.
 	self validateRequest: http request.
-	result := http execute.
+	result := self performExecuteOn: http.
 	self validateResponse: http response.
 	^ result
 ]
@@ -197,6 +197,11 @@ WSClient >> executorsOfPath: aPath [
 WSClient >> initializeWithUrl: aUrl [
 	self initialize.
 	baseUrl := aUrl asUrl
+]
+
+{ #category : #execution }
+WSClient >> performExecuteOn: http [
+	^ http execute
 ]
 
 { #category : #http }
