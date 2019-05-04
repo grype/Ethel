@@ -153,7 +153,7 @@ WSPluggableEndpoint >> initializeHeaders [
 { #category : #enumerating }
 WSPluggableEndpoint >> next: aLimit with: aCursor [
 	enumerationBlock ifNil: [ ^ nil ].
-	^ enumerationBlock cull: self cull: aCursor cull: aLimit
+	^ enumerationBlock cull: self cull: aLimit cull: aCursor
 ]
 
 { #category : #api }
