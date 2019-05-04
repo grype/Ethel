@@ -22,7 +22,7 @@ TGHPagingEndpoint >> cursor [
 
 { #category : #enumerating }
 TGHPagingEndpoint >> maxPageSize [
-	^ 3
+	^ 100
 ]
 
 { #category : #enumerating }
