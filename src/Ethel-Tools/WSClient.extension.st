@@ -15,7 +15,20 @@ WSClient >> buildMapOn: aBuilder [
 				do: [ :parent | references at: parent ifAbsentPut: self / parent ] ].
 	references at: Path root put: self.
 
-	aBuilder view canvas color: (Color colorFrom: '#EEE').
+	aBuilder shape circle
+		size: 15;
+		color: [ Color transparent ];
+		borderColor: [ :anImpl | 
+			| defaultColor methodColor |
+			methodColor := Color colorFrom: '#4682B4'.
+			defaultColor := Color gray.
+			anImpl == self
+				ifTrue: [ defaultColor ]
+				ifFalse: [ anImpl isWSEndpoint
+						ifTrue: [ defaultColor ]
+						ifFalse: [ methodColor ] ] ];
+		borderWidth: 2.
+
 	aBuilder
 		explore: self
 		using: [ :anImpl | 
@@ -34,6 +47,7 @@ WSClient >> buildMapOn: aBuilder [
 	aBuilder rightward.
 	aBuilder gap: 120 @ 0.
 	aBuilder labelShape
+		color: Color veryVeryDarkGray;
 		text: [ :anImpl | 
 			| aPath |
 
@@ -41,6 +55,7 @@ WSClient >> buildMapOn: aBuilder [
 			aPath isRoot
 				ifTrue: [ self baseUrl ]
 				ifFalse: [ aPath segments last ] ].
+	aBuilder lineShape color: Color gray.
 	aBuilder build
 ]
 
