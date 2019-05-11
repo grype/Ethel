@@ -11,7 +11,7 @@ GHGraphqlClientExamples >> createClient [
 ]
 
 { #category : #'as yet unclassified' }
-GHGraphqlClientExamples >> getFewGistFiles [
+GHGraphqlClientExamples >> queryFewGistFiles [
 	<gtExample>
 	| client gists result |
 
@@ -48,7 +48,7 @@ GHGraphqlClientExamples >> getFewGistFiles [
 ]
 
 { #category : #'as yet unclassified' }
-GHGraphqlClientExamples >> getFewGists [
+GHGraphqlClientExamples >> queryFewGists [
 	<gtExample>
 	| client gists result |
 
