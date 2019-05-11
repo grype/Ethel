@@ -18,11 +18,14 @@ BaselineOfEthel >> baseline: spec [
 			spec
 				package: #'Ethel-Tools'
 				with: [ spec requires: #('Ethel' 'Roassal2') ].
+			spec package: #'Ethel-Examples' with: [ spec requires: #('Ethel') ].
 			spec
-				group: 'default' with: #('Ethel' 'Ethel-Tests' 'Ethel-Tools');
+				group: 'default'
+					with: #('Ethel' 'Ethel-Tests' 'Ethel-Tools' 'Ethel-Examples');
 				group: 'core' with: #('Ethel');
 				group: 'tests' with: #('Ethel-Tests');
-				group: 'tools' with: #('Ethel-Tools') ]
+				group: 'tools' with: #('Ethel-Tools');
+				group: 'examples' with: #('Ethel-Examples') ]
 ]
 
 { #category : #baselines }
