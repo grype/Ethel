@@ -120,6 +120,7 @@ WSClient >> baseUrl [
 
 { #category : #http }
 WSClient >> configureHttpClient: http [
+	http url: self baseUrl.
 	contentReader ifNotNil: [ :val | http contentReader: val ].
 	contentWriter ifNotNil: [ :val | http contentWriter: val ]
 ]
