@@ -12,14 +12,36 @@ GHGraphqlClient class >> default [
 	^ self basicNew initializeWithConfiguration: GHApiConfiguration graphql
 ]
 
+{ #category : #accessing }
+GHGraphqlClient >> baseUrl [ 
+	^ config url
+]
+
 { #category : #http }
 GHGraphqlClient >> configureHttpClient: http [
 	super configureHttpClient: http.
-	http headerAt: #Authorization put: 'bearer ' , config authToken
+	http headerAt: #Authorization put: 'bearer ' , config authToken.
+	http
+		enforceHttpSuccess: true;
+		enforceAcceptContentType: false;
+		numberOfRetries: 3
+]
+
+{ #category : #initialization }
+GHGraphqlClient >> initialize [
+	super initialize.
+	contentWriter := [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ]
 ]
 
 { #category : #initialization }
 GHGraphqlClient >> initializeWithConfiguration: aConfig [
 	self initialize.
 	config := aConfig
+]
+
+{ #category : #accessing }
+GHGraphqlClient >> query: aQueryNodeOrCollection [
+	^ (self / GHGraphqlRootEndpoint)
+		query: aQueryNodeOrCollection;
+		execute
 ]
