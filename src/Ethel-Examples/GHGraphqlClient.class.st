@@ -30,7 +30,8 @@ GHGraphqlClient >> configureHttpClient: http [
 { #category : #initialization }
 GHGraphqlClient >> initialize [
 	super initialize.
-	contentWriter := [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ]
+	contentWriter := [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ].
+	contentReader := [ :obj | NeoJSONReader fromString: obj ]
 ]
 
 { #category : #initialization }
