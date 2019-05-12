@@ -31,7 +31,10 @@ GHRestClient >> gists [
 { #category : #initialization }
 GHRestClient >> initialize [
 	super initialize.
-	contentReader := [ :json | NeoJSONReader fromString: json ]
+	contentReader := [ :entity | 
+	(entity contentType sub asLowercase includesSubstring: 'json')
+		ifTrue: [ NeoJSONReader fromString: entity contents ]
+		ifFalse: [ entity contents ] ]
 ]
 
 { #category : #initialization }
