@@ -13,6 +13,12 @@ GHRestGistsEndpoint class >> endpointPath [
 ]
 
 { #category : #traversing }
+GHRestGistsEndpoint >> mine [
+	<get>
+	^ self execute
+]
+
+{ #category : #traversing }
 GHRestGistsEndpoint >> public [
 	^ self / GHRestPublicGistsEndpoint 
 ]
@@ -20,6 +26,13 @@ GHRestGistsEndpoint >> public [
 { #category : #traversing }
 GHRestGistsEndpoint >> publicForUsername: aUsername [
 	<path: '/users/{aUsername}/gists'>
+	<get>
+	^ self execute
+]
+
+{ #category : #traversing }
+GHRestGistsEndpoint >> withId: anId [
+	<path: '{anId}'>
 	<get>
 	^ self execute
 ]
