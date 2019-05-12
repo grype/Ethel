@@ -1,12 +1,15 @@
 Class {
 	#name : #GHRestGistsEndpoint,
 	#superclass : #GHRestAbstractGistsEndpoint,
+	#instVars : [
+		'gistData'
+	],
 	#category : #'Ethel-Examples-Github-REST'
 }
 
 { #category : #accessing }
 GHRestGistsEndpoint class >> endpointPath [
-	^ Path / #gist
+	^ Path / #gists
 ]
 
 { #category : #traversing }
