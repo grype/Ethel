@@ -13,6 +13,19 @@ GHRestGistsEndpoint class >> endpointPath [
 ]
 
 { #category : #traversing }
+GHRestGistsEndpoint >> createWithDescription: aDescription isPublic: isPublic files: aFilesDict [
+	"aFilesDict should be { #fileName -> 'file content'... }"
+
+	<post>
+	gistData := {(#description -> aDescription).
+	(#isPublic -> isPublic).
+	(#files
+		-> (aFilesDict collect: [ :each | {(#content -> each)} asDictionary ]))}
+		asDictionary.
+	self execute
+]
+
+{ #category : #traversing }
 GHRestGistsEndpoint >> mine [
 	<get>
 	^ self execute
