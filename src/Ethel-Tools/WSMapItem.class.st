@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'item'
 	],
-	#category : #'Ethel-Core'
+	#category : #'Ethel-Tools-Map'
 }
 
 { #category : #'instance creation' }
@@ -13,17 +13,12 @@ WSMapItem class >> handles: anObj [
 ]
 
 { #category : #'instance creation' }
-WSMapItem class >> with: anObj map: aMap [
+WSMapItem class >> with: anObj forMap: aMap [
 	^ (self allSubclasses select: [ :each | each subclasses isEmpty ])
 		detect: [ :cls | cls handles: anObj ]
-		ifFound: [ :cls | cls basicNew initializeWith: anObj map: aMap ]
+		ifFound: [ :cls | cls basicNew initializeWith: anObj forMap: aMap ]
 		ifNone: [ Error
 				signal: 'No WSMapItem subclass handles object of type ' , anObj class asString ]
-]
-
-{ #category : #accessing }
-WSMapItem >> children [ 
-	^ self subclassResponsibility 
 ]
 
 { #category : #accessing }
@@ -32,7 +27,7 @@ WSMapItem >> description [
 ]
 
 { #category : #initialization }
-WSMapItem >> initializeWith: anObj map: anObject [
+WSMapItem >> initializeWith: anObj forMap: aMap [
 	self initialize.
 	item := anObj
 ]

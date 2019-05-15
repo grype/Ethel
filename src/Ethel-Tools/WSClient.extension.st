@@ -9,6 +9,65 @@ WSClient >> buildMapOn: aBuilder [
 ]
 
 { #category : #'*Ethel-Tools' }
+WSClient >> buildMapOnOld: aBuilder [
+	| map path |
+
+	map := ((self class pathReferences groupedBy: [ :each | each value ])
+		sorted: [ :a :b | a key pathString < b key pathString ])
+		asDictionary.
+
+	map
+		keysAndValuesDo: [ :aPath :impls | 
+			(aPath withParents copyWithout: aPath)
+				do: [ :parent | map at: parent ifAbsentPut: (Set with: self / parent) ] ].
+	map at: Path root put: self.
+	
+	aBuilder shape circle
+		size: 15;
+		color: [ Color transparent ];
+		borderColor: [ :impls | 
+			| defaultColor methodColor |
+
+			methodColor := Color colorFrom: '#4682B4'.
+			defaultColor := Color gray.
+			(impls size = 1 and: [ impls anyOne == self ])
+				ifTrue: [ defaultColor ]
+				ifFalse: [ impls
+						detect: [ :anImpl | anImpl isMethod and: [ anImpl isWSEndpointMethod ] ]
+						ifFound: [ methodColor ]
+						ifNone: [ defaultColor ] ] ];
+		borderWidth: 2.
+	aBuilder
+		explore: self
+		using: [ :anImpl | 
+			anImpl == self
+				ifTrue: [ map associations
+						select: [ :each | each key size = 1 ]
+						thenCollect: #value ]
+				ifFalse: [ path := anImpl isWSEndpoint
+						ifTrue: [ anImpl endpointPath ]
+						ifFalse: [ anImpl wsEndpointPath ].
+					map associations
+						select: [ :assoc | 
+							assoc key segments size = (path segments size + 1)
+								and: [ assoc key segments beginsWith: path segments ] ]
+						thenCollect: #value ] ].
+	aBuilder rightward.
+	aBuilder gap: 120 @ 0.
+	aBuilder labelShape
+		color: Color lightGray;
+		text: [ :anImpl | 
+			| aPath |
+
+			aPath := map keyAtValue: anImpl.
+			aPath isRoot
+				ifTrue: [ self baseUrl ]
+				ifFalse: [ aPath segments last ] ].
+	aBuilder lineShape color: Color gray.
+	aBuilder build
+]
+
+{ #category : #'*Ethel-Tools' }
 WSClient >> buildTopologyOn: aBuilder [
 	| endpointClasses colors allHttpMethods lb |
 

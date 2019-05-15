@@ -1,10 +1,7 @@
 Class {
 	#name : #WSMapEndpointItem,
 	#superclass : #WSMapItem,
-	#instVars : [
-		'children'
-	],
-	#category : #'Ethel-Core'
+	#category : #'Ethel-Tools-Map'
 }
 
 { #category : #'instance creation' }
@@ -13,25 +10,8 @@ WSMapEndpointItem class >> handles: anObj [
 ]
 
 { #category : #accessing }
-WSMapEndpointItem >> children [
-	^ children
-]
-
-{ #category : #accessing }
 WSMapEndpointItem >> description [ 
 	^ item endpointPath segments last
-]
-
-{ #category : #initialization }
-WSMapEndpointItem >> initializeWith: anObj map: aMap [
-	| ourPath |
-
-	super initializeWith: anObj map: aMap.
-	ourPath := anObj endpointPath.
-	children := (aMap associations
-		select: [ :each | 
-			(each key segments size = (ourPath segments size + 1))
-				and: [ each key segments beginsWith: ourPath segments ] ]) flatCollect: [ :each | each value asOrderedCollection ]
 ]
 
 { #category : #testing }
