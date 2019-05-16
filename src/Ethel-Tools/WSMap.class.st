@@ -46,10 +46,10 @@ WSMap >> buildMapOn: aBuilder [
 		borderWidth: 2.
 
 	aBuilder labelShape
-		color: [ UITheme current textColor ];
+		color: [ Smalltalk ui theme textColor ];
 		text: [ :obj | (WSMapItem with: obj forMap: self) description ].
 
-	aBuilder lineShape color: [ UITheme current ghostTextColor ].
+	aBuilder lineShape color: [ Smalltalk ui theme ghostTextColor ].
 
 	aBuilder
 		explore: client
