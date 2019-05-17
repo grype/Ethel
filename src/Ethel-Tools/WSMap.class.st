@@ -34,10 +34,13 @@ WSMap >> buildMap [
 
 { #category : #building }
 WSMap >> buildMapOn: aBuilder [
+	| maxSegmentSize gap |
 	self buildMap.
+	maxSegmentSize := ((map keys flatCollect: [ :each | each segments ]) collect: #size) max.
+	gap := ((120 max: maxSegmentSize * 8) min: 220) @ 0.
 	aBuilder
 		rightward;
-		gap: 120 @ 0.
+		gap: gap.
 
 	aBuilder shape circle
 		size: 15;
