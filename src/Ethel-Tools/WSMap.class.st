@@ -54,7 +54,8 @@ WSMap >> buildMapOn: aBuilder [
 	aBuilder
 		explore: client
 		using: [ :obj | 
-			obj == client
+			| children |
+			children := obj == client
 				ifTrue: [ map associationsSelect: [ :each | each key segments size = 1 ] ]
 				ifFalse: [ | thisPath |
 
@@ -62,7 +63,8 @@ WSMap >> buildMapOn: aBuilder [
 					map
 						associationsSelect: [ :each | 
 							each key segments size = (thisPath segments size + 1)
-								and: [ each key segments beginsWith: thisPath segments ] ] ] ].
+								and: [ each key segments beginsWith: thisPath segments ] ] ].
+			OrderedDictionary newFrom: (children associations sorted: [ :a :b | a key <= b key ]) ].
 
 	aBuilder build
 ]
