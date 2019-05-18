@@ -18,7 +18,10 @@ WSMapEndpointItem >> description [
 WSMapEndpointItem >> shapeBorderColor [
 	^ (item isKindOf: WSPluggableEndpoint)
 		ifTrue: [ Color gray ]
-		ifFalse: [ Color colorFrom: '#4682B4' ]
+		ifFalse: [ (item class wsEndpointExecutingMethods
+				select: [ :each | each wsEndpointPath = item endpointPath ])
+				ifEmpty: [ Smalltalk ui theme warningTextColor alpha: 0.5 ]
+				ifNotEmpty: [ Color colorFrom: '#4682B4' ] ]
 ]
 
 { #category : #testing }

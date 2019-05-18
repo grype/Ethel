@@ -1,7 +1,7 @@
 Class {
 	#name : #WSMapBuilder,
 	#superclass : #RTInteractiveTreeBuilder,
-	#category : #'Ethel-Tools'
+	#category : #'Ethel-Tools-Map'
 }
 
 { #category : #interactions }
