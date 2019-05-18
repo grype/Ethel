@@ -20,9 +20,8 @@ WSMap >> associations [
 
 { #category : #building }
 WSMap >> buildMap [
-	map := client class pathReferences
-		groupedBy: [ :each | each value ]
-		affect: [ :impls | impls collect: #key ].
+	map := (client class pathReferences groupedBy: [ :each | each value ])
+		associationsDo: [ :each | each value: (each value collect: #key) ].
 
 	map at: Path root put: client.
 	map
