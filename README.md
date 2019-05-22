@@ -1,14 +1,12 @@
-# Ethel
-
 Ethel is a lightweight framework for composing web service clients in Pharo Smalltalk.
 
 ## Motivations
 * Reduce boilerplate code
 * Reduce number of tests one has to write when implementing an API
 * Allow scripting
-* Provide concise and easy to maintain architecture and that encourages encapsulation and composition
+* Provide concise and easy to maintain architecture - one that strongly encourages encapsulation and composition
 * Provide clear overview of the API coverage and of the implementation itself
-* Encourage composition of clients that conceal much of the network-based nature behind a façade of plain old objects. For example - providing a collection-like API to paginating endpoints. 
+* Encourage composition of clients that conceal much of their network-based nature behind a façade of plain old objects and familiar collection-like APIs
 
 ## Installation
 ```smalltalk
@@ -29,7 +27,7 @@ client := WSClient jsonWithUrl: 'https://api.github.com/'.
 
 "Create a gist"
 files := Dictionary new
-	at: 'load-ethel.st' put: { #content -> 'Metacello new baseline: ''Ethel''; repository: ''github://grype/unrest:ethel''; load ' } asDictionary;
+	at: 'example.st' put: { #content -> 'Metacello new baseline: ''Ethel''; repository: ''github://grype/unrest:ethel''; load ' } asDictionary;
 	yourself.
 	
 (client / #gists) 
@@ -38,14 +36,14 @@ files := Dictionary new
 	post.
 ```
 
-Above are some of the examples of scripting with Ethel - namely, instantiating WSClient and deriving pluggable endpoints via #/ message. This approach is fine for quick and dirty tasks, but as you begin to cover more of the API - subclassing WSClient and implementing concrete endpoints becomes increasingly advantageous, resulting in an inteface like:
+Above are some of the examples of scripting with Ethel - namely, instantiating WSClient and deriving pluggable endpoints via #/ message. This approach is fine for quick and dirty tasks, but as you begin to cover more of the API - subclassing WSClient and implementing concrete endpoints becomes increasingly advantageous, resulting in an interface like:
 
 ```smalltalk
 client := GHRestClient default.
 client gists mine.
-client gists public flatCollect: #files max: 10.
+client gists public flatCollect: [:each | each at: #files] max: 10.
 client gists 
-  creataeWithDescription: 'GHRestClient' 
+  createWithDescription: 'GHRestClient' 
   isPublic: true 
   files: (GHRestClient methods collect: [ :each | (each selector asString , '.st') -> each asString ]) asDictionary.
 ```
@@ -53,4 +51,4 @@ client gists
 Concrete examples of the above can be found in `Ethel-Examples` package.
 
 ## Etymology
-Ethel is named in tribute to the timeless "Ethel The Aardvark Goes Quantity Surveying". That is all...
+Ethel is named after Monty Python's Ethel The Aardvark. That is all...
