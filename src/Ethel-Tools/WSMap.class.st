@@ -34,8 +34,10 @@ WSMap >> buildMap [
 { #category : #building }
 WSMap >> buildMapOn: aBuilder [
 	| maxSegmentSize gap |
+
 	self buildMap.
-	maxSegmentSize := ((map keys flatCollect: [ :each | each segments ]) collect: #size) max.
+	maxSegmentSize := ((map keys flatCollect: [ :each | each segments ])
+		collect: #size) max.
 	gap := ((120 max: maxSegmentSize * 8) min: 220) @ 0.
 	aBuilder
 		rightward;
@@ -57,6 +59,7 @@ WSMap >> buildMapOn: aBuilder [
 		explore: client
 		using: [ :obj | 
 			| children |
+
 			children := obj == client
 				ifTrue: [ map associationsSelect: [ :each | each key segments size = 1 ] ]
 				ifFalse: [ | thisPath |
@@ -66,8 +69,11 @@ WSMap >> buildMapOn: aBuilder [
 						associationsSelect: [ :each | 
 							each key segments size = (thisPath segments size + 1)
 								and: [ each key segments beginsWith: thisPath segments ] ] ].
-			OrderedDictionary newFrom: (children associations sorted: [ :a :b | a key <= b key ]) ].
+			OrderedDictionary
+				newFrom: (children associations sorted: [ :a :b | a key <= b key ]) ].
 
+	aBuilder elements
+		do: [ :e | e @ (RTPopup new text: [ :item | self popupTextFor: item ]) ].
 	aBuilder build
 ]
 
@@ -80,4 +86,16 @@ WSMap >> client [
 WSMap >> initWithClient: aClient [
 	self initialize.
 	client := aClient
+]
+
+{ #category : #building }
+WSMap >> popupTextFor: item [
+	item isCollection
+		ifFalse: [ ^ item ].
+	^ (item
+		collect: [ :each | 
+			each isCompiledMethod
+				ifTrue: [ each printString ]
+				ifFalse: [ each asString ] ]) asOrderedCollection
+		joinUsing: Character cr
 ]
