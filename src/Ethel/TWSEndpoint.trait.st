@@ -123,6 +123,11 @@ TWSEndpoint >> execute [
 ]
 
 { #category : #executing }
+TWSEndpoint >> execute: anExecBlock [
+	^ wsClient execute: self with: anExecBlock 
+]
+
+{ #category : #executing }
 TWSEndpoint >> executingContext [
 	| sender |
 
