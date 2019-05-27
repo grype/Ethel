@@ -59,7 +59,8 @@ Class {
 	#instVars : [
 		'baseUrl',
 		'contentReader',
-		'contentWriter'
+		'contentWriter',
+		'httpConfiguration'
 	],
 	#category : #'Ethel-Core'
 }
@@ -80,8 +81,10 @@ WSClient class >> endpoints [
 { #category : #'instance creation' }
 WSClient class >> jsonWithUrl: aUrl [
 	^ (self withUrl: aUrl)
-		contentReader: [ :aJsonString | NeoJSONReader fromString: aJsonString ];
-		contentWriter: [ :obj | NeoJSONWriter toString: obj ];
+		httpConfiguration: [ :http | 
+			http
+				contentReader: [ :aJsonString | NeoJSONReader fromString: aJsonString ];
+				contentWriter: [ :obj | NeoJSONWriter toString: obj ] ];
 		yourself
 ]
 
@@ -121,8 +124,7 @@ WSClient >> baseUrl [
 { #category : #http }
 WSClient >> configureHttpClient: http [
 	http url: self baseUrl.
-	contentReader ifNotNil: [ :val | http contentReader: val ].
-	contentWriter ifNotNil: [ :val | http contentWriter: val ]
+	httpConfiguration ifNotNil: [ :aBlock | aBlock cull: http ]
 ]
 
 { #category : #accessing }
@@ -133,16 +135,6 @@ WSClient >> contentReader [
 { #category : #accessing }
 WSClient >> contentReader: anObject [
 	contentReader := anObject
-]
-
-{ #category : #accessing }
-WSClient >> contentWriter [
-	^ contentWriter
-]
-
-{ #category : #accessing }
-WSClient >> contentWriter: anObject [
-	contentWriter := anObject
 ]
 
 { #category : #http }
@@ -199,6 +191,16 @@ WSClient >> executorsOfPath: aPath [
 	^ pathsAndMethods
 		select: [ :each | each value matches: aPath ]
 		thenCollect: [ :each | each key ]
+]
+
+{ #category : #accessing }
+WSClient >> httpConfiguration [
+	^ httpConfiguration
+]
+
+{ #category : #accessing }
+WSClient >> httpConfiguration: anObject [
+	httpConfiguration := anObject
 ]
 
 { #category : #initialization }

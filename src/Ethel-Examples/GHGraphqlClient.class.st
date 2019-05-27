@@ -20,18 +20,13 @@ GHGraphqlClient >> baseUrl [
 { #category : #http }
 GHGraphqlClient >> configureHttpClient: http [
 	super configureHttpClient: http.
-	http headerAt: #Authorization put: 'bearer ' , config authToken.
 	http
+		headerAt: #Authorization put: 'bearer ' , config authToken;
 		enforceHttpSuccess: true;
 		enforceAcceptContentType: false;
-		numberOfRetries: 3
-]
-
-{ #category : #initialization }
-GHGraphqlClient >> initialize [
-	super initialize.
-	contentWriter := [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ].
-	contentReader := [ :obj | NeoJSONReader fromString: obj ]
+		numberOfRetries: 3;
+		contentWriter: [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ];
+		contentReader: [ :obj | NeoJSONReader fromString: obj ]
 ]
 
 { #category : #initialization }
