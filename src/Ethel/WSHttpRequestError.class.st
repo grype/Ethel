@@ -9,21 +9,9 @@ Class {
 
 { #category : #exceptioninstantiator }
 WSHttpRequestError class >> signal: aRequest [
-	(self basicNew initializeWithRequest: aRequest) signal
-]
-
-{ #category : #initialization }
-WSHttpRequestError >> initializeWithHttp: anHttp [
-	self initialize.
-	request := anHttp.
-	messageText := 'Invalid HTTP Request'
-]
-
-{ #category : #initialization }
-WSHttpRequestError >> initializeWithRequest: aRequest [
-	self initialize.
-	request := aRequest.
-	messageText := 'Invalid HTTP Request'
+	^ self new
+		request: aRequest;
+		signal: 'Invalid HTTP Request'
 ]
 
 { #category : #private }
@@ -34,4 +22,9 @@ WSHttpRequestError >> isResumable [
 { #category : #accessing }
 WSHttpRequestError >> request [
 	^ request
+]
+
+{ #category : #accessing }
+WSHttpRequestError >> request: anObject [
+	request := anObject
 ]

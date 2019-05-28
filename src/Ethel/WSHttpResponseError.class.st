@@ -9,27 +9,13 @@ Class {
 
 { #category : #exceptioninstantiator }
 WSHttpResponseError class >> signal: aResponse [
-	(self basicNew initializeWithResponse: aResponse) signal
-]
-
-{ #category : #initialization }
-WSHttpResponseError >> initializeWithHttp: anHttp [
-	self initialize.
-	response := anHttp.
-	messageText := '{1}: {2}'
-		format:
-			{response response statusLine code.
-			response response statusLine reason}
-]
-
-{ #category : #initialization }
-WSHttpResponseError >> initializeWithResponse: aResponse [
-	self initialize.
-	response := aResponse.
-	messageText := '{1}: {2}'
-		format:
-			{aResponse statusLine code.
-			aResponse statusLine reason}
+	^ self new
+		response: aResponse;
+		signal:
+			('{1}: {2}'
+				format:
+					{aResponse statusLine code.
+					aResponse statusLine reason})
 ]
 
 { #category : #private }
@@ -40,4 +26,9 @@ WSHttpResponseError >> isResumable [
 { #category : #accessing }
 WSHttpResponseError >> response [
 	^ response
+]
+
+{ #category : #accessing }
+WSHttpResponseError >> response: anObject [
+	response := anObject
 ]
