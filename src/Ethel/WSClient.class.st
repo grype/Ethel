@@ -166,19 +166,21 @@ WSClient >> endpointForPath: aPath [
 WSClient >> execute: anEndpoint [
 	^ self
 		execute: anEndpoint
-		with: [ :http | self performExecuteOn: http ]
+		with: [ :http | 
+			| result |
+			self validateRequest: http request.
+			result := self performExecuteOn: http.
+			self validateResponse: http response.
+			result ]
 ]
 
 { #category : #execution }
 WSClient >> execute: anEndpoint with: anExecBlock [
 	| http result |
-
 	http := self createHttpClient.
 	anEndpoint prepareForExecutingOn: http.
 	anEndpoint configureOn: http.
-	self validateRequest: http request.
 	result := anExecBlock cull: http.
-	self validateResponse: http response.
 	^ result
 ]
 
@@ -216,18 +218,11 @@ WSClient >> performExecuteOn: http [
 
 { #category : #http }
 WSClient >> validateRequest: aRequest [
-	(aRequest method isNotNil and: [ aRequest url isNotNil ]) ifFalse: [ WSError signal: 'Invalid HTTP Request' ]
+	(aRequest method isNotNil and: [ aRequest url isNotNil ]) ifFalse: [ WSHttpRequestError signal: aRequest ]
 ]
 
 { #category : #http }
 WSClient >> validateResponse: aResponse [
 	aResponse isSuccess
-		ifTrue: [ ^ true ].
-	WSError
-		signal:
-			('{1}: {2}'
-				format:
-					{aResponse statusLine code.
-					aResponse statusLine reason}).
-	^ false
+		ifFalse: [ WSHttpResponseError signal: aResponse ]
 ]
