@@ -27,3 +27,8 @@ Path >> matches: aPathOrPattern [
 			isRecursiveGlobbing := b includesSubstring: '**' ].
 	^ s1 atEnd and: [ s2 atEnd ]
 ]
+
+{ #category : #'*Ethel' }
+Path >> wsGtPrintString [
+	^ self pathString
+]
