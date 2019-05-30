@@ -1,51 +1,21 @@
 "
 I am a general purpose web-based API client.
 
-I am good at talking to RESTful APIs and the like, and can be used as-is for scripting purposes. However, if you'd like to make explicit a particular web-based API - do subclass me. I use ZincHTTPComponents for actual transport, and collaborate with instances implementing ==WSEndpoint== for configuring and executing HTTP requests.
+I am good at talking to RESTful APIs and the like, and can be used as-is for scripting purposes. However, if you'd like to make explicit a particular web-based API - do subclass me. I use ZincHTTPComponents for actual transport, and collaborate with instances implementing ==TWSEndpoint== for configuring and executing HTTP requests.
 
 Instantiate me #withUrl:
 
 [[[ client := WSClient withUrl: 'https://api.example.com/v1'. ]]]
 
-By default I don't provide any special content reader or writer. If, for example, you're dealing
-with reading JSON responses, you can configure me with:
-
-[[[ 
-			client 
-				contentReader: [ :aJsonString | NeoJSONReader fromString: aJsonString ]; 
-				contentWriter: [ :obj | ZnEntity json: NeoJSONWriter toString: obj ]. 
-]]]
-
-For convenience, ==WSClient class>>jsonWithUrl:== creates an instance with that configuration.
-
 From there, you're typically traversing endpoints and executing requests:
 
 [[[ response := (client / #things) get. ""GET /things"" ]]]
 
-When scripting, I create instances of ==WSPluggableEndpoint==, which provides ways for setting custom headers and data, as well as convenience methods for various HTTP methods.
-
-[[[ 
-			response := (client / #things) 
-				headerAt: #Authorization put: '...';
-				data: aThing;
-				post. 
-]]]
+When scripting, as seen above, I create instances of ==WSPluggableEndpoint==.
 	
 When subclassing:
 	* override #configureHttpClient: when there's a need to configure http transport with data not specific to a particular endpoint (endpoints get to configure transport separately)
 	* override #validateResponse: for custom error handling
-
-It also helps to provide access to all top-level endpoints from within the subclass, e.g.:
-
-[[[ MyClient>>things
-	^ self / ThingsEndpoint ]]]
-	
-This way you could chain endpoints starting with the client:
-
-client foo bar get. ""GET /foo/bar""
-client foo bar title: 'Title'; body: 'Body'; post. ""POST /foo/bar {data from #bar endpoint}""
-
-Taking this approach has two benefits: 1) explicitly defined paths are easier to discover and use when using message sends; 2) by default, WSClient class>>#endpoints returns list of endpoint classes that can be derived from the class by following references to classes that implement ==TWSEndpoint==. That information is used to discover all relevant endpoint when inspecting my instances.
 
 Instance Variables
 	baseUrl:		<ZnUrl>
@@ -58,8 +28,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'baseUrl',
-		'contentReader',
-		'contentWriter',
 		'httpConfiguration'
 	],
 	#category : #'Ethel-Core'
@@ -125,16 +93,6 @@ WSClient >> baseUrl [
 WSClient >> configureHttpClient: http [
 	http url: self baseUrl.
 	httpConfiguration ifNotNil: [ :aBlock | aBlock cull: http ]
-]
-
-{ #category : #accessing }
-WSClient >> contentReader [
-	^ contentReader
-]
-
-{ #category : #accessing }
-WSClient >> contentReader: anObject [
-	contentReader := anObject
 ]
 
 { #category : #http }
