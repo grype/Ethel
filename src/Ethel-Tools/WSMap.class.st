@@ -36,8 +36,7 @@ WSMap >> buildMapOn: aBuilder [
 	| maxSegmentSize gap |
 
 	self buildMap.
-	maxSegmentSize := ((map keys flatCollect: [ :each | each segments ])
-		collect: #size) max.
+	maxSegmentSize := (map keys flatCollect: #segments) ifEmpty: [ 0 ] ifNotEmpty: [ :segments | (segments collect: #size) max ].
 	gap := ((120 max: maxSegmentSize * 8) min: 220) @ 0.
 	aBuilder
 		rightward;
