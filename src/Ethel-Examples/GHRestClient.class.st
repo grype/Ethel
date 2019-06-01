@@ -20,21 +20,17 @@ GHRestClient >> baseUrl [
 { #category : #http }
 GHRestClient >> configureHttpClient: http [
 	super configureHttpClient: http.
+	http
+		contentReader: [ :entity | 
+			(entity contentType sub asLowercase includesSubstring: 'json')
+				ifTrue: [ NeoJSONReader fromString: entity contents ]
+				ifFalse: [ entity contents ] ].
 	http headerAt: #Authorization put: 'token ' , config authToken
 ]
 
 { #category : #traversing }
 GHRestClient >> gists [
 	^ self / GHRestGistsEndpoint 
-]
-
-{ #category : #initialization }
-GHRestClient >> initialize [
-	super initialize.
-	contentReader := [ :entity | 
-	(entity contentType sub asLowercase includesSubstring: 'json')
-		ifTrue: [ NeoJSONReader fromString: entity contents ]
-		ifFalse: [ entity contents ] ]
 ]
 
 { #category : #initialization }
