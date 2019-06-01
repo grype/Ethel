@@ -9,7 +9,7 @@ WSClient >> buildMapOn: aBuilder [
 ]
 
 { #category : #'*Ethel-Tools' }
-WSClient >> buildTopologyOn: aBuilder [
+WSClient >> buildUMLOn: aBuilder [
 	| endpointClasses colors allHttpMethods lb |
 
 	endpointClasses := (self class endpoints flatCollect: [ :each | each withAllSuperclasses ]) select: #isWSEndpoint.
@@ -62,9 +62,9 @@ WSClient >> buildTopologyOn: aBuilder [
 
 { #category : #'*Ethel-Tools' }
 WSClient >> gtDerivedEndpointClassesIn: aComposite [
-	<gtInspectorPresentationOrder: 12>
+	<gtInspectorPresentationOrder: 13>
 	^ aComposite list
-		title: [ 'Endpoint classes' translated ];
+		title: [ 'Endpoints' translated ];
 		beMultiple;
 		allowsSearch;
 		display: [ self class endpoints ];
@@ -81,10 +81,10 @@ WSClient >> gtMapIn: aComposite [
 ]
 
 { #category : #'*Ethel-Tools' }
-WSClient >> gtTopologyIn: aComposite [
+WSClient >> gtUMLIn: aComposite [
 	<gtInspectorPresentationOrder: 12>
 	^ aComposite roassal2
-		title: ['Topology' translated];
+		title: ['UML' translated];
 		initializeView: [ RTUMLClassBuilder new ];
-		painting: [ :view | self buildTopologyOn: view ]
+		painting: [ :view | self buildUMLOn: view ]
 ]
