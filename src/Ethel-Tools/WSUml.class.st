@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'client',
 		'httpMethods',
-		'colors'
+		'colors',
+		'objects'
 	],
 	#category : #'Ethel-Tools'
 }
@@ -51,7 +52,7 @@ WSUml >> buildUMLOn: aBuilder [
 	aBuilder
 		classname: [ :each | self classNameFor: each ];
 		instanceVariables: #instVarNames;
-		methodsNames: [ :cls | cls methods select: #isWSEndpointExecutionMethod ];
+		methodsNames: [ :cls | self methodNamesFor: cls ];
 		methodselector: [ :aMethod | self selectorForMethod: aMethod ];
 		attributeselector: #yourself;
 		superclass: #superclass.
@@ -81,6 +82,9 @@ WSUml >> client: anObject [
 
 { #category : #accessing }
 WSUml >> colorForHttpMethod: anHttpMethod [
+	(anHttpMethod wsEndpointHttpMethod isNotNil
+		and: [ self httpMethods includes: anHttpMethod wsEndpointHttpMethod ])
+		ifFalse: [ ^ Color gray ].
 	^ self colors
 		at: (self httpMethods indexOf: anHttpMethod wsEndpointHttpMethod)
 ]
@@ -106,28 +110,36 @@ WSUml >> initializeWithClient: aClient [
 	client := aClient
 ]
 
+{ #category : #building }
+WSUml >> methodNamesFor: cls [
+	(cls traitComposition includesTrait: TWSEnumerationCursor) ifTrue: [ ^ cls methods ].
+	^ cls methods select: #isWSEndpointExecutionMethod
+]
+
 { #category : #accessing }
 WSUml >> objects [
-	| allObjects traits |
-	allObjects := Set with: client class.
-	((client class endpoints
-		flatCollect: [ :each | each withAllSuperclasses ])
-		select: #isWSEndpoint) ifNotEmpty: [ :val | allObjects addAll: val ].
+	| traits |
+	^ objects
+		ifNil: [ objects := Set with: client class.
+			((client class endpoints
+				flatCollect: [ :each | each withAllSuperclasses ])
+				select: #isWSEndpoint) ifNotEmpty: [ :val | objects addAll: val ].
 
-	traits := allObjects
-		flatCollect: [ :each | each traitComposition allTraits ].
-	allObjects addAll: traits.
-	allObjects
-		addAll:
-			((traits flatCollect: #referencedClasses)
-				select: [ :each | 
-					each isWSEndpoint
-						or: [ each traitComposition includesTrait: TWSEnumerationCursor ] ]).
-	^ allObjects
+			traits := objects
+				flatCollect: [ :each | each traitComposition allTraits ].
+			objects addAll: traits.
+			objects
+				addAll:
+					((traits flatCollect: #referencedClasses)
+						select: [ :each | 
+							each isWSEndpoint
+								or: [ each traitComposition includesTrait: TWSEnumerationCursor ] ]).
+			^ objects ]
 ]
 
 { #category : #building }
 WSUml >> selectorForMethod: aMethod [
+	aMethod wsEndpointPath ifNil: [ ^ aMethod selector ].
 	^ '{1} ~> {2}'
 		format:
 			{aMethod selector.
