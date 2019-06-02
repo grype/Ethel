@@ -10,65 +10,9 @@ WSClient >> buildMapOn: aBuilder [
 
 { #category : #'*Ethel-Tools' }
 WSClient >> buildUMLOn: aBuilder [
-	| endpointClasses colors allHttpMethods lb |
-
-	endpointClasses := (self class endpoints flatCollect: [ :each | each withAllSuperclasses ]) select: #isWSEndpoint.
-
-	allHttpMethods := self class supportedHttpMethods
-		collect: #asLowercase.
-
-	colors := RTColorPalette qualitative
-		colors: allHttpMethods size
-		scheme: 'Dark2'.
-
-	aBuilder methodShape
-		color:
-			[ :method | colors at: (allHttpMethods indexOf: method wsEndpointHttpMethod) ].
-	aBuilder
-		classname: #name;
-		instanceVariables: #instVarNames;
-		methodsNames: [ :cls | cls methods select: #isWSEndpointExecutionMethod ];
-		methodselector: [ :aMethod | 
-			'{1} ~> {2}'
-				format:
-					{aMethod selector.
-					aMethod wsEndpointPath pathString } ];
-		attributeselector: #yourself;
-		superclass: #superclass.
-	aBuilder addObjects: endpointClasses.
-	aBuilder layout tree.
-
-	lb := RTLegendBuilder new.
-	lb view: aBuilder view.
-	lb left.
-	lb
-		nestDo: [ :n :e :g | 
-			n
-				padding: 10;
-				on: e nest: g;
-				resizeWithoutRecursion: e for: g ].
-
-	lb backgroundShape
-		box;
-		borderColor: Color white;
-		color: Color transparent;
-		borderWidth: 2.
-
-	allHttpMethods
-		withIndexDo:
-			[ :aMethod :i | lb addColoredText: aMethod asString color: (colors at: i) ].
-	lb build
-]
-
-{ #category : #'*Ethel-Tools' }
-WSClient >> gtDerivedEndpointClassesIn: aComposite [
-	<gtInspectorPresentationOrder: 13>
-	^ aComposite list
-		title: [ 'Endpoints' translated ];
-		beMultiple;
-		allowsSearch;
-		display: [ self class endpoints ];
-		when: [ self class endpoints isEmptyOrNil not ]
+	| uml |
+	uml := WSUml onClient: self.
+	uml buildOn: aBuilder
 ]
 
 { #category : #'*Ethel-Tools' }

@@ -10,7 +10,7 @@ Class {
 
 { #category : #'as yet unclassified' }
 WSMap class >> onClient: aClient [
-	^ self basicNew initWithClient: aClient
+	^ self basicNew initializeWithClient: aClient
 ]
 
 { #category : #accessing }
@@ -82,7 +82,7 @@ WSMap >> client [
 ]
 
 { #category : #initialization }
-WSMap >> initWithClient: aClient [
+WSMap >> initializeWithClient: aClient [
 	self initialize.
 	client := aClient
 ]
