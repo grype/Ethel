@@ -35,7 +35,9 @@ Class {
 		'data',
 		'method',
 		'headers',
-		'enumerationBlock'
+		'enumeration',
+		'httpConfiguration',
+		'wsClient'
 	],
 	#category : #'Ethel-Core'
 }
@@ -43,7 +45,8 @@ Class {
 { #category : #configuring }
 WSPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
 	headers isEmptyOrNil
-		ifFalse: [ anEndpoint headersAddAll: headers associations ]
+		ifFalse: [ anEndpoint headersAddAll: headers associations ].
+	anEndpoint httpConfiguration: self httpConfiguration
 ]
 
 { #category : #configuring }
@@ -55,7 +58,8 @@ WSPluggableEndpoint >> configureOn: http [
 				ifFalse: [ http contents: aData ] ].
 
 	http method: method asString asUppercase asSymbol.
-	http headerAddAll: headers
+	http headerAddAll: headers.
+	httpConfiguration ifNotNil: [ :val | val cull: http cull: self ]
 ]
 
 { #category : #accessing }
@@ -138,6 +142,16 @@ WSPluggableEndpoint >> headersRemoveAll [
 { #category : #headers }
 WSPluggableEndpoint >> headersRemoveAt: aName [
 	headers remove: aName ifAbsent: [  ]
+]
+
+{ #category : #accessing }
+WSPluggableEndpoint >> httpConfiguration [
+	^ httpConfiguration
+]
+
+{ #category : #accessing }
+WSPluggableEndpoint >> httpConfiguration: anObject [
+	httpConfiguration := anObject
 ]
 
 { #category : #initialization }
