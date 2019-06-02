@@ -88,13 +88,13 @@ WSPluggableEndpoint >> endpointPath [
 ]
 
 { #category : #accessing }
-WSPluggableEndpoint >> enumerationBlock [
-	^ enumerationBlock
+WSPluggableEndpoint >> enumeration [
+	^ enumeration
 ]
 
 { #category : #accessing }
-WSPluggableEndpoint >> enumerationBlock: anObject [
-	enumerationBlock := anObject
+WSPluggableEndpoint >> enumeration: anObject [
+	enumeration := anObject
 ]
 
 { #category : #api }
@@ -167,8 +167,8 @@ WSPluggableEndpoint >> initializeHeaders [
 
 { #category : #enumerating }
 WSPluggableEndpoint >> next: aLimit with: aCursor [
-	enumerationBlock ifNil: [ ^ nil ].
-	^ enumerationBlock cull: self cull: aLimit cull: aCursor
+	enumeration ifNil: [ ^ nil ].
+	^ enumeration cull: self cull: aLimit cull: aCursor
 ]
 
 { #category : #api }
