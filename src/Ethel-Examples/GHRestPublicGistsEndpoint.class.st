@@ -22,13 +22,3 @@ GHRestPublicGistsEndpoint >> nextPage [
 	<get>
 	^ self execute
 ]
-
-{ #category : #accessing }
-GHRestPublicGistsEndpoint >> since [
-	^ since
-]
-
-{ #category : #accessing }
-GHRestPublicGistsEndpoint >> since: anObject [
-	since := anObject
-]
