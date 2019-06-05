@@ -29,6 +29,6 @@ WSClient >> gtUMLIn: aComposite [
 	<gtInspectorPresentationOrder: 12>
 	^ aComposite roassal2
 		title: ['UML' translated];
-		initializeView: [ RTUMLClassBuilder new ];
+		initializeView: [ WSUMLBuilder new ];
 		painting: [ :view | self buildUMLOn: view ]
 ]

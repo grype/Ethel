@@ -5,7 +5,8 @@ Class {
 		'client',
 		'httpMethods',
 		'colors',
-		'objects'
+		'objects',
+		'typePalette'
 	],
 	#category : #'Ethel-Tools'
 }
@@ -13,6 +14,21 @@ Class {
 { #category : #'as yet unclassified' }
 WSUml class >> onClient: aClient [
 	^ self basicNew initializeWithClient: aClient
+]
+
+{ #category : #building }
+WSUml >> boxColorFor: cls [
+	| types color pallete |
+	types := self distinguishedTypes.
+	color := Color white.
+	pallete := self typePalette.
+	types
+		detect: [ :each | 
+			(cls includesBehavior: each)
+				or: [ cls traitComposition includesTrait: each ] ]
+		ifFound: [ :found | color := pallete at: (types indexOf: found) ]
+		ifNone: [  ].
+	^ color
 ]
 
 { #category : #building }
@@ -49,16 +65,20 @@ WSUml >> buildUMLOn: aBuilder [
 	aBuilder methodShape
 		color: [ :method | self colorForHttpMethod: method ].
 
+	aBuilder classNameShape color: [ :cls | self colorForClassName: cls ].
+
+	aBuilder boxShape color: [ :cls | self boxColorFor: cls ].
+
 	aBuilder
 		classname: [ :each | self classNameFor: each ];
-		instanceVariables: #instVarNames;
+		instanceVariables: [ :cls | self instanceVariablesFor: cls ];
 		methodsNames: [ :cls | self methodNamesFor: cls ];
 		methodselector: [ :aMethod | self selectorForMethod: aMethod ];
 		attributeselector: #yourself;
 		superclass: #superclass.
 
 	aBuilder addObjects: self objects.
-	aBuilder layout tree
+	aBuilder layout tree verticalGap: 40; horizontalGap: 30.
 ]
 
 { #category : #accessing }
@@ -81,6 +101,13 @@ WSUml >> client: anObject [
 ]
 
 { #category : #accessing }
+WSUml >> colorForClassName: aClass [
+	^ aClass package = WSClient package
+		ifTrue: [ Color gray lighter ]
+		ifFalse: [ Color gray darker ]
+]
+
+{ #category : #accessing }
 WSUml >> colorForHttpMethod: anHttpMethod [
 	(anHttpMethod wsEndpointHttpMethod isNotNil
 		and: [ self httpMethods includes: anHttpMethod wsEndpointHttpMethod ])
@@ -97,6 +124,13 @@ WSUml >> colors [
 				scheme: 'Dark2' ]
 ]
 
+{ #category : #building }
+WSUml >> distinguishedTypes [
+	^ {WSClient.
+	TWSEnumeration.
+	TWSEnumerationCursor}
+]
+
 { #category : #accessing }
 WSUml >> httpMethods [
 	^ httpMethods
@@ -111,9 +145,18 @@ WSUml >> initializeWithClient: aClient [
 ]
 
 { #category : #building }
+WSUml >> instanceVariablesFor: cls [
+	^ cls package = WSClient package
+		ifTrue: [ {} ]
+		ifFalse: [ cls instVarNames ]
+]
+
+{ #category : #building }
 WSUml >> methodNamesFor: cls [
-	(cls traitComposition includesTrait: TWSEnumerationCursor) ifTrue: [ ^ cls methods ].
-	^ cls methods select: #isWSEndpointExecutionMethod
+	(cls package = WSClient package) ifTrue: [ ^ {  } ].
+	^ cls methods reject: #isFromTrait.
+"	(cls traitComposition includesTrait: TWSEnumerationCursor) ifTrue: [ ^ cls methods ].
+	^ cls methods select: #isWSEndpointExecutionMethod"
 ]
 
 { #category : #accessing }
@@ -139,9 +182,21 @@ WSUml >> objects [
 
 { #category : #building }
 WSUml >> selectorForMethod: aMethod [
-	aMethod wsEndpointPath ifNil: [ ^ aMethod selector ].
+	[aMethod wsEndpointPath ifNil: [ ^ aMethod selector ]] on: Error do: [^ aMethod selector ].
 	^ '{1} ~> {2}'
 		format:
 			{aMethod selector.
 			aMethod wsEndpointPath pathString}
+]
+
+{ #category : #building }
+WSUml >> typePalette [
+	^ typePalette
+		ifNil: [ typePalette := (RTColorPalette qualitative
+				colors: self distinguishedTypes size)
+				collect: [ :each | 
+					| result |
+					result := each.
+					[ result lightness < 0.9 ] whileTrue: [ result := result paler ].
+					result ] ]
 ]
