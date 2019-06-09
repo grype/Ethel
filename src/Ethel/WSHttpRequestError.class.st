@@ -1,6 +1,12 @@
+"
+I represent a request error. I am typically raised by ==WSClient>>#validateRequest:== method to indicate an incomplete HTTP request
+
+Instance Variables
+	request:		<ZnRequest>
+"
 Class {
 	#name : #WSHttpRequestError,
-	#superclass : #Error,
+	#superclass : #WSError,
 	#instVars : [
 		'request'
 	],
@@ -12,11 +18,6 @@ WSHttpRequestError class >> signal: aRequest [
 	^ self new
 		request: aRequest;
 		signal: 'Invalid HTTP Request'
-]
-
-{ #category : #private }
-WSHttpRequestError >> isResumable [
-	^ true
 ]
 
 { #category : #accessing }

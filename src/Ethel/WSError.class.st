@@ -1,3 +1,6 @@
+"
+I am a general purpose WSError, but my subclasses are a lot more meaningful.
+"
 Class {
 	#name : #WSError,
 	#superclass : #Error,

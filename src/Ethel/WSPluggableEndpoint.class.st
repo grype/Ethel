@@ -1,9 +1,9 @@
 "
-I am a pluggable endpoint that's primarily used for scripting interactions with web-based services. Both ==WSClient== and ==TWSEndpoint== create instances of me via #/ method. I provide an interface for configuring request headers and request data, and implement common HTTP methods like #get, #post, #put, #patch and #delete.
+I am a pluggable endpoint that's primarily used for scripting interactions with web-based services. I provide an interface for configuring requests and implement common HTTP methods like #get, #post, #put, #patch and #delete.
 
 Sending #/ message with a path argument to an instance of ==WSClient== or ==TWSEndpoing== will first look for a concrete endpoint class for the resulting path. If none could be found, my instance will be returned, capturing the final path.
 
-I also implement a block-based enumeration via #enumerationBlock. When set, the block will be passed three arguments: 1) an instance of the endpoint 2) number of items requested and 3) pertinent cursor object (see ==TWSEnumeration== and ==TWSEnumerationCursor==).
+I also implement a block-based enumeration via #enumeration:. When set, the block will be passed three arguments: 1) an instance of the endpoint 2) number of items requested and 3) pertinent cursor object (see ==TWSEnumeration== and ==TWSEnumerationCursor==).
 
 [[[
 			client := WSClient withUrl: 'http://example.com'.
@@ -12,7 +12,7 @@ I also implement a block-based enumeration via #enumerationBlock. When set, the 
 			(client / #examples) get. ""GET /examples""
 			(client / #examples) data: aNewExample; put. ""PUT /examples {aNewExample asJson}""
 			(client / #examples) 
-				enumerationBlock: [ :endpoint :limit :cursor | 
+				enumeration: [ :endpoint :limit :cursor | 
 					endpoint data at: #page put: (cursor at: #page).
 					endpoint data at: #page_size put: (cursor at: #pageSize) ]; 
 				collect: #yourself.

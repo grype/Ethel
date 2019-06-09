@@ -1,7 +1,7 @@
 "
 I am a general purpose web-based API client.
 
-I am good at talking to RESTful APIs and the like, and can be used as-is for scripting purposes. However, if you'd like to make explicit a particular web-based API - do subclass me. I use ZincHTTPComponents for actual transport, and collaborate with instances implementing ==TWSEndpoint== for configuring and executing HTTP requests.
+I am used for communicating with RESTful Services and the like. I can be used as-is, but do subclasses me if you'd like to make explicit a particular web-based API. I use ZincHTTPComponents for the actual HTTP transport, and collaborate with instances implementing ==TWSEndpoint== for configuring and executing HTTP requests.
 
 Instantiate me #withUrl:
 
@@ -11,16 +11,16 @@ From there, you're typically traversing endpoints and executing requests:
 
 [[[ response := (client / #things) get. ""GET /things"" ]]]
 
-When scripting, as seen above, I create instances of ==WSPluggableEndpoint==.
+When deriving endpoints via #/ message, I will first attempt to find a concrete class that implements the resulting path, and if none could be found I'll create an instance of ==WSPluggableEndpoint==. You can also pass a concrete class that uses ==TWSEndpoint== as the argument.
 	
 When subclassing:
 	* override #configureHttpClient: when there's a need to configure http transport with data not specific to a particular endpoint (endpoints get to configure transport separately)
 	* override #validateResponse: for custom error handling
+	* declare methods for traversing concrete endpoints if you'd like them to be discoverable
 
 Instance Variables
 	baseUrl:		<ZnUrl>
-	contentReader:		<Block>
-	contentWriter:		<Block>
+	httpConfiguration: <Block>
 
 "
 Class {
