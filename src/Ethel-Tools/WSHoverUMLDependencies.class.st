@@ -7,7 +7,7 @@ Class {
 	#classVars : [
 		'AttributeName'
 	],
-	#category : #'Ethel-Tools'
+	#category : #'Ethel-Tools-UML'
 }
 
 { #category : #'class initialization' }

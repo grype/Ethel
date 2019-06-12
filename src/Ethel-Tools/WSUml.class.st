@@ -8,7 +8,7 @@ Class {
 		'objects',
 		'typePalette'
 	],
-	#category : #'Ethel-Tools'
+	#category : #'Ethel-Tools-UML'
 }
 
 { #category : #'as yet unclassified' }
@@ -165,7 +165,7 @@ WSUml >> initializeWithClient: aClient [
 WSUml >> instanceVariablesFor: cls [
 	^ cls package = WSClient package
 		ifTrue: [ {} ]
-		ifFalse: [ cls instVarNames ]
+		ifFalse: [ cls instVarNames sorted: [ :a :b | a < b ] ]
 ]
 
 { #category : #testing }
@@ -207,7 +207,7 @@ WSUml >> lineToElement: element [
 WSUml >> methodNamesFor: cls [
 	cls package = WSClient package
 		ifTrue: [ ^ {} ].
-	^ cls methods reject: #isFromTrait
+	^ (cls methods reject: #isFromTrait) sorted: [ :a :b | a selector < b selector ]
 ]
 
 { #category : #accessing }

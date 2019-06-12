@@ -26,6 +26,7 @@ CompiledMethod >> wsEndpointHttpMethod [
 CompiledMethod >> wsEndpointPath [
 	self methodClass isWSEndpoint
 		ifFalse: [ ^ nil ].
+	self wsEndpointHttpMethod ifNil: [ ^ nil ].
 	^ (self pragmaAt: self methodClass endpointPathPragma)
 		ifNil: [ self methodClass endpointPath ]
 		ifNotNil: [ :val | self methodClass endpointPath / val arguments first ]

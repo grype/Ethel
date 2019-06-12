@@ -12,7 +12,7 @@ Class {
 		'lastHighlightedElements',
 		'lastColor'
 	],
-	#category : #'Ethel-Tools'
+	#category : #'Ethel-Tools-UML'
 }
 
 { #category : #'reset shape' }

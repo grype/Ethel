@@ -1,7 +1,7 @@
 Class {
 	#name : #WSUMLBuilder,
 	#superclass : #RTUMLClassBuilder,
-	#category : #'Ethel-Tools'
+	#category : #'Ethel-Tools-UML'
 }
 
 { #category : #edges }
