@@ -17,18 +17,27 @@ WSUml class >> onClient: aClient [
 ]
 
 { #category : #building }
+WSUml >> additionaInteractions [
+	^ {self showAllReferencesInteraction}
+]
+
+{ #category : #building }
 WSUml >> boxColorFor: cls [
-	| types color pallete |
-	types := self distinguishedTypes.
-	color := Color white.
-	pallete := self typePalette.
-	types
-		detect: [ :each | 
-			(cls includesBehavior: each)
-				or: [ cls traitComposition includesTrait: each ] ]
-		ifFound: [ :found | color := pallete at: (types indexOf: found) ]
-		ifNone: [  ].
-	^ color
+	cls package = WSClient package
+		ifTrue: [ ^ Color white alpha: 0.9 ].
+	(cls inheritsFrom: WSClient)
+		ifTrue: [ ^ Color
+				r: 0.642
+				g: 0.87
+				b: 0.976
+				alpha: 1.0 ].
+	cls isTrait
+		ifTrue: [ ^ Color
+				r: 0.866
+				g: 0.905
+				b: 0.78
+				alpha: 1.0 ].
+	^ Color white
 ]
 
 { #category : #building }
@@ -66,7 +75,6 @@ WSUml >> buildUMLOn: aBuilder [
 		color: [ :method | self colorForHttpMethod: method ].
 
 	aBuilder classNameShape color: [ :cls | self colorForClassName: cls ].
-
 	aBuilder boxShape color: [ :cls | self boxColorFor: cls ].
 
 	aBuilder
@@ -78,7 +86,11 @@ WSUml >> buildUMLOn: aBuilder [
 		superclass: #superclass.
 
 	aBuilder addObjects: self objects.
-	aBuilder layout tree verticalGap: 40; horizontalGap: 30.
+	aBuilder layout tree
+		verticalGap: 40;
+		horizontalGap: 30.
+	self additionaInteractions
+		do: [ :each | aBuilder interaction addInteraction: each ]
 ]
 
 { #category : #accessing }
@@ -125,10 +137,15 @@ WSUml >> colors [
 ]
 
 { #category : #building }
-WSUml >> distinguishedTypes [
-	^ {WSClient.
-	TWSEnumeration.
-	TWSEnumerationCursor}
+WSUml >> elementsReferencedBy: element [
+	^ element view elements
+		select: [ :each | self isElement: each referencedBy: element ]
+]
+
+{ #category : #building }
+WSUml >> elementsReferencing: element [
+	^ element view elements
+		select: [ :el | self isElement: element referencedBy: el ]
 ]
 
 { #category : #accessing }
@@ -151,12 +168,46 @@ WSUml >> instanceVariablesFor: cls [
 		ifFalse: [ cls instVarNames ]
 ]
 
+{ #category : #testing }
+WSUml >> isElement: element referencedBy: referencingElement [
+	((referencingElement shape isKindOf: RTBox)
+		and: [ element shape isKindOf: RTBox ])
+		ifFalse: [ ^ false ].
+	(element model isNil or: [ referencingElement model isNil ])
+		ifTrue: [ ^ false ].
+	((referencingElement model respondsTo: #referencedClasses)
+		and: [ referencingElement model referencedClasses includes: element model ])
+		ifTrue: [ ^ true ].
+	(referencingElement model isTrait
+		and: [ element model isClass
+				and: [ element model traitComposition
+						includesTrait: referencingElement model ] ])
+		ifTrue: [ ^ true ].
+	^ false
+]
+
+{ #category : #building }
+WSUml >> lineFromElement: anObject [
+	^ RTArrowedLine new
+		color: (Color colorFrom: '#82B446');
+		attachPoint: RTShorterDistanceAttachPoint new;
+		inverted;
+		yourself
+]
+
+{ #category : #building }
+WSUml >> lineToElement: element [
+	^ RTArrowedLine new
+		color: (Color colorFrom: '#4682B4');
+		attachPoint: RTShorterDistanceAttachPoint new;
+		yourself
+]
+
 { #category : #building }
 WSUml >> methodNamesFor: cls [
-	(cls package = WSClient package) ifTrue: [ ^ {  } ].
-	^ cls methods reject: #isFromTrait.
-"	(cls traitComposition includesTrait: TWSEnumerationCursor) ifTrue: [ ^ cls methods ].
-	^ cls methods select: #isWSEndpointExecutionMethod"
+	cls package = WSClient package
+		ifTrue: [ ^ {} ].
+	^ cls methods reject: #isFromTrait
 ]
 
 { #category : #accessing }
@@ -189,14 +240,11 @@ WSUml >> selectorForMethod: aMethod [
 			aMethod wsEndpointPath pathString}
 ]
 
-{ #category : #building }
-WSUml >> typePalette [
-	^ typePalette
-		ifNil: [ typePalette := (RTColorPalette qualitative
-				colors: self distinguishedTypes size)
-				collect: [ :each | 
-					| result |
-					result := each.
-					[ result lightness < 0.9 ] whileTrue: [ result := result paler ].
-					result ] ]
+{ #category : #interactions }
+WSUml >> showAllReferencesInteraction [
+	^ WSShowEdges new
+		toShape: [ :element | self lineToElement: element ];
+		fromShape: [ :element | self lineFromElement: element ];
+		connectFromElements: [ :element | self elementsReferencing: element ];
+		connectToElements: [ :element | self elementsReferencedBy: element ]
 ]

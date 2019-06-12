@@ -7,7 +7,7 @@ Class {
 { #category : #edges }
 WSUMLBuilder >> buildEdges [
 	super buildEdges.
-	self buildEdgesForDependents: classes
+	"self buildEdgesForDependents: classes"
 ]
 
 { #category : #edges }
