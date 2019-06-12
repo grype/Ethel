@@ -7,6 +7,7 @@ Class >> gtInspectorWSEndpointExecutingMethodsIn: composite [
 	<gtInspectorPresentationOrder: 20>
 	composite list 
 		title: 'Endpoint Methods';
+		when: [ self isWSEndpoint and: [ self wsEndpointExecutingMethods isNotEmpty ] ];
 		display: [ (self wsEndpointExecutingMethods collect: #asRingDefinition) 
 						sorted: [ :x :y | x selector < y selector ] ];
 		format: #selector;
