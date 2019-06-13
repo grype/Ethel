@@ -1,6 +1,15 @@
 Extension { #name : #CompiledMethod }
 
 { #category : #'*Ethel' }
+CompiledMethod >> gtUMLIn: aComposite [
+	<gtInspectorPresentationOrder: 13>
+	^ aComposite roassal2
+		title: ['UML' translated];
+		initializeView: [ WSUMLBuilder new ];
+		painting: [ :view | self buildUMLOn: view ]
+]
+
+{ #category : #'*Ethel' }
 CompiledMethod >> isWSEndpointExecutionMethod [
 	^ self wsEndpointHttpMethod isNotNil 
 ]

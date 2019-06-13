@@ -23,3 +23,21 @@ TWSEndpoint >> gtPathReferencesIn: aComposite [
 		column: 'Path' evaluated: [ :each | each value wsGtPrintString ];
 		column: 'Implementor' evaluated: [ :each | each key selector ]
 ]
+
+{ #category : #'*Ethel-Tools' }
+TWSEndpoint classSide >> gtUMLIn: aComposite [
+	<gtInspectorPresentationOrder: 13>
+	^ aComposite roassal2
+		title: [ 'UML' translated ];
+		initializeView: [ WSUMLBuilder new ];
+		painting: [ :view | 
+			| uml |
+			uml := WSUml onEndpointClass: self.
+			uml buildOn: view ]
+]
+
+{ #category : #'*Ethel-Tools' }
+TWSEndpoint >> gtUMLIn: aComposite [
+	<gtInspectorPresentationOrder: 13>
+	^ self class gtUMLIn: aComposite
+]

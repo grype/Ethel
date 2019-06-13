@@ -2,7 +2,6 @@ Class {
 	#name : #WSUml,
 	#superclass : #Object,
 	#instVars : [
-		'client',
 		'httpMethods',
 		'colors',
 		'objects',
@@ -14,6 +13,16 @@ Class {
 { #category : #'as yet unclassified' }
 WSUml class >> onClient: aClient [
 	^ self basicNew initializeWithClient: aClient
+]
+
+{ #category : #'as yet unclassified' }
+WSUml class >> onEndpoint: anEndpoint [
+	^ self onEndpointClass: anEndpoint class
+]
+
+{ #category : #'as yet unclassified' }
+WSUml class >> onEndpointClass: anEndpointClass [
+	^ self basicNew initializeWithEndpointClass: anEndpointClass
 ]
 
 { #category : #building }
@@ -66,7 +75,8 @@ WSUml >> buildLegendOn: aBuilder [
 { #category : #building }
 WSUml >> buildOn: aBuilder [
 	self buildUMLOn: aBuilder.
-	self buildLegendOn: aBuilder
+	self httpMethods isEmptyOrNil
+		ifFalse: [ self buildLegendOn: aBuilder ]
 ]
 
 { #category : #building }
@@ -85,7 +95,7 @@ WSUml >> buildUMLOn: aBuilder [
 		attributeselector: #yourself;
 		superclass: #superclass.
 
-	aBuilder addObjects: self objects.
+	aBuilder addObjects: objects.
 	aBuilder layout tree
 		verticalGap: 40;
 		horizontalGap: 30.
@@ -100,16 +110,6 @@ WSUml >> classNameFor: anObject [
 			((anObject traitComposition includesTrait: TWSEnumeration)
 				ifTrue: [ '*' ]
 				ifFalse: [ '' ])
-]
-
-{ #category : #accessing }
-WSUml >> client [
-	^ client
-]
-
-{ #category : #accessing }
-WSUml >> client: anObject [
-	client := anObject
 ]
 
 { #category : #accessing }
@@ -132,7 +132,7 @@ WSUml >> colorForHttpMethod: anHttpMethod [
 WSUml >> colors [
 	^ colors
 		ifNil: [ colors := RTColorPalette qualitative
-				colors: self httpMethods size
+				colors: (4 max: self httpMethods size)
 				scheme: 'Dark2' ]
 ]
 
@@ -148,17 +148,52 @@ WSUml >> elementsReferencing: element [
 		select: [ :el | self isElement: element referencedBy: el ]
 ]
 
+{ #category : #initialization }
+WSUml >> extendWithTraits [
+	| traits |
+	traits := objects
+		flatCollect: [ :each | each traitComposition allTraits ].
+	objects addAll: traits.
+	objects
+		addAll:
+			((traits flatCollect: #referencedClasses)
+				select: [ :each | 
+					each isWSEndpoint
+						or: [ each traitComposition includesTrait: TWSEnumerationCursor ] ])
+]
+
 { #category : #accessing }
 WSUml >> httpMethods [
 	^ httpMethods
-		ifNil: [ httpMethods := client class supportedHttpMethods
-				collect: #asLowercase ]
+		ifNil: [ | methods |
+			methods := objects flatCollect: [ :each | each methods ].
+			httpMethods := (methods
+				select: [ :each | each isWSEndpointExecutionMethod ]
+				thenCollect: [ :each | each wsEndpointHttpMethod asLowercase ])
+				asSet asOrderedCollection ]
 ]
 
 { #category : #initialization }
 WSUml >> initializeWithClient: aClient [
 	self initialize.
-	client := aClient
+	objects := Set with: aClient class.
+	((aClient class endpoints
+		flatCollect: [ :each | each withAllSuperclasses ])
+		select: #isWSEndpoint) ifNotEmpty: [ :val | objects addAll: val ].
+	self extendWithTraits
+]
+
+{ #category : #initialization }
+WSUml >> initializeWithEndpointClass: anEndpointClass [
+	self initialize.
+	objects := Set new
+		add: anEndpointClass;
+		addAll: anEndpointClass allSubclasses;
+		addAll: (anEndpointClass allSuperclasses select: #isWSEndpoint);
+		yourself.
+	objects
+		addAll: (anEndpointClass referencedClasses select: #isWSEndpoint).
+	self extendWithTraits
 ]
 
 { #category : #building }
@@ -211,24 +246,8 @@ WSUml >> methodNamesFor: cls [
 ]
 
 { #category : #accessing }
-WSUml >> objects [
-	| traits |
-	^ objects
-		ifNil: [ objects := Set with: client class.
-			((client class endpoints
-				flatCollect: [ :each | each withAllSuperclasses ])
-				select: #isWSEndpoint) ifNotEmpty: [ :val | objects addAll: val ].
-
-			traits := objects
-				flatCollect: [ :each | each traitComposition allTraits ].
-			objects addAll: traits.
-			objects
-				addAll:
-					((traits flatCollect: #referencedClasses)
-						select: [ :each | 
-							each isWSEndpoint
-								or: [ each traitComposition includesTrait: TWSEnumerationCursor ] ]).
-			^ objects ]
+WSUml >> objects: anObject [
+	objects := anObject
 ]
 
 { #category : #building }
