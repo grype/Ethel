@@ -33,6 +33,7 @@ TWSEndpoint classSide >> gtUMLIn: aComposite [
 		painting: [ :view | 
 			| uml |
 			uml := WSUml onEndpointClass: self.
+			uml selectedObject: self.
 			uml buildOn: view ]
 ]
 

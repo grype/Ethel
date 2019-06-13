@@ -5,7 +5,8 @@ Class {
 		'httpMethods',
 		'colors',
 		'objects',
-		'typePalette'
+		'typePalette',
+		'selectedObject'
 	],
 	#category : #'Ethel-Tools-UML'
 }
@@ -32,6 +33,8 @@ WSUml >> additionaInteractions [
 
 { #category : #building }
 WSUml >> boxColorFor: cls [
+	(selectedObject isNotNil and: [ cls = selectedObject ])
+		ifTrue: [ ^ Color white ].
 	cls package = WSClient package
 		ifTrue: [ ^ Color white alpha: 0.9 ].
 	(cls inheritsFrom: WSClient)
@@ -46,7 +49,7 @@ WSUml >> boxColorFor: cls [
 				g: 0.905
 				b: 0.78
 				alpha: 1.0 ].
-	^ Color white
+	^ Color white alpha: 0.8
 ]
 
 { #category : #building }
@@ -114,6 +117,8 @@ WSUml >> classNameFor: anObject [
 
 { #category : #accessing }
 WSUml >> colorForClassName: aClass [
+	(selectedObject isNotNil and: [ aClass = selectedObject ])
+		ifTrue: [ ^ Color red ].
 	^ aClass package = WSClient package
 		ifTrue: [ Color gray lighter ]
 		ifFalse: [ Color gray darker ]
@@ -248,6 +253,16 @@ WSUml >> methodNamesFor: cls [
 { #category : #accessing }
 WSUml >> objects: anObject [
 	objects := anObject
+]
+
+{ #category : #accessing }
+WSUml >> selectedObject [
+	^ selectedObject
+]
+
+{ #category : #accessing }
+WSUml >> selectedObject: anObject [
+	selectedObject := anObject
 ]
 
 { #category : #building }

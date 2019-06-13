@@ -4,9 +4,13 @@ Extension { #name : #CompiledMethod }
 CompiledMethod >> gtUMLIn: aComposite [
 	<gtInspectorPresentationOrder: 13>
 	^ aComposite roassal2
-		title: ['UML' translated];
+		title: [ 'UML' translated ];
 		initializeView: [ WSUMLBuilder new ];
-		painting: [ :view | self buildUMLOn: view ]
+		painting: [ :view | 
+			| uml |
+			uml := WSUml onEndpointClass: self methodClass.
+			uml selectedObject: self methodClass.
+			uml buildOn: view ]
 ]
 
 { #category : #'*Ethel' }
