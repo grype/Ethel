@@ -11,17 +11,17 @@ Class {
 	#category : #'Ethel-Tools-UML'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 WSUml class >> onClient: aClient [
 	^ self basicNew initializeWithClient: aClient
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 WSUml class >> onEndpoint: anEndpoint [
 	^ self onEndpointClass: anEndpoint class
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 WSUml class >> onEndpointClass: anEndpointClass [
 	^ self basicNew initializeWithEndpointClass: anEndpointClass
 ]
