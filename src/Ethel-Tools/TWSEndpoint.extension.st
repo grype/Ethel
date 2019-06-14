@@ -20,8 +20,8 @@ TWSEndpoint >> gtPathReferencesIn: aComposite [
 		title: [ 'Paths' translated ];
 		display: [ self gtPathReferences ];
 		when: [ self class pathReferences isEmptyOrNil not ];
-		column: 'Path' evaluated: [ :each | each value wsGtPrintString ];
-		column: 'Implementor' evaluated: [ :each | each key selector ]
+		column: 'Implementor' evaluated: [ :each | each key selector ];
+		column: 'Path' evaluated: [ :each | each value wsGtPrintString ]
 ]
 
 { #category : #'*Ethel-Tools' }
