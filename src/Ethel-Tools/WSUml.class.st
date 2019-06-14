@@ -195,6 +195,11 @@ WSUml >> initializeWithEndpointClass: anEndpointClass [
 		add: anEndpointClass;
 		addAll: anEndpointClass allSubclasses;
 		addAll: (anEndpointClass allSuperclasses select: #isWSEndpoint);
+		addAll:
+			(Object allSubclasses
+				select: [ :cls | 
+					cls isWSEndpoint
+						and: [ cls referencedClasses includes: anEndpointClass ] ]);
 		yourself.
 	objects
 		addAll: (anEndpointClass referencedClasses select: #isWSEndpoint).
