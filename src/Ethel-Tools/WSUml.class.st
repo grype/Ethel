@@ -198,7 +198,7 @@ WSUml >> initializeWithEndpointClass: anEndpointClass [
 		addAll:
 			(Object allSubclasses
 				select: [ :cls | 
-					cls isWSEndpoint
+					(cls isWSEndpoint or: [ cls inheritsFrom: WSClient ])
 						and: [ cls referencedClasses includes: anEndpointClass ] ]);
 		yourself.
 	objects
