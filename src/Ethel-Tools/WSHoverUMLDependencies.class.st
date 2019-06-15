@@ -30,12 +30,10 @@ WSHoverUMLDependencies >> createEdgesFrom: element [
 	fromElements := element view elements
 		select:
 			[ :each | each model isClass and: [ each model referencedClasses includes: cls ] ].
-"	self halt."
 	edgeBuilder view: element view.
 	edgeBuilder objects: (toElements , fromElements collect: #model).
 	edgeBuilder connectFrom: [ :i | fromElements includes: i ].
-	edgeBuilder connectTo: [ :i | toElements includes: i ].
-"	RTTreeLayout on: {element} , toElements , fromElements"
+	edgeBuilder connectTo: [ :i | toElements includes: i ]
 ]
 
 { #category : #hooks }
