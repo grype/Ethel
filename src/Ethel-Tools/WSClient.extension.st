@@ -25,6 +25,15 @@ WSClient >> gtMapIn: aComposite [
 ]
 
 { #category : #'*Ethel-Tools' }
+WSClient class >> gtUMLIn: aComposite [
+	<gtInspectorPresentationOrder: 12>
+	^ aComposite roassal2
+		title: ['UML' translated];
+		initializeView: [ WSUMLBuilder new ];
+		painting: [ :view | self buildUMLOn: view ]
+]
+
+{ #category : #'*Ethel-Tools' }
 WSClient >> gtUMLIn: aComposite [
 	<gtInspectorPresentationOrder: 12>
 	^ aComposite roassal2
