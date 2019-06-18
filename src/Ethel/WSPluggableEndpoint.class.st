@@ -46,7 +46,8 @@ Class {
 WSPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
 	headers isEmptyOrNil
 		ifFalse: [ anEndpoint headersAddAll: headers associations ].
-	anEndpoint httpConfiguration: self httpConfiguration
+	(anEndpoint respondsTo: #httpConfiguration:)
+		ifTrue: [ anEndpoint httpConfiguration: self httpConfiguration ]
 ]
 
 { #category : #configuring }
