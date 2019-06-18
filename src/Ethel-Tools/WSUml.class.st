@@ -12,13 +12,8 @@ Class {
 }
 
 { #category : #'instance creation' }
-WSUml class >> onClient: aClient [
-	^ self basicNew initializeWithClient: aClient
-]
-
-{ #category : #'instance creation' }
-WSUml class >> onEndpoint: anEndpoint [
-	^ self onEndpointClass: anEndpoint class
+WSUml class >> onClientClass: cls [
+	^ self basicNew initializeWithClientClass: cls
 ]
 
 { #category : #'instance creation' }
@@ -179,11 +174,10 @@ WSUml >> httpMethods [
 ]
 
 { #category : #initialization }
-WSUml >> initializeWithClient: aClient [
+WSUml >> initializeWithClientClass: cls [
 	self initialize.
-	objects := Set with: aClient class.
-	((aClient class endpoints
-		flatCollect: [ :each | each withAllSuperclasses ])
+	objects := Set with: cls.
+	((cls endpoints flatCollect: [ :each | each withAllSuperclasses ])
 		select: #isWSEndpoint) ifNotEmpty: [ :val | objects addAll: val ].
 	self extendWithTraits
 ]

@@ -9,9 +9,9 @@ WSClient >> buildMapOn: aBuilder [
 ]
 
 { #category : #'*Ethel-Tools' }
-WSClient >> buildUMLOn: aBuilder [
+WSClient class >> buildUMLOn: aBuilder [
 	| uml |
-	uml := WSUml onClient: self.
+	uml := WSUml onClientClass: self.
 	uml buildOn: aBuilder
 ]
 
@@ -30,5 +30,5 @@ WSClient >> gtUMLIn: aComposite [
 	^ aComposite roassal2
 		title: ['UML' translated];
 		initializeView: [ WSUMLBuilder new ];
-		painting: [ :view | self buildUMLOn: view ]
+		painting: [ :view | self class buildUMLOn: view ]
 ]
