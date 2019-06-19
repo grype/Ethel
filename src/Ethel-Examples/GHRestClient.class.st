@@ -28,6 +28,19 @@ GHRestClient >> configureHttpClient: http [
 	http headerAt: #Authorization put: 'token ' , config authToken
 ]
 
+{ #category : #execution }
+GHRestClient >> execute: anEndpoint with: anExecBlock [
+	^ [ super execute: anEndpoint with: anExecBlock ]
+		on: WSHttpResponseError
+		do: [ :err | 
+			err response code = 401
+				ifTrue: [ UIManager default
+						alert: 'Be sure to set API token in Settings/Tools/Ethel'
+						title: 'Unauthorized'.
+						err resume ]
+				ifFalse: [ err signal ] ]
+]
+
 { #category : #traversing }
 GHRestClient >> gists [
 	^ self / GHRestGistsEndpoint 
