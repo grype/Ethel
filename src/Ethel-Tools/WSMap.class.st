@@ -72,7 +72,9 @@ WSMap >> buildMapOn: aBuilder [
 				newFrom: (children associations sorted: [ :a :b | a key <= b key ]) ].
 
 	aBuilder elements
-		do: [ :e | e @ (RTPopup new text: [ :item | self popupTextFor: item ]) ].
+		do: [ :e | 
+			e removeInteractionIfPresent: RTPopup.
+			e @ (RTPopup new text: [ :item | self popupTextFor: item ]) ].
 	aBuilder build
 ]
 
