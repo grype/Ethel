@@ -9,7 +9,7 @@ BaselineOfEthel >> baseline: spec [
 	<baseline>
 	spec
 		for: #common
-		do: [ spec repository: 'github://grype/Unrest/src'.
+		do: [ spec repository: 'github://grype/Ethel'.
 			self dependencies: spec.
 			spec package: #Ethel with: [ spec requires: #('NeoJSON') ].
 			spec
