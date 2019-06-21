@@ -1,0 +1,12 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'Ethel',
+      #directory : 'src',
+      #platforms : [ #pharo ]
+    }
+  ],
+  #testing: {
+    #packages: [ 'Ethel', 'Ethel-*' ]
+  }
+}
