@@ -26,25 +26,25 @@ PathTest >> testMatches [
 	recurseMiddle.
 	recurseEnd}
 		do: [ :aPath | 
-			(aPath matches: aPath) should beTrue.
-			(aPath matches: aPath pathString) should beTrue ].
+			(aPath matches: aPath) should be: true.
+			(aPath matches: aPath pathString) should be: true ].
 
-	(shortSimple matches: Path / #*) should beTrue.
-	(longSimple matches: Path / #*) should beFalse.
-	(longSimple matches: '/foo/*') should beFalse.
-	(longSimple matches: '/foo/bar/*') should beTrue.
-	(longSimple matches: '/*/bar/baz') should beTrue.
-	(longSimple matches: '/*/*/baz') should beTrue.
-	(longSimple matches: '/*/*/*') should beTrue.
-	(longSimple matches: '/*/baz') should beFalse.
+	(shortSimple matches: Path / #*) should be: true.
+	(longSimple matches: Path / #*) should be: false.
+	(longSimple matches: '/foo/*') should be: false.
+	(longSimple matches: '/foo/bar/*') should be: true.
+	(longSimple matches: '/*/bar/baz') should be: true.
+	(longSimple matches: '/*/*/baz') should be: true.
+	(longSimple matches: '/*/*/*') should be: true.
+	(longSimple matches: '/*/baz') should be: false.
 
 	{recurseStart.
 	recurseMiddle.
 	recurseEnd}
-		do: [ :aPath | (longSimple matches: aPath) should beTrue ].
+		do: [ :aPath | (longSimple matches: aPath) should be: true ].
 
 	{noMatchStart.
 	noMatchMiddle.
 	noMatchEnd}
-		do: [ :aPath | (longSimple matches: aPath) should beFalse ]
+		do: [ :aPath | (longSimple matches: aPath) should be: false ]
 ]
