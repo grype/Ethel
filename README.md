@@ -12,7 +12,7 @@ Ethel is a lightweight framework for composing web service clients in Pharo Smal
 ```smalltalk
 Metacello new
   baseline: 'Ethel';
-  repository: 'github://grype/unrest:ethel';
+  repository: 'github://grype/Ethel';
   load.
 ```
 
