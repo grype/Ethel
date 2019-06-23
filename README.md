@@ -47,7 +47,7 @@ Let’s use GitHub’s gist API for a quick look into some of the capabilities o
 #### Scripting
 
 ```smalltalk
-client := WSClient jsonWithUrl: 'https://api.github.com/‘.
+client := WSClient jsonWithUrl: 'https://api.github.com/'.
 client httpConfiguration: [ :http |
     http headerAt: 'Authorization' put: 'token <MyAuthToken>'
 ].
