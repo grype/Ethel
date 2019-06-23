@@ -89,7 +89,7 @@ files := { ‘example.st’ -> ({ #content -> loadScript } asDictionary) } asDic
 
 #### Composing a dedicated client
 
-When making a dedicated client, start by subclassing `WSClient` and then define endpoint classes that represents logical pieces of the API - like GitHub’s gists, for example. The framework allows both client and endpoint classes to configure HTTP request via `#configureOn:`.
+When making a dedicated client, start by subclassing `WSClient` and then define endpoint classes that represent logical pieces of the API - like GitHub’s gists, for example. The framework allows both client and endpoint classes to configure HTTP request via `#configureOn:`.
 
 ```smalltalk
 "Subclass WSClient"
@@ -125,7 +125,7 @@ GHPublicGistsEndpoint class>>#endpointPath
     ^ GHGistsEndpoint endpointPath / #public
 
 GHPublicGistsEndpoint>>cursor:
-    ^ WSPluggableCursor new. "Or your own cursor object”
+    ^ WSPluggableCursor new. "Or your own cursor object"
 
 GHPublicGistsEndpoint>>next: limit with: cursor
     | result |
