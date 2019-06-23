@@ -75,7 +75,7 @@ WSPluggableEndpoint >> data [
 
 { #category : #'accessing - data' }
 WSPluggableEndpoint >> dataAddAll: aKeyedCollection [
-	^ data addAll: aKeyedCollection
+	data addAll: aKeyedCollection
 ]
 
 { #category : #'accessing - data' }
