@@ -171,13 +171,21 @@ client gists
   files: (GHRestClient methods collect: [ :each | (each selector asString , '.st') -> each asString ]) asDictionary.
 ```
 
-When inspecting the client object, you get an overview of the API coverage and which parts of our implementation handle individual endpoints:
+When inspecting the client object, you get an overview of the API coverage and which parts of our implementation handle individual endpoints.
 
 ![Map](resources/gh-map.png)
 
-You also get UML diagrams for both client and endpoint object, which show both hierarchical and dependency relationships, and look something like this:
+The map view, implemented as an extension to the inspector, distinguishes various types of implementation:
+- gray nodes represent unimplemented path segments
+- yellow nodes represent paths that are implemented by an endpoint but for which there are no executing methods (methods that actually generate an HTTP request)
+- blue nodes represent concrete implementation - which means there's at least one executing method for that path
+- filled blue nodes represent enumerating endpoints
+
+There's also an inspector extension for visualizing UML of both client and endpoint classes.
 
 ![UML](resources/gh-uml.png)
+
+The UML view will show whatever is relevant to the inspected object. Inspecting the client object (or its class) gives the most extensive overview. Inspecting an endpoint object (or its class) restricts the view to only those classes that either reference or are referenced by the endpoint class. Gray lines here indicate a hierarchical relationship between classes. Blue and yellow arrows indicate references to/from other classes.
 
 ## Etymology
 
