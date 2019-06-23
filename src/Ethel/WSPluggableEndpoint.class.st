@@ -73,9 +73,47 @@ WSPluggableEndpoint >> data [
 	^ data
 ]
 
-{ #category : #accessing }
-WSPluggableEndpoint >> data: anObject [
-	data := anObject
+{ #category : #'accessing - data' }
+WSPluggableEndpoint >> dataAddAll: aKeyedCollection [
+	^ data addAll: aKeyedCollection
+]
+
+{ #category : #'accessing - data' }
+WSPluggableEndpoint >> dataAt: key [ 
+	^ data at: key 
+]
+
+{ #category : #'accessing - data' }
+WSPluggableEndpoint >> dataAt: key add: value [
+	^ data
+		at: key
+		ifPresent: [ :val | val add: value ]
+		ifAbsentPut: [ OrderedCollection with: value ]
+]
+
+{ #category : #'accessing - data' }
+WSPluggableEndpoint >> dataAt: key ifAbsentPut: absentBlock [
+	^ data at: key ifAbsentPut: absentBlock
+]
+
+{ #category : #'accessing - data' }
+WSPluggableEndpoint >> dataAt: key put: value [
+	^ data at: key put: value
+]
+
+{ #category : #'accessing - data' }
+WSPluggableEndpoint >> dataRemove: key [
+	^ data removeKey: key
+]
+
+{ #category : #'accessing - data' }
+WSPluggableEndpoint >> dataRemove: key ifAbsent: absentBlock [
+	^ data removeKey: key ifAbsent: absentBlock
+]
+
+{ #category : #'accessing - data' }
+WSPluggableEndpoint >> dataRemoveAll [
+	^ data removeAll
 ]
 
 { #category : #api }
@@ -159,6 +197,7 @@ WSPluggableEndpoint >> httpConfiguration: anObject [
 WSPluggableEndpoint >> initialize [
 	super initialize.
 	self initializeHeaders.
+	data := Dictionary new
 ]
 
 { #category : #initialization }
