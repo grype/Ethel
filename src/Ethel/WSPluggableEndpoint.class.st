@@ -158,7 +158,7 @@ WSPluggableEndpoint >> get [
 	^ self executeHttpMethod: #get
 ]
 
-{ #category : #headers }
+{ #category : #'accessing - headers' }
 WSPluggableEndpoint >> headerAt: aPropertyName put: aValue [
 	headers at: aPropertyName put: aValue
 ]
@@ -168,17 +168,17 @@ WSPluggableEndpoint >> headers [
 	^ headers
 ]
 
-{ #category : #headers }
+{ #category : #'accessing - headers' }
 WSPluggableEndpoint >> headersAddAll: aKeyedCollection [
 	headers addAll: aKeyedCollection 
 ]
 
-{ #category : #headers }
+{ #category : #'accessing - headers' }
 WSPluggableEndpoint >> headersRemoveAll [
 	headers removeAll
 ]
 
-{ #category : #headers }
+{ #category : #'accessing - headers' }
 WSPluggableEndpoint >> headersRemoveAt: aName [
 	headers remove: aName ifAbsent: [  ]
 ]
