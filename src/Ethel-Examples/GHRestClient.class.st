@@ -18,8 +18,8 @@ GHRestClient >> baseUrl [
 ]
 
 { #category : #http }
-GHRestClient >> configureHttpClient: http [
-	super configureHttpClient: http.
+GHRestClient >> configureOn: http [
+	super configureOn: http.
 	http
 		contentReader: [ :entity | 
 			(entity contentType sub asLowercase includesSubstring: 'json')

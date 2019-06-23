@@ -4,8 +4,3 @@ Extension { #name : #Object }
 Object >> isWSEndpoint [
 	^ self class isWSEndpoint
 ]
-
-{ #category : #'*Ethel' }
-Object >> wsGtPrintString [
-	^ self printString
-]

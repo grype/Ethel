@@ -18,8 +18,8 @@ GHGraphqlClient >> baseUrl [
 ]
 
 { #category : #http }
-GHGraphqlClient >> configureHttpClient: http [
-	super configureHttpClient: http.
+GHGraphqlClient >> configureOn: http [
+	super configureOn: http.
 	http
 		headerAt: #Authorization put: 'bearer ' , config authToken;
 		enforceHttpSuccess: true;

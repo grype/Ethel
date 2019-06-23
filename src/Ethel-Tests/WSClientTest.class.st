@@ -152,7 +152,7 @@ WSClientTest >> testExecutorsOfPath [
 WSClientTest >> testHttpClientCreation [
 	client stub.
 	client createHttpClient.
-	client should receive configureHttpClient: (Instance of: ZnClient)
+	client should receive configureOn: (Instance of: ZnClient)
 ]
 
 { #category : #tests }

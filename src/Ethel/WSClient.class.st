@@ -90,7 +90,7 @@ WSClient >> baseUrl [
 ]
 
 { #category : #http }
-WSClient >> configureHttpClient: http [
+WSClient >> configureOn: http [
 	http url: self baseUrl.
 	httpConfiguration ifNotNil: [ :aBlock | aBlock cull: http ]
 ]
@@ -99,7 +99,7 @@ WSClient >> configureHttpClient: http [
 WSClient >> createHttpClient [
 	| client |
 	client := ZnClient new.
-	self configureHttpClient: client.
+	self configureOn: client.
 	^ client
 ]
 
