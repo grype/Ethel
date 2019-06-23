@@ -175,7 +175,7 @@ When inspecting the client object, you get an overview of the API coverage and w
 
 You also get UML diagrams for both client and endpoint object, which show both hierarchical and dependency relationships, and look something like this:
 
-![UML](resources/gh-uml.map)
+![UML](resources/gh-uml.png)
 
 ## Etymology
 
