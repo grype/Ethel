@@ -56,10 +56,11 @@ client httpConfiguration: [ :http |
 
 
 "GET /gists/public - First page of public gists"
-(client / #gists / #public) get.
+endpoint := client / #gists / #public.
+endpoint get.
 
 "Enumerating gists using Collections-like API"
-client enumerationBlock: [ :endpoint :limit :cursor |
+endpoint enumerationBlock: [ :endpoint :limit :cursor |
     | result |
     endpoint dataAddAll: {
         #page -> ( cursor data at: #page ifAbsentPut: 1 ).
@@ -68,9 +69,9 @@ client enumerationBlock: [ :endpoint :limit :cursor |
     cursor data at: #page put: (cursor data at: #page) + 1.
     cursor hasMore: (result size < (endpoint data at: #per_page) ).
     result ].
-(client / #gists / #public) collect: #yourself.
-(client / #gists / #public) select: [:each | … ] max: 10.
-(client / #gists / #public) detect: [:each | … ] ifFound: [ :gist | … ].
+endpoint collect: #yourself.
+endpoint select: [:each | … ] max: 10.
+endpoint detect: [:each | … ] ifFound: [ :gist | … ].
 
 
 "POST /gists - Create a gist"
@@ -89,7 +90,7 @@ files := { ‘example.st’ -> ({ #content -> loadScript } asDictionary) } asDic
      post.
 ```
 
-#### Composing a dedicated client
+#### Subclassing
 
 When making a dedicated client, start by subclassing `WSClient` and then define endpoint classes that represent logical pieces of the API - like GitHub’s gists, for example. The framework allows both client and endpoint classes to configure HTTP request via `#configureOn:`.
 
@@ -157,7 +158,7 @@ GHGistsEndpoint>>#public
 
 ```
 
-That’s essentially the bare bones of a client for GitHub’s Gists. We defined two endpoints there - one for /gists and one for /gists/public. The former isn’t really needed for the latter to exist, and was added to provide an example of endpoint composition. You can look inside `Ethel-Examples` package for a functional implementation of these examples.
+That’s essentially the bare bones of a dedicated client for GitHub’s Gists. We defined two endpoints there - one for /gists and one for /gists/public. The former isn’t really needed for the latter to exist, and was added to provide an example of endpoint composition. You can look inside `Ethel-Examples` package for a functional implementation of these examples.
 
 There are several benefits to subclassing `WSClient` and defining concrete endpoints. For one, the interaction with the client becomes more succinct:
 
@@ -171,11 +172,15 @@ client gists
   files: (GHRestClient methods collect: [ :each | (each selector asString , '.st') -> each asString ]) asDictionary.
 ```
 
-Endpoint classes, methods that execute http requests and methods that reference other endpoints are distinguished in the class browser:
+And if you installed **Ethel-Tools** package, you'll find additional tools to help you develop and maintain your code.
+
+#### Tools
+
+**Browser**. Endpoint classes, methods that execute http requests and methods that reference other endpoints are distinguished in the class browser:
 
 ![Browser](resources/gh-browser.png)
 
-When inspecting the client object, you get an overview of the API coverage and which parts of our implementation handle individual endpoints.
+**Map**. When inspecting the client object, you get an overview of the API coverage and which parts of our implementation handle individual endpoints.
 
 ![Map](resources/gh-map.png)
 
@@ -185,11 +190,11 @@ The map view, implemented as an extension to the inspector, distinguishes variou
 - blue nodes represent concrete implementation - which means there's at least one executing method for that path
 - filled blue nodes represent enumerating endpoints
 
-There's also an inspector extension for visualizing UML of both client and endpoint classes.
+**UML**. Inspecting clients, endpoints, or their classes, you also get UML visualization.
 
 ![UML](resources/gh-uml.png)
 
-The UML view will show whatever is relevant to the inspected object. Inspecting the client object (or its class) gives the most extensive overview. Inspecting an endpoint object (or its class) restricts the view to only those classes that either reference or are referenced by the endpoint class. Gray lines here indicate a hierarchical relationship between classes. Blue and yellow arrows indicate references to/from other classes.
+The UML view will show whatever is relevant to the inspected object. Inspecting the client object (or its class) gives the most extensive overview. Inspecting an endpoint object (or its class) limits the scope to classes that either reference or are referenced by the endpoint class. Gray lines here indicate a hierarchical relationship between classes. Blue and yellow arrows indicate references to/from other classes.
 
 ## Etymology
 
