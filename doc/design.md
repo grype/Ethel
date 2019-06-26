@@ -101,7 +101,16 @@ Requests are actually executed by the client object, but the process usually sta
 (client / AcmeSearchEndpoint) search: 'meaning of life'
 ```
 
-Looking at `AcmeSearchEndpoint>>#search`, you’ll notice that it returns the result of `self execute`, which simply calls: `wsClient execute: self`. Another thing you’ll notice is the `<get>` pragma. It is this pragma that is used to designate the **executing method**. The value of this pragma is also used to configure the http request method, in this case it is GET. List of the recognized HTTP methods is defined in `WSClient class>>supportedHttpMethods`, and can be changed, affecting identification of **executing methods**.
+Let's look at the implementing method:
+
+```smalltalk
+AcmeSearchEndpoint>>search: aString
+    <get>
+    query := aString.
+    ^ self execute
+```
+
+You’ll notice two things. First, is that it returns the result of `self execute`, which simply calls: `wsClient execute: self`. Second, is the `<get>` pragma. It is this pragma that is used to designate the **executing method**. The value of this pragma is also used to configure the http request method, in this case GET. List of the recognized HTTP methods is defined in `WSClient class>>supportedHttpMethods`, and can be changed, affecting identification of **executing methods**.
 
 Another way to execute request is via `TWSEndpoint>>#execute:` method:
 
@@ -111,9 +120,15 @@ AcmeSearchEndpoint>>search: aString
     ^ self execute: [ :http | http request queryAt: #query put: aString ]
 ```
 
-This way we can skip the instance variable altogether. The argument block is the last thing that gets to configure the http transport before its request is executed, and therefore happens after `#configureOn:` has been called. Notice, we still designate the method with the `<get>` pragma, even though we could easily override that inside the execution block.
+This way we can skip the instance variable altogether. The argument block is the last thing that gets to configure the http transport before its request is executed, and therefore happens after callign `#configureOn:`. Notice, we still designate the method with the `<get>` pragma, even though we could easily override that inside the execution block.
 
-Now, we can further simplify this interface, and get rid of `AcmeSearchEndpoint` altogether, replacing it with:
+Now, once the request is configured, it is validated (`#validateRequest:`), executed (by calling `ZnClient>>#execute`), and the response is validated (`#validateResponse:`) before the result is returned. Use those validation methods to handle misconfigured requests and erroneous responses.
+
+### Execution Context
+
+During the execution phase, the **executing method** sets the execution context. This context, as previously seen, contains both the HTTP method and the final URL for the request. The former is handled via pragmas, like `<get>`, `<post>`, etc. The latter, however, requires a bit of explanation.
+
+Let's try to simplify our interface a bit by getting rid of the `AcmeSearchEndpoint` altogether, replacing it with:
 
 ```smalltalk
 AcmeThingsEndpoint>>search: aString
@@ -122,13 +137,7 @@ AcmeThingsEndpoint>>search: aString
     ^ self execute: [ :http | http queryAt: #query put: aString ].
 ```
 
-This is a great way to handle very slim and simple endpoints… The value of the `<path>` pragma will be resolved against the `#endpointPath` (the instance-side method, which, by default, calls the class-side method). So, calling this method would result in a GET /things/search?query=aString. Endpoints with many parameters are probably best handled as classes of their own, however.
-
-### Execution Context
-
-During the execution phase, the **executing method** sets the execution context. This context, as previously seen, contains both the HTTP method and the final URL for the request. The former is handled via pragmas, like `<get>`, `<post>`, etc. The latter, however, requires a bit of explanation.
-
-When the client executes an endpoint, it first creates an instance of `ZnClient` and configures it, at the bare minimum, with the base URL of the client. It then passes that instance to the endpoint, via `#prepareForExecutingOn:` method. There, the endpoint will update the request URL by appending the path returned by its `#endpointPath` method. If the **executing method** contains `<path:>` pragma, then its value will be resolved against the class-side  `#endpointPath` value, and the resulting path will be used instead. After that, `#configureOn:` is called, which is an empty behavior on `TWSEndpoint` trait.
+When the client executes an endpoint, it first creates an instance of `ZnClient` and configures it with the base URL of the client. However, before calling the endpoint's `#configureOn`, the client first calls its `#prepareForExecutingOn:` method. There, the endpoint will update the request URL by appending its `#endpointPath`. If the **executing method** contains the `<path:>` pragma, then its value will be resolved against the class-side  `#endpointPath` value, and the resulting path will be used instead. After that, the endpoint's `#configureOn:` method is called.
 
 When declaring paths, you can use format strings. For example:
 
@@ -141,7 +150,7 @@ AcmeThingsEndpoint>>at: aThingId
 client things at: ‘idOfSomeThing'.
 ```
 
-In this case, calling `#at:` will result in a GET /things/idOfSomeThing. The string format is identical to `String>>format:`, and the variables are sourced from the execution context of the method. And since path resolution happens at execution time, both `#endpointPath` methods and the `<path:>` pragma can make use of string formatting.
+In this case, calling `#at:` will result in a GET /things/idOfSomeThing. The string format is identical to `String>>format:`, and the variables are sourced from the execution context of the **executing method**. And since path resolution happens at execution time, both `#endpointPath` methods and the `<path:>` pragma can make use of string formatting.
 
 Now, in the event that /things/{thingId} represents a Thing with a lot of behavior, we could define it as a separate endpoint:
 
