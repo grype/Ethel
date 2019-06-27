@@ -146,9 +146,11 @@ AcmeThingsEndpoint>>search: aString
     ^ self execute: [ :http | http queryAt: #query put: aString ].
 ```
 
-When the client executes an endpoint, it first creates an instance of `ZnClient` and configures it with the base URL of the client. However, before calling the endpoint's `#configureOn`, the client first calls its `#prepareForExecutingOn:` method. There, the endpoint will update the request URL by appending its `#endpointPath`. If the **executing method** contains the `<path:>` pragma, then its value will be resolved against the class-side  `#endpointPath` value, and the resulting path will be used instead. After that, the endpoint's `#configureOn:` method is called.
+During execution, the value of the `<path>` pragma, if present, will be resolved against the class-side `#endpointPath`. Without the `<path>` pragma - the instance-side `#endpointPath` is used, which, by default, returns the class-side value. This path resolution happens between the client's and the endpoint's `#configureOn:` calls. 
 
-When declaring paths, you can use format strings. For example:
+It should be clear that the newly added method will result in a GET request to */things/search*, resolved by appending relative path from `<path>` to `AcmeThingsEndpoint class>>#endpointPath`. Had we defined an absolute path, e.g. `<path: '/search'>`, the resulting URL would have been */search*.
+
+Paths can also use format strings. For example:
 
 ```smalltalk
 AcmeThingsEndpoint>>at: aThingId
@@ -161,7 +163,9 @@ client things at: ‘idOfSomeThing'.
 
 In this case, calling `#at:` will result in a GET /things/idOfSomeThing. The string format is identical to `String>>format:`, and the variables are sourced from the execution context of the **executing method**. And since path resolution happens at execution time, both `#endpointPath` methods and the `<path:>` pragma can make use of string formatting.
 
-Now, in the event that /things/{thingId} represents a Thing with a lot of behavior, we could define it as a separate endpoint:
+It is worth noting that the use of pragmas is mainly for organizational purpose. We could easily provide complete request configuration inside an execution block passed to `#execute:`. So, to put things into perspective: mark **executing methods** with an HTTP method pragma, like `<get>`, as that denotes the execution context. The fact that the framework configures HTTP request with a corresponding HTTP method is a convenience. The `<path>` pragma is used for tracking which method handles the corresponding path. The fact that the request is configured with the resuling URL is, again, a convenience.
+
+Lastly, in the event that /things/{thingId} represents a Thing with a lot of behavior, we could define it as a separate endpoint:
 
 ```smalltalk
 Object subclass: #AcmeThingEndpoint
@@ -200,7 +204,7 @@ aThing title: 'New title’.
 aThing := (client things withId: aThing id) updateWith: aThing.
 ```
 
-Although, let’s make it a bit more succinct:
+Or better yet,
 
 ```smalltalk
 AcmeClient>>thingWithId: aThingId
@@ -212,7 +216,7 @@ thingEp value in: [ :aThing |
     thingEp updateWith: aThing ]
 ```
 
-Another thing worth mentioning here is the ability of an endpoint to pass its state to another, when using `#/` to derive endpoints. For example, if we were to define another endpoint that makes use of the `thingId`:
+Another thing worth mentioning here is the ability of an endpoint to pass its state to another when using `#/` to derive endpoints. For example, if we were to define another endpoint that makes use of the `thingId`:
 
 ```smalltalk
 Object subclass: #AcmeThingSiblingsEndpoint
