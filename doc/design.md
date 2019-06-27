@@ -244,9 +244,9 @@ The last two lines would produce an identically configured instance of `AcmeThin
 
 ### Enumeration
 
-When listing large collections, web services usually provide some sort of pagination mechanism, often in the form of: offset & limit, page & pageSize, or some sort of a cursor, or several. Eventually that translates to some attribute in the HTTP request. It would be nice if we could interact with this API as we do with normal collections in Smalltalk. 
+When listing large collections, web services usually provide some sort of pagination mechanism, often in the form of: offset & limit, page & pageSize, or some sort of a cursors. Eventually that translates to some attributes in the HTTP request. It would be nice if we could interact with this API as we do with normal collections in Smalltalk. 
 
-This is where two additional structs come in: `TWSEnumeration` and `TWSCursor` traits. They allow one to easily setup an endpoint for enumeration. Let’s say that our /things endpoint allows enumeration using #page and #page_size query parameters.
+This is where two additional structs come in: `TWSEnumeration` and `TWSCursor` traits. They allow one to easily setup an endpoint for enumeration. Let’s say that our /things endpoint allows enumeration using `#page` and `#page_size` query parameters.
 
 ```smalltalk
 Object subclass: #AcmeThingsEndpoint
@@ -290,7 +290,7 @@ AcmeThingsEndpoint>>#next: aLimit with: aCursor
     ^ result
 ```
 
-An enumerating endpoint behaves in a manner similar to a collection:
+An enumerating endpoint behaves similar to a collection:
 
 ```smalltalk
 client things select: #title.
