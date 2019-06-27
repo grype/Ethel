@@ -1,5 +1,14 @@
 # Design
 
+## Contents
+
+- [The client](#the-client)
+- [The endpoint](#the-endpoint)
+- [Request execution](#request-execution)
+- [Execution Context](#execution-context)
+- [Enumeration](#enumeration)
+
+
 There are two basic building blocks in Ethel - a client and an endpoint. A client, implemented by `WSClient`, has one essential job - to create and execute endpoints. An endpoint, implemented by `TWSEndpoint` trait, is used to encapsulate one or more logical structures of an API. You interact with the client by deriving an endpoint of interest and executing it.
 
 When a client executes an endpoint, it first creates and configures an http transport, `ZnClient`, and then passes it to the endpoint for further configuration, before finally executing the resulting http request. This means that a client typically manages data that is common to all endpoints. While an endpoint  manages data that is specific to a particular logical construct - i.e. parameters for querying or creating a resource.
