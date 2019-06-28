@@ -42,3 +42,10 @@ TWSEndpoint >> gtUMLIn: aComposite [
 	<gtInspectorPresentationOrder: 13>
 	^ self class gtUMLIn: aComposite
 ]
+
+{ #category : #'*Ethel-Tools' }
+TWSEndpoint classSide >> wsUmlSortOrder [
+	^ self isTrait
+		ifTrue: [ super wsUmlSortOrder ]
+		ifFalse: [ super wsUmlSortOrder + 2 ]
+]

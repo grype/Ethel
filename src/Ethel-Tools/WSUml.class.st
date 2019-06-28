@@ -93,6 +93,12 @@ WSUml >> buildUMLOn: aBuilder [
 		attributeselector: #yourself;
 		superclass: #superclass.
 
+	objects := objects
+		sorted: [ :a :b | 
+			a wsUmlSortOrder = b wsUmlSortOrder
+				ifTrue: [ a asString < b asString ]
+				ifFalse: [ a wsUmlSortOrder < b wsUmlSortOrder ] ].
+
 	aBuilder addObjects: objects.
 	aBuilder layout tree
 		verticalGap: 40;

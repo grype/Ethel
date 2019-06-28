@@ -41,3 +41,8 @@ WSClient >> gtUMLIn: aComposite [
 		initializeView: [ WSUMLBuilder new ];
 		painting: [ :view | self class buildUMLOn: view ]
 ]
+
+{ #category : #'*Ethel-Tools' }
+WSClient class >> wsUmlSortOrder [
+	^ 1
+]
