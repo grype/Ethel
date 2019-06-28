@@ -2,7 +2,7 @@
 
 `WSClient` provides enough functionality to be used as-is, without the need to subclass it. Together with `WSPluggableEndpoint` it is possible to script the client without having to create concrete endpoints.
 
-Let’s take GitHub’s Gist API for example. First we create a client
+Let’s take GitHub’s Gist API for example. First create a client
 
 ```smalltalk
 client := WSClient jsonWithUrl: 'https://api.github.com/'.
@@ -16,7 +16,7 @@ client httpConfiguration: [ :http |
 ].
 ```
 
-That should do it. Now, let’s try to hit */gists/public*.
+Now, let’s try to hit */gists/public*.
 
 ```smalltalk
 (client / #gists / #public) get.
@@ -44,7 +44,7 @@ files := { ‘example.st’ -> ({ #content -> loadScript } asDictionary) } asDic
      post.
 ```
 
-The first couple of statements simply setup the “file” portion of the payload we’ll be posting. The last statement creates a `WSPluggableEndpoint` instance via `client / #gists`, and adds appropriate POST “data”. `WSPluggableEndpoint` treats data as a dictionary of values. When the endpoint is executed, the data is transformed to HTTP request parameters. If the request method is GET - this data is added as query attributes; in all other cases - it’s added as content, or body of the request. When we instantiated `WSClient`, we did so via the `#jsonWithUrl:` method, which sets up the client with an `#httpConfiguration` block that transforms this data to a JSON string.
+The first couple of statements simply setup the “file” portion of the payload we’ll be posting. The last statement creates a `WSPluggableEndpoint` instance via `client / #gists`, and adds appropriate POST “data”. `WSPluggableEndpoint` provides several methods to manage data, kept internally in a Dictionary. When the endpoint is executed, the data is transformed to HTTP request parameters. If the request method is GET - this data is added as query attributes; in all other cases - it’s added as content, or body of the request. When we instantiated `WSClient`, we did so via the `#jsonWithUrl:` method, which sets up the client with an `#httpConfiguration` block that transforms this data to a JSON string.
 
 Lastly, `WSPluggableEndpoint` supports enumeration via `#enumerationBlock`. Let’s see how this works:
 
@@ -60,11 +60,11 @@ endpoint enumerationBlock: [ :endpoint :limit :cursor |
     result ].
 ```
 
-The enumeration block gets passed three arguments: the endpoint instance, the limit - an integer indicating the maximum number of results needed, and the  cursor. For the latter, an instance of `WSPluggableCursor` is used, which defines its own `#data` dictionary for capturing arbitrary values - be it page & page size, or offset & limit, or what have you.
+The enumeration block gets passed three arguments: an endpoint, a limit - integer indicating the maximum number of results needed, and a cursor. For the latter, an instance of `WSPluggableCursor` is used, which defines its own `#data` dictionary for capturing arbitrary values - be it page & page size, or offset & limit, or what have you.
 
-The enumeration block then configures the endpoint data to include appropriate parameters, calls an execution method, updates cursor data, and returns the result of calling the execution method. The cursor must answer truthfully to `#hasMore` in order for the enumeration process to continue, so, once you know you have all the values, simply set `#hasMore:` to false on the pluggable cursor.
+The enumeration block then configures the endpoint to include appropriate parameters, calls appropriate execution method, and updates cursor data, before returning the response data. Between each iteration, the cursor is asked it `#hasMore` data to fetch. If the cursor responds with `true` - the block is evaluated again. So be sure to set the pluggable cursor's `#hasMore` to false when done.
 
-Interacting with enumerating endpoints is very similar to interacting with collections in Smalltalk. The only thing to note here is that exhaustive methods, like `#select:`, also take an optional max value...
+Interacting with enumerating endpoints is very similar to interacting with collections in Smalltalk. The only thing to note here is that exhaustive methods, like `#select:`, **also** take an optional max value...
 
 ```smalltalk
 "exhaustive fetch"
