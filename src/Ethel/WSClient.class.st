@@ -124,17 +124,18 @@ WSClient >> endpointForPath: aPath [
 WSClient >> execute: anEndpoint [
 	^ self
 		execute: anEndpoint
-		with: [ :http | self performExecuteOn: http ]
+		with: nil
 ]
 
 { #category : #execution }
-WSClient >> execute: anEndpoint with: anExecBlock [
+WSClient >> execute: anEndpoint with: aBlock [
 	| http result |
 	http := self createHttpClient.
 	anEndpoint prepareForExecutingOn: http.
 	anEndpoint configureOn: http.
+	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.
-	result := anExecBlock cull: http.
+	result := http execute.
 	self validateResponse: http response.
 	^ result
 ]
@@ -164,11 +165,6 @@ WSClient >> httpConfiguration: anObject [
 WSClient >> initializeWithUrl: aUrl [
 	self initialize.
 	baseUrl := aUrl asUrl
-]
-
-{ #category : #execution }
-WSClient >> performExecuteOn: http [
-	^ http execute
 ]
 
 { #category : #http }
