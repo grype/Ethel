@@ -11,5 +11,6 @@ WSEndpointReferenceMethodQuery >> description [
 
 { #category : #testing }
 WSEndpointReferenceMethodQuery >> selectsMethod: aMethod [
-	^ aMethod isWSEndpointReferencingMethod
+	^ aMethod methodClass isWSEndpoint
+		and: [ aMethod isWSEndpointReferencingMethod ]
 ]
