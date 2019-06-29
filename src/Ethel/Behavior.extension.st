@@ -6,6 +6,7 @@ Behavior >> collectDerivedWSEndpointsInto: aCollection [
 
 	result := (self wsEndpointReferences asSet flatCollect: #value)
 		copyWithoutAll: aCollection.
+	result := result reject: [ :each | each isTrait ].
 	aCollection addAll: result.
 	result
 		do: [ :aClass | aClass collectDerivedWSEndpointsInto: aCollection ]
