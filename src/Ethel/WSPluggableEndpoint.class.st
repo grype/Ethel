@@ -1,7 +1,9 @@
 "
-I am a pluggable endpoint that's primarily used for scripting interactions with web-based services. I provide an interface for configuring requests and implement common HTTP methods like #get, #post, #put, #patch and #delete.
+I am a pluggable endpoint that's primarily used for scripting interactions with web-based services. I provide an interface for configuring requests and implement common HTTP methods via #get, #post, #put, #patch and #delete.
 
-Sending #/ message with a path argument to an instance of ==WSClient== or ==TWSEndpoing== will first look for a concrete endpoint class for the resulting path. If none could be found, my instance will be returned, capturing the final path.
+Sending #/ message with a path argument to an instance of ==WSClient== or ==TWSEndpoint== will first look for a concrete endpoint class for the resulting path. If none could be found, my instance will be returned, capturing the final path.
+
+I provide two ways of configuring http request: one via #httpConfiguration, and the other via parameterized executing methods (#get:, etc). The former tends to stick with my instances and is executed first. The latter is evaluated immediately before executing the configured HTTP request and is only used for that one request. The block argument will be passed an instance of ==ZnClient==.
 
 I also implement a block-based enumeration via #enumeration:. When set, the block will be passed three arguments: 1) an instance of the endpoint 2) number of items requested and 3) pertinent cursor object (see ==TWSEnumeration== and ==TWSEnumerationCursor==).
 
@@ -9,12 +11,29 @@ I also implement a block-based enumeration via #enumeration:. When set, the bloc
 			client := WSClient withUrl: 'http://example.com'.
 			client httpConfiguration: [:http | 
 				http contenWriter: [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ] ].
-			(client / #examples) get. ""GET /examples""
-			(client / #examples) data: aNewExample; put. ""PUT /examples {aNewExample asJson}""
+			
+			""GET /examples""
+			(client / #examples) get. 
+			
+			""PUT /examples {aNewExample asJson}""
+			(client / #examples) put: [ :http | 
+				http request contents: aNewExample
+				].
+			
+			""Paginate the entirety of GET /examples?page=&page_size=""
 			(client / #examples) 
-				enumeration: [ :endpoint :limit :cursor | 
-					endpoint data at: #page put: (cursor at: #page).
-					endpoint data at: #page_size put: (cursor at: #pageSize) ]; 
+				enumeration: [ :endpoint :limit :cursor |
+					| result |
+					""Return result of #get:, and update cursor""
+					result := endpoint get: [ :http | 
+						http 
+							queryAt: #page put: (cursor at: #page ifAbsentPut: 1);
+							queryAt: #page_size put: (cursor at: #page_size ifAbsentPut: 100)
+						].
+					cursor at: #page put: (cursor at: #page) + 1.
+					cursor hasMore: result size = (cursor at: #page_size).
+					result
+					]; 
 				collect: #yourself.
 ]]]
 
@@ -32,9 +51,7 @@ Class {
 	#classTraits : 'TWSEndpoint classTrait + TWSEnumeration classTrait',
 	#instVars : [
 		'path',
-		'data',
 		'method',
-		'headers',
 		'enumeration',
 		'httpConfiguration',
 		'wsClient'
@@ -44,22 +61,13 @@ Class {
 
 { #category : #configuring }
 WSPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
-	headers isEmptyOrNil
-		ifFalse: [ anEndpoint headersAddAll: headers associations ].
 	(anEndpoint respondsTo: #httpConfiguration:)
 		ifTrue: [ anEndpoint httpConfiguration: self httpConfiguration ]
 ]
 
 { #category : #configuring }
 WSPluggableEndpoint >> configureOn: http [
-	data
-		ifNotNil: [ :aData | 
-			method = #get
-				ifTrue: [ http queryAddAll: aData ]
-				ifFalse: [ http contents: aData ] ].
-
 	http method: method asString asUppercase asSymbol.
-	http headerAddAll: headers.
 	httpConfiguration ifNotNil: [ :val | val cull: http cull: self ]
 ]
 
@@ -68,57 +76,16 @@ WSPluggableEndpoint >> cursor [
 	^ WSPluggableCursor new
 ]
 
-{ #category : #accessing }
-WSPluggableEndpoint >> data [
-	^ data
-]
-
-{ #category : #'accessing - data' }
-WSPluggableEndpoint >> dataAddAll: aKeyedCollection [
-	data addAll: aKeyedCollection
-]
-
-{ #category : #'accessing - data' }
-WSPluggableEndpoint >> dataAt: key [ 
-	^ data at: key 
-]
-
-{ #category : #'accessing - data' }
-WSPluggableEndpoint >> dataAt: key add: value [
-	^ data
-		at: key
-		ifPresent: [ :val | val add: value ]
-		ifAbsentPut: [ OrderedCollection with: value ]
-]
-
-{ #category : #'accessing - data' }
-WSPluggableEndpoint >> dataAt: key ifAbsentPut: absentBlock [
-	^ data at: key ifAbsentPut: absentBlock
-]
-
-{ #category : #'accessing - data' }
-WSPluggableEndpoint >> dataAt: key put: value [
-	^ data at: key put: value
-]
-
-{ #category : #'accessing - data' }
-WSPluggableEndpoint >> dataRemove: key [
-	^ data removeKey: key
-]
-
-{ #category : #'accessing - data' }
-WSPluggableEndpoint >> dataRemove: key ifAbsent: absentBlock [
-	^ data removeKey: key ifAbsent: absentBlock
-]
-
-{ #category : #'accessing - data' }
-WSPluggableEndpoint >> dataRemoveAll [
-	^ data removeAll
+{ #category : #api }
+WSPluggableEndpoint >> delete [
+	method := #delete.
+	^ self execute
 ]
 
 { #category : #api }
-WSPluggableEndpoint >> delete [
-	^ self executeHttpMethod: #delete
+WSPluggableEndpoint >> delete: aBlock [
+	method := #delete.
+	^ self execute: aBlock
 ]
 
 { #category : #accessing }
@@ -136,12 +103,6 @@ WSPluggableEndpoint >> enumeration: anObject [
 	enumeration := anObject
 ]
 
-{ #category : #api }
-WSPluggableEndpoint >> executeHttpMethod: aMethod [
-	method := aMethod.
-	^ wsClient execute: self
-]
-
 { #category : #executing }
 WSPluggableEndpoint >> executingContext [
 	| sender |
@@ -155,32 +116,14 @@ WSPluggableEndpoint >> executingContext [
 
 { #category : #api }
 WSPluggableEndpoint >> get [
-	^ self executeHttpMethod: #get
+	method := #get.
+	^ self execute
 ]
 
-{ #category : #'accessing - headers' }
-WSPluggableEndpoint >> headerAt: aPropertyName put: aValue [
-	headers at: aPropertyName put: aValue
-]
-
-{ #category : #accessing }
-WSPluggableEndpoint >> headers [
-	^ headers
-]
-
-{ #category : #'accessing - headers' }
-WSPluggableEndpoint >> headersAddAll: aKeyedCollection [
-	headers addAll: aKeyedCollection 
-]
-
-{ #category : #'accessing - headers' }
-WSPluggableEndpoint >> headersRemoveAll [
-	headers removeAll
-]
-
-{ #category : #'accessing - headers' }
-WSPluggableEndpoint >> headersRemoveAt: aName [
-	headers remove: aName ifAbsent: [  ]
+{ #category : #api }
+WSPluggableEndpoint >> get: aBlock [
+	method := #get.
+	^ self execute: aBlock
 ]
 
 { #category : #accessing }
@@ -193,18 +136,6 @@ WSPluggableEndpoint >> httpConfiguration: anObject [
 	httpConfiguration := anObject
 ]
 
-{ #category : #initialization }
-WSPluggableEndpoint >> initialize [
-	super initialize.
-	self initializeHeaders.
-	data := Dictionary new
-]
-
-{ #category : #initialization }
-WSPluggableEndpoint >> initializeHeaders [
-	headers := Dictionary new
-]
-
 { #category : #enumerating }
 WSPluggableEndpoint >> next: aLimit with: aCursor [
 	enumeration ifNil: [ ^ nil ].
@@ -213,7 +144,14 @@ WSPluggableEndpoint >> next: aLimit with: aCursor [
 
 { #category : #api }
 WSPluggableEndpoint >> patch [
-	^ self executeHttpMethod: #patch
+	method := #patch.
+	^ self execute
+]
+
+{ #category : #api }
+WSPluggableEndpoint >> patch: aBlock [
+	method := #patch.
+	^ self execute: aBlock
 ]
 
 { #category : #accessing }
@@ -228,10 +166,24 @@ WSPluggableEndpoint >> path: anObject [
 
 { #category : #api }
 WSPluggableEndpoint >> post [
-	^ self executeHttpMethod: #post
+	method := #post.
+	^ self execute
+]
+
+{ #category : #api }
+WSPluggableEndpoint >> post: aBlock [
+	method := #post.
+	^ self execute: aBlock
 ]
 
 { #category : #api }
 WSPluggableEndpoint >> put [
-	^ self executeHttpMethod: #put
+	method := #put.
+	^ self execute
+]
+
+{ #category : #api }
+WSPluggableEndpoint >> put: aBlock [
+	method := #put.
+	^ self execute: aBlock
 ]

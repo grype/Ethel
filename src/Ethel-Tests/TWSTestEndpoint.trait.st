@@ -20,7 +20,10 @@ TWSTestEndpoint classSide >> testHeaderValue [
 
 { #category : #configuring }
 TWSTestEndpoint >> configureDerivedEndpoint: anEndpoint [
-	self headers associationsDo: [ :each | anEndpoint headers add: each ]
+	self headers
+		associationsDo: [ :each | 
+			(anEndpoint traitComposition includesTrait: TWSTestEndpoint)
+				ifTrue: [ anEndpoint headers add: each ] ]
 ]
 
 { #category : #configuring }

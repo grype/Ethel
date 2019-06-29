@@ -23,7 +23,9 @@ TWSEndpointTest >> ensureEndpoint: aDestination derivedPluggableEndpointFrom: aS
 	aDestination class should equal: WSPluggableEndpoint.
 	aDestination wsClient should equal: aSource wsClient.
 	aDestination endpointPath should equal: aPath.
-	(aDestination headers keys includesAll: aSource headers keys) should be
+	(aDestination class traitComposition includesTrait: TWSEndpointTest)
+		ifTrue: [ (aDestination headers keys includesAll: aSource headers keys) should
+				be ]
 ]
 
 { #category : #stubbing }

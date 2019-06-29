@@ -56,6 +56,17 @@ WSClient class >> jsonWithUrl: aUrl [
 		yourself
 ]
 
+{ #category : #'instance creation' }
+WSClient class >> jsonWithUrl: aUrl httpConfiguration: aBlock [
+	^ (self withUrl: aUrl)
+		httpConfiguration: [ :http | 
+			http
+				contentReader: [ :aJsonString | NeoJSONReader fromString: aJsonString ];
+				contentWriter: [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ].
+			aBlock ifNotNil: [ :val | val cull: http ] ];
+		yourself
+]
+
 { #category : #accessing }
 WSClient class >> pathReferences [
 	"Returns all path references found in related endpoint classes"

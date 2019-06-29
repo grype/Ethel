@@ -1,12 +1,11 @@
 "
 I am a pluggable cursor and I am used by ==WSPluggableEndpoint== to handle enumeration.
 
-I hold arbitrary data in #data ivar - this of this as your store of things like offset and limit, or page number and page size values. This data can be accessed and modified during enumeration.
+I hold arbitrary data in #data ivar - think of this as your store of things like offset and limit, or page number and page size values. This data can be accessed and modified during enumeration.
 
 Set #hasMore to false when enumereation process should stop.
 
 See class notes on ==WSPluggableEndpoint== for more information.
-
 
 Instance Variables
 	data:		<Object>
@@ -25,13 +24,18 @@ Class {
 }
 
 { #category : #accessing }
-WSPluggableCursor >> data [
-	^ data
+WSPluggableCursor >> at: key [
+	^ data at: key ifAbsent: nil
 ]
 
 { #category : #accessing }
-WSPluggableCursor >> data: anObject [
-	data := anObject
+WSPluggableCursor >> at: key ifAbsentPut: value [
+	^ data at: key ifAbsentPut: value
+]
+
+{ #category : #accessing }
+WSPluggableCursor >> at: key put: value [
+	^ data at: key put: value
 ]
 
 { #category : #enumerating }
@@ -49,4 +53,9 @@ WSPluggableCursor >> initialize [
 	super initialize.
 	hasMore := true.
 	data := Dictionary new
+]
+
+{ #category : #accessing }
+WSPluggableCursor >> remove: key [
+	data remove: key ifAbsent: [  ]
 ]
