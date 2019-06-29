@@ -60,15 +60,17 @@ endpoint := client / #gists / #public.
 endpoint get.
 
 "Enumerating gists using Collections-like API"
-endpoint enumerationBlock: [ :endpoint :limit :cursor |
+endpoint enumeration: [ :endpoint :limit :cursor |
     | result |
-    endpoint dataAddAll: {
-        #page -> ( cursor data at: #page ifAbsentPut: 1 ).
-        #per_page -> ( limit ifNil: [ 200 ] ) } asDictionary.
-    result := endpoint get.
-    cursor data at: #page put: (cursor data at: #page) + 1.
-    cursor hasMore: (result size < (endpoint data at: #per_page) ).
-    result ].
+    "Return result of #get:, and update cursor"
+		result := endpoint get: [ :http | 
+			http 
+				queryAt: #page put: (cursor at: #page ifAbsentPut: 1);
+				queryAt: #page_size put: (cursor at: #page_size ifAbsentPut: 100)
+			].
+		cursor at: #page put: (cursor at: #page) + 1.
+		cursor hasMore: result size = (cursor at: #page_size).
+		result ].
 endpoint collect: #yourself.
 endpoint select: [:each | … ] max: 10.
 endpoint detect: [:each | … ] ifFound: [ :gist | … ].
@@ -82,12 +84,12 @@ loadScript := 'Metacello new
 
 files := { ‘example.st’ -> ({ #content -> loadScript } asDictionary) } asDictionary.
      
-(client / #gists) 
-     dataAddAll: {
-        #description -> 'Loading Ethel’.
-        #public -> true.
-        #files -> files } asDictionary;
-     post.
+(client / #gists)
+  post: [ :http |
+    http request contents: {
+      #description -> 'Loading Ethel’.
+      #public -> true.
+      #files -> files } asDictionary ]
 ```
 
 #### Subclassing
