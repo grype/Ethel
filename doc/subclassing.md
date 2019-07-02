@@ -1,4 +1,4 @@
-#Subclassing
+# Subclassing
 
 When creating a dedicated client for a web service, it is best to subclass `WSClient` and define concrete endpoints, as that makes the code more manageable and easier to maintain. Let’s take GitHub’s Gist API as an example.
 
