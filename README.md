@@ -128,27 +128,31 @@ Object subclass: #GHPublicGistsEndpoint
 GHPublicGistsEndpoint class>>#endpointPath
     ^ GHGistsEndpoint endpointPath / #public
 
-GHPublicGistsEndpoint>>cursor:
+"Instance should return a new cursor object to use for pagination"
+GHPublicGistsEndpoint>>#cursor
     ^ WSPluggableCursor new. "Or your own cursor object"
 
-GHPublicGistsEndpoint>>next: limit with: cursor
+"Fetch a single page of results using cursor"
+GHPublicGistsEndpoint>>#next: limit with: cursor
     | result |
-    page := cursor data at: #page ifAbsentPut: [ 1 ].
-    perPage := next ifNil: [ cursor data at: #perPage ifAbsentPut: [ 100 ] ].
-    result := self nextPage.
-    (result isNotNil and: [ result size >= perPage ])
-        ifTrue: [ cursor data at: #page put: page + 1 ]
-        ifFalse: [ cursor hasMore: false ].
+    page := cursor at: #page ifAbsentPut: [ 1 ].
+    "Use limit value, if one is given, otherwise, use cursor's #perPage value"
+    perPage := limit ifNil: [ cursor at: #perPage ifAbsentPut: 100 ].
+    result := self execute.
+    cursor at: #page put: page + 1.
+    cursor hasMore: (result size = perPage).
     ^ result
 
+"Configure request with pagination values"
 GHPublicGistsEndpoint>>configureOn: http
     http 
         queryAt: #page put: page;
         queryAt: #per_page put: perPage
 
-GHPublicGistsEndpoint>>nextPage
+"Override trait's implementation of #execute, by adding <get> pragma"
+GHPublicGistsEndpoint>>#execute
     <get>
-    ^ self execute
+    ^ wsClient execute: self
 
 "Connect endpoints so that we can access them from the client and other endpoints"
 WSClient>>#gists
