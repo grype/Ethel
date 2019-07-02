@@ -9,7 +9,7 @@ Ethel has a simple architecture that is able to support a wide range of APIs, in
 ## Documentation
 * [Design](doc/design.md)
 * [Scripting](doc/scripting.md)
-* [Composing dedicated clients](doc/composing.md)
+* [Composing dedicated clients](doc/subclassing.md)
 * [Introspection](doc/introspection.md)
 * [Methodologies](doc/methodolgies.md)
 
