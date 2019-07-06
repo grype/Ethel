@@ -160,7 +160,9 @@ MyElement>>#compound
 
 Having a default client simplifies handling of computed properties:
 
+```smalltalk
 compounds := elements collect: #compound.
+```
 
 ## Materializing data
 
