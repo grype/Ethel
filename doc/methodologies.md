@@ -1,6 +1,6 @@
 # Methodologies
 
-Ethel tries not to impose too much on how you design your client and endpoints. This is generally a good thing, but it also means that there are many ways of going about composing your client. A few methods proved to be helpful over time. This documents outlines a few of those methods...
+Ethel tries not to impose too much on how you design your client and endpoints. This is generally a good thing, but it also means that there are many ways of going about it. A few methods proved to be helpful over time. This documents outlines a few of those methods...
 
 * [Encapsulation](#Encapsulation)
 * [Defaults](#Defaults)
@@ -89,11 +89,11 @@ And,
 client somewhere search: [ :endpoint | endpoint query: 'something'; limit: 100 ].
 ```
 
-By encapsulating the search functionality in its own endpoint makes it more clear and concise, easier to maintain and, in many actual cases, reveals something about the web service...
+Encapsulating the search functionality in its own endpoint makes it more clear and concise, easier to maintain and, in many actual cases, reveals something about the web service...
 
 ## Defaults
 
-In many cases, the web client bears some kind of identification and authorization information. In some cases, web services provide multiple environments (development, staging, production, etc). This information can easily be captured in class side methods of your `WSClient` subclass:
+In some cases, web services provide multiple environments (development, staging, production, etc). This information can easily be captured in class side methods of your `WSClient` subclass:
 
 ```smalltalk
 WSClient subclass: MyClient
@@ -107,7 +107,7 @@ MyClient class>>production
     ^ self withUrl: ProductionUrl
 ```
 
-This comes in handy when you find yourself in a Playground. Putting authorization info into instance creators is probably not a good idea. Putting it into Settings, on the other hand, has a few advantages: it makes it easier to configure - both, during development and production; and makes it possible to have a 'default' client.
+In some cases, the web client bears some kind of identification and authorization information. Putting authorization info into instance creators is probably not a good idea. Putting it into Settings, on the other hand, has a few advantages: it makes it easier to configure - both during development and in production; and makes it possible to have a 'default' client.
 
 ```smalltalk
 WSClient subclass: MyClient
