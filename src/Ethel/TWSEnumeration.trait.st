@@ -96,7 +96,7 @@ TWSEnumeration >> collect: aBlock into: aCollection until: untilBlock [
 	self
 		enumerate: [ :val | 
 			aCollection fillFrom: val with: aBlock.
-			untilBlock value
+			(untilBlock cull: val)
 				ifTrue: [ ^ self ] ].
 	^ aCollection
 ]
@@ -182,7 +182,7 @@ TWSEnumeration >> do: aBlock separatedBy: separatorBlock until: untilBlock [
 	self
 		enumerate: [ :val | 
 			val do: aBlock separatedBy: separatorBlock.
-			untilBlock value
+			(untilBlock cull: val)
 				ifTrue: [ ^ self ] ]
 ]
 
@@ -191,7 +191,7 @@ TWSEnumeration >> do: aBlock until: untilBlock [
 	self
 		enumerate: [ :val | 
 			val do: aBlock.
-			untilBlock value
+			(untilBlock cull: val)
 				ifTrue: [ ^ self ] ]
 ]
 
@@ -379,7 +379,7 @@ TWSEnumeration >> reject: aBlock thenDo: doBlock until: untilBlock [
 	self
 		enumerate: [ :val | 
 			val reject: aBlock thenDo: doBlock.
-			untilBlock value
+			(untilBlock cull: val)
 				ifTrue: [ ^ self ] ]
 ]
 
@@ -475,7 +475,7 @@ TWSEnumeration >> select: selectBlock thenDo: doBlock until: untilBlock [
 	self
 		enumerate: [ :val | 
 			val select: selectBlock thenDo: doBlock.
-			untilBlock value
+			(untilBlock cull: val)
 				ifTrue: [ ^ self ] ]
 ]
 
@@ -502,5 +502,17 @@ TWSEnumeration >> select: selectBlock thenFlatCollect: collectBlock max: aLimit 
 				ifNotNil: [ :selected | result addAll: selected ].
 			result size >= aLimit
 				ifTrue: [ ^ result first: aLimit ] ].
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: aBlock until: untilBlock [
+	| result |
+	result := OrderedCollection new.
+	self
+		enumerate: [ :val | 
+			(val select: aBlock) ifNotNil: [ :selected | result addAll: selected ].
+			(untilBlock cull: val)
+				ifTrue: [ ^ result ] ].
 	^ result
 ]
