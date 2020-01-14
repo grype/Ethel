@@ -122,8 +122,8 @@ WSClient >> endpointForPath: aPath [
 		select: [ :aClass | 
 			aClass ~= WSPluggableEndpoint
 				and: [ aClass endpointPath matches: aPath ] ].
-	endpoints size > 1
-		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ].
+"	endpoints size > 1
+		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ]."
 	^ endpoints
 		ifEmpty: [ (WSPluggableEndpoint on: self)
 				path: aPath;
