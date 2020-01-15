@@ -73,7 +73,7 @@ WSClientExplorer >> apiClient: anObject [
 { #category : #initialization }
 WSClientExplorer >> executingMethods [
 	| methods |
-	methods := CdClient derivedWSEndpoints
+	methods := apiClient class derivedWSEndpoints
 		flatCollect: [ :each | each wsEndpointExecutingMethods ].
 	^ (methods
 		collect: [ :each | each wsEndpointPath pathString -> each methodClass ])
