@@ -75,9 +75,7 @@ WSClientExplorer >> executingMethods [
 	| methods |
 	methods := apiClient class derivedWSEndpoints
 		flatCollect: [ :each | each wsEndpointExecutingMethods ].
-	^ (methods
-		collect: [ :each | each wsEndpointPath pathString -> each methodClass ])
-		sorted: [ :a :b | a key < b key ]
+	^ methods asSet sorted: [ :a :b | a wsEndpointPath pathString < b wsEndpointPath pathString ]
 ]
 
 { #category : #initialization }
@@ -121,9 +119,9 @@ WSClientExplorer >> initializeWidgets [
 		yourself.
 	pathSelector := self newDropList
 		items: self executingMethods;
-		displayBlock: [ :each | each key ];
-		whenSelectedItemChanged: [ :item | 
-			self loadParametersForClass: item value path: item key.
+		displayBlock: [ :each | each wsEndpointPath pathString ];
+		whenSelectedItemChanged: [ :method | 
+			self loadParametersForMethod: method.
 			self needRebuild: false.
 			self buildWithSpecLayout: self class defaultSpec ];
 		yourself.
@@ -139,13 +137,13 @@ WSClientExplorer >> initializeWidgets [
 		action: [ self go ].
 	self executingMethods first
 		in:
-			[ :assoc | self loadParametersForClass: assoc value path: assoc key ].
+			[ :method | self loadParametersForMethod: method ].
 	self setupFocusOrder
 ]
 
 { #category : #initialization }
-WSClientExplorer >> loadParametersForClass: aClass path: aPathString [
-	params := self paramsWidgetForClass: aClass path: aPathString
+WSClientExplorer >> loadParametersForMethod: aMethod [
+	params := self paramsWidgetForMethod: aMethod
 ]
 
 { #category : #accessing }
@@ -179,12 +177,12 @@ WSClientExplorer >> params: anObject [
 ]
 
 { #category : #initialization }
-WSClientExplorer >> paramsWidgetForClass: aClass path: aPathString [
+WSClientExplorer >> paramsWidgetForMethod: aMethod [
 	^ self
 		instantiate:
 			(WSEndpointParamsPresenter
-				on: aClass
-				withParameters: aPathString formatTokens)
+				on: aMethod methodClass
+				withParameters: aMethod wsEndpointPath pathString formatTokens , aMethod wsEndpointExecutionParams)
 ]
 
 { #category : #accessing }

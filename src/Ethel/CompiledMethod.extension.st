@@ -11,6 +11,15 @@ CompiledMethod >> isWSEndpointReferencingMethod [
 ]
 
 { #category : #'*Ethel' }
+CompiledMethod >> wsEndpointExecutionParams [
+	self methodClass isWSEndpoint
+		ifFalse: [ ^ nil ].
+	^ (self pragmaAt: self methodClass endpointParamsPragma)
+		ifNil: [ self ffiArgumentNames ]
+		ifNotNil: [ :val | val arguments first ]
+]
+
+{ #category : #'*Ethel' }
 CompiledMethod >> wsEndpointHttpMethod [
 	| methods |
 

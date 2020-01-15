@@ -150,7 +150,12 @@ WSEndpointParamsPresenter >> instance [
 
 { #category : #initialization }
 WSEndpointParamsPresenter >> layout [
+	| labelWidth longestLabel |
 	layout := SpecColumnLayout composed.
+	longestLabel := (params sorted: [ :a :b | a size < b size ]) last.
+	labelWidth := (StringMorph contents: longestLabel) measureContents x
+		min: 120.
+	labelWidth := labelWidth + 8.
 	showsClassDescription
 		ifTrue: [ | col |
 			col := SpecRowLayout composed.
@@ -165,7 +170,7 @@ WSEndpointParamsPresenter >> layout [
 			| col |
 			col := SpecRowLayout composed.
 			col
-				add: (var , '_label') asSymbol;
+				add: (var , '_label') asSymbol width: labelWidth;
 				add: (var , '_input') asSymbol.
 			layout add: col height: self class toolbarHeight ].
 	layout add: #spacer height: 1.

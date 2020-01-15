@@ -34,6 +34,12 @@ Class {
 }
 
 { #category : #defaults }
+WSClient class >> endpointParamsPragma [
+	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
+	^ #params:
+]
+
+{ #category : #defaults }
 WSClient class >> endpointPathPragma [
 	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
 	^ #path:
