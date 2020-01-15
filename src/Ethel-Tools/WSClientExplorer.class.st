@@ -87,10 +87,10 @@ WSClientExplorer >> go [
 	self params configureOn: endpoint.
 	(endpoint
 		execute: [ :http | 
-			http
-				url:
-					(self pathSelector selectedItem key
-						format: self params paramsWithValues).
+			| url |
+			url := http request ifNotNil: [ :req | req url asString ].
+			url ifNil: [ url := self pathSelector selectedItem key ].
+			http url: (url format: self params paramsWithValues).
 			http method: self methodSelector selectedItem asString asUppercase ])
 		inspect
 ]
