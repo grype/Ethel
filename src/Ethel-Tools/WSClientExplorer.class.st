@@ -108,7 +108,7 @@ WSClientExplorer >> goButton: anObject [
 { #category : #initialization }
 WSClientExplorer >> httpMethods [
 	| methods |
-	methods := CdClient derivedWSEndpoints
+	methods := apiClient class derivedWSEndpoints
 		flatCollect: [ :each | each wsEndpointExecutingMethods ].
 	^ (methods collect: [ :each | each wsEndpointHttpMethod ]) asSet
 		sorted: [ :a :b | a < b ]
