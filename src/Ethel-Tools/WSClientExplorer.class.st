@@ -1,3 +1,10 @@
+"
+I provide basic UI for configuring and executing endpoints on an instance of WSClient.
+
+Example:
+
+(WSClientExplorer on: myClient) openWithSpec.
+"
 Class {
 	#name : #WSClientExplorer,
 	#superclass : #ComposablePresenter,

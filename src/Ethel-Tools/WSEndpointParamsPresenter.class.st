@@ -1,3 +1,10 @@
+"
+I create a form-like UI for configuring endpoint parameters based on ivars that have setters, and any arbitrary set of parameters.
+
+Example:
+
+(WSEndpointParamsPresenter on: MyEndpointClass withParameters: #(#foo #bar)) openWithSpec
+"
 Class {
 	#name : #WSEndpointParamsPresenter,
 	#superclass : #DynamicComposablePresenter,
