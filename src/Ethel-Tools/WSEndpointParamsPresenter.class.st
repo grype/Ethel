@@ -152,7 +152,9 @@ WSEndpointParamsPresenter >> instance [
 WSEndpointParamsPresenter >> layout [
 	| labelWidth longestLabel |
 	layout := SpecColumnLayout composed.
-	longestLabel := (params sorted: [ :a :b | a size < b size ]) last.
+	longestLabel := params isEmptyOrNil
+		ifTrue: [ '' ]
+		ifFalse: [ (params sorted: [ :a :b | a size < b size ]) last ].
 	labelWidth := (StringMorph contents: longestLabel) measureContents x
 		min: 120.
 	labelWidth := labelWidth + 8.
