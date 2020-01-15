@@ -119,7 +119,7 @@ TWSEndpoint >> endpointPath [
 
 { #category : #executing }
 TWSEndpoint >> execute [
-	^ wsClient execute: self
+	^ self execute: nil
 ]
 
 { #category : #executing }
