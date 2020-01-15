@@ -80,17 +80,13 @@ WSClientExplorer >> executingMethods [
 
 { #category : #initialization }
 WSClientExplorer >> go [
-	| endpoint |
+	| endpoint method args |
 	endpoint := self params endpointClass on: apiClient.
 	self params configureOn: endpoint.
-	(endpoint
-		execute: [ :http | 
-			| url |
-			url := http request ifNotNil: [ :req | req url asString ].
-			url ifNil: [ url := self pathSelector selectedItem key ].
-			http url: (url format: self params paramsWithValues).
-			http method: self methodSelector selectedItem asString asUppercase ])
-		inspect
+	method := pathSelector selectedItem.
+	args := method wsEndpointExecutionParams
+		collect: [ :each | self params valueFor: each asSymbol ].
+	(endpoint perform: method selector withArguments: args) inspect
 ]
 
 { #category : #accessing }
@@ -119,7 +115,7 @@ WSClientExplorer >> initializeWidgets [
 		yourself.
 	pathSelector := self newDropList
 		items: self executingMethods;
-		displayBlock: [ :each | each wsEndpointHttpMethod asString asUppercase , ' ' , each wsEndpointPath pathString ];
+		displayBlock: [ :each | self pathDescriptionForMethod: each ];
 		whenSelectedItemChanged: [ :method | 
 			self loadParametersForMethod: method.
 			self needRebuild: false.
@@ -136,8 +132,7 @@ WSClientExplorer >> initializeWidgets [
 		label: 'Go';
 		action: [ self go ].
 	self executingMethods first
-		in:
-			[ :method | self loadParametersForMethod: method ].
+		in: [ :method | self loadParametersForMethod: method ].
 	self setupFocusOrder
 ]
 
@@ -184,6 +179,23 @@ WSClientExplorer >> paramsWidgetForMethod: aMethod [
 			(WSEndpointParamsPresenter
 				on: aMethod methodClass
 				withParameters: aMethod wsEndpointPath pathString formatTokens , aMethod wsEndpointExecutionParams)
+]
+
+{ #category : #initialization }
+WSClientExplorer >> pathDescriptionForMethod: aMethod [
+	| str execParams epParams methodParams pathParams |
+	str := aMethod wsEndpointHttpMethod asString asUppercase , ' '
+		, aMethod wsEndpointPath pathString.
+	execParams := aMethod wsEndpointExecutionParams.
+	execParams isEmptyOrNil
+		ifTrue: [ ^ str ].
+	epParams := WSEndpointParamsPresenter
+		propertiesFromClass: aMethod methodClass.
+	pathParams := aMethod wsEndpointPath pathString formatTokens.
+	methodParams := execParams difference: (epParams union: pathParams).
+	methodParams isEmptyOrNil
+		ifFalse: [ str := str , ' ( +' , (methodParams joinUsing: ' +') , ' )' ].
+	^ str
 ]
 
 { #category : #accessing }

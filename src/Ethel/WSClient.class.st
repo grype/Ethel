@@ -153,6 +153,8 @@ WSClient >> execute: anEndpoint with: aBlock [
 	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.
 	result := http execute.
+	(Smalltalk at: #WrapperSignal)
+		ifNotNil: [ :signal | signal emit: http ].
 	self validateResponse: http response.
 	^ result
 ]
