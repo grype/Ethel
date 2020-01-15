@@ -119,7 +119,7 @@ WSClientExplorer >> initializeWidgets [
 		yourself.
 	pathSelector := self newDropList
 		items: self executingMethods;
-		displayBlock: [ :each | each wsEndpointPath pathString ];
+		displayBlock: [ :each | each wsEndpointHttpMethod asString asUppercase , ' ' , each wsEndpointPath pathString ];
 		whenSelectedItemChanged: [ :method | 
 			self loadParametersForMethod: method.
 			self needRebuild: false.
@@ -143,7 +143,8 @@ WSClientExplorer >> initializeWidgets [
 
 { #category : #initialization }
 WSClientExplorer >> loadParametersForMethod: aMethod [
-	params := self paramsWidgetForMethod: aMethod
+	params := self paramsWidgetForMethod: aMethod.
+	methodSelector setSelectedItem: aMethod wsEndpointHttpMethod
 ]
 
 { #category : #accessing }
