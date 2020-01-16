@@ -13,7 +13,8 @@ Class {
 		'pathLabel',
 		'pathSelector',
 		'goButton',
-		'params'
+		'params',
+		'inspectButton'
 	],
 	#category : #'Ethel-Tools-Widgets'
 }
@@ -27,7 +28,8 @@ WSClientExplorer class >> defaultSpec [
 		newRow: [ :row | 
 			row
 				add: #pathLabel width: labelWidth;
-				add: #pathSelector ]
+				add: #pathSelector;
+				add: #inspectButton width: self toolbarHeight ]
 		origin: 0 @ 0
 		corner: 1 @ 0
 		offsetOrigin: 0 @ 0
@@ -106,12 +108,25 @@ WSClientExplorer >> initializeWidgets [
 			self needRebuild: false.
 			self buildWithSpecLayout: self class defaultSpec ];
 		yourself.
+	inspectButton := self newButton
+		icon: (self iconNamed: #smallInfo);
+		action: [ apiClient inspect ].
 	goButton := self newButton
 		label: 'Go';
 		action: [ self go ].
 	self executingMethods first
 		in: [ :method | self loadParametersForMethod: method ].
 	self setupFocusOrder
+]
+
+{ #category : #accessing }
+WSClientExplorer >> inspectButton [
+	^ inspectButton
+]
+
+{ #category : #accessing }
+WSClientExplorer >> inspectButton: anObject [
+	inspectButton := anObject
 ]
 
 { #category : #initialization }
