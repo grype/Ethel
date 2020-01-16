@@ -12,8 +12,6 @@ Class {
 		'apiClient',
 		'pathLabel',
 		'pathSelector',
-		'methodLabel',
-		'methodSelector',
 		'goButton',
 		'params'
 	],
@@ -22,8 +20,7 @@ Class {
 
 { #category : #specs }
 WSClientExplorer class >> defaultSpec [
-	| rows spec labelWidth rowCount |
-	rows := #(#(#pathLabel #pathSelector) #(#params) #(#methodSelector #goButton)).
+	| labelWidth spec |
 	labelWidth := 100.
 	spec := SpecLayout composed.
 	spec
@@ -42,10 +39,7 @@ WSClientExplorer class >> defaultSpec [
 		offsetOrigin: 0 @ self toolbarHeight
 		offsetCorner: 0 @ (1 - self toolbarHeight).
 	spec
-		newRow: [ :row | 
-			row
-				add: #methodSelector width: labelWidth;
-				add: #goButton ]
+		newRow: [ :row | row add: #goButton ]
 		origin: 0 @ 1
 		corner: 1 @ 1
 		offsetOrigin: 0 @ (1 - self toolbarHeight)
@@ -100,15 +94,6 @@ WSClientExplorer >> goButton: anObject [
 ]
 
 { #category : #initialization }
-WSClientExplorer >> httpMethods [
-	| methods |
-	methods := apiClient class derivedWSEndpoints
-		flatCollect: [ :each | each wsEndpointExecutingMethods ].
-	^ (methods collect: [ :each | each wsEndpointHttpMethod ]) asSet
-		sorted: [ :a :b | a < b ]
-]
-
-{ #category : #initialization }
 WSClientExplorer >> initializeWidgets [
 	pathLabel := self newLabel
 		label: 'Path';
@@ -121,13 +106,6 @@ WSClientExplorer >> initializeWidgets [
 			self needRebuild: false.
 			self buildWithSpecLayout: self class defaultSpec ];
 		yourself.
-	methodLabel := self newLabel
-		label: 'Method';
-		yourself.
-	methodSelector := self newDropList
-		items: self httpMethods;
-		displayBlock: [ :each | each asString asUppercase ];
-		yourself.
 	goButton := self newButton
 		label: 'Go';
 		action: [ self go ].
@@ -138,28 +116,7 @@ WSClientExplorer >> initializeWidgets [
 
 { #category : #initialization }
 WSClientExplorer >> loadParametersForMethod: aMethod [
-	params := self paramsWidgetForMethod: aMethod.
-	methodSelector setSelectedItem: aMethod wsEndpointHttpMethod
-]
-
-{ #category : #accessing }
-WSClientExplorer >> methodLabel [
-	^ methodLabel
-]
-
-{ #category : #accessing }
-WSClientExplorer >> methodLabel: anObject [
-	methodLabel := anObject
-]
-
-{ #category : #accessing }
-WSClientExplorer >> methodSelector [
-	^ methodSelector
-]
-
-{ #category : #accessing }
-WSClientExplorer >> methodSelector: anObject [
-	methodSelector := anObject
+	params := self paramsWidgetForMethod: aMethod
 ]
 
 { #category : #accessing }
@@ -224,7 +181,6 @@ WSClientExplorer >> setupFocusOrder [
 		removeAll;
 		add: pathSelector;
 		add: params;
-		add: methodSelector;
 		add: goButton
 ]
 
