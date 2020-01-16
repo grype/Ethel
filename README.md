@@ -152,7 +152,7 @@ GHPublicGistsEndpoint>>configureOn: http
 "Override trait's implementation of #execute, by adding <get> pragma"
 GHPublicGistsEndpoint>>#execute
     <get>
-    ^ wsClient execute: self
+    ^ self execute: nil
 
 "Connect endpoints so that we can access them from the client and other endpoints"
 WSClient>>#gists
