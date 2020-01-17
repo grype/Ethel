@@ -16,22 +16,6 @@ WSClient class >> buildUMLOn: aBuilder [
 ]
 
 { #category : #'*Ethel-Tools' }
-WSClient >> curlForExecuting: anEndpoint [
-	^ self curlForExecuting: anEndpoint with: nil
-]
-
-{ #category : #'*Ethel-Tools' }
-WSClient >> curlForExecuting: anEndpoint with: aBlock [
-	| http |
-	http := self createHttpClient.
-	"Unlike the execute method, we execute the block before going through regular routine of setting up the transport. This is because when calling this method, we're bypassing the regular method execution, which leaves us without context from which we can determine the executing method's pragmas for HTTP method, path etc. The supplied block allows us to do just that - to configure the transport appropriately as if it's being executed by the actual executing method"
-	aBlock ifNotNil: [ :block | block cull: http ].
-	anEndpoint prepareForExecutingOn: http.
-	anEndpoint configureOn: http.
-	^ http curl
-]
-
-{ #category : #'*Ethel-Tools' }
 WSClient >> gtMapIn: aComposite [
 	<gtInspectorPresentationOrder: 11>
 	^ aComposite roassal2
