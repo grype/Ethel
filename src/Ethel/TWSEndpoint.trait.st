@@ -118,6 +118,16 @@ TWSEndpoint >> configureOn: http [
 	"Configures http transport prior to execution"
 ]
 
+{ #category : #executing }
+TWSEndpoint >> curl [
+	^ self curl: nil
+]
+
+{ #category : #executing }
+TWSEndpoint >> curl: anExecBlock [
+	^ wsClient curlForExecuting: self with: anExecBlock 
+]
+
 { #category : #accessing }
 TWSEndpoint >> endpointPath [
 	^ self class endpointPath 

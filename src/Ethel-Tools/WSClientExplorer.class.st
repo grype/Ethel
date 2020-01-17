@@ -14,7 +14,8 @@ Class {
 		'pathSelector',
 		'goButton',
 		'params',
-		'inspectButton'
+		'inspectButton',
+		'curlButton'
 	],
 	#category : #'Ethel-Tools-Widgets'
 }
@@ -41,7 +42,10 @@ WSClientExplorer class >> defaultSpec [
 		offsetOrigin: 0 @ self toolbarHeight
 		offsetCorner: 0 @ (1 - self toolbarHeight).
 	spec
-		newRow: [ :row | row add: #goButton ]
+		newRow: [ :row | 
+			row
+				add: #curlButton width: self toolbarHeight;
+				add: #goButton ]
 		origin: 0 @ 1
 		corner: 1 @ 1
 		offsetOrigin: 0 @ (1 - self toolbarHeight)
@@ -64,6 +68,16 @@ WSClientExplorer >> apiClient [
 { #category : #accessing }
 WSClientExplorer >> apiClient: anObject [
 	apiClient := anObject
+]
+
+{ #category : #accessing }
+WSClientExplorer >> curlButton [
+	^ curlButton
+]
+
+{ #category : #accessing }
+WSClientExplorer >> curlButton: anObject [
+	curlButton := anObject
 ]
 
 { #category : #initialization }
@@ -114,6 +128,9 @@ WSClientExplorer >> initializeWidgets [
 	goButton := self newButton
 		label: 'Go';
 		action: [ self go ].
+	curlButton := self newButton
+		icon: (self iconNamed: #string);
+		action: [ self showCurl ].
 	self executingMethods first
 		in: [ :method | self loadParametersForMethod: method ].
 	self setupFocusOrder
@@ -155,7 +172,7 @@ WSClientExplorer >> paramsWidgetForMethod: aMethod [
 
 { #category : #initialization }
 WSClientExplorer >> pathDescriptionForMethod: aMethod [
-	| str execParams epParams methodParams pathParams |
+	| str execParams epParams methodParams pathParams prefix |
 	str := aMethod wsEndpointHttpMethod asString asUppercase , ' '
 		, aMethod wsEndpointPath pathString.
 	execParams := aMethod wsEndpointExecutionParams.
@@ -165,8 +182,10 @@ WSClientExplorer >> pathDescriptionForMethod: aMethod [
 		propertiesFromClass: aMethod methodClass.
 	pathParams := aMethod wsEndpointPath pathString formatTokens.
 	methodParams := execParams difference: (epParams union: pathParams).
+	prefix := ' :'.
 	methodParams isEmptyOrNil
-		ifFalse: [ str := str , ' ( +' , (methodParams joinUsing: ' +') , ' )' ].
+		ifFalse:
+			[ str := str , ' (' , prefix , (methodParams joinUsing: prefix) , ' )' ].
 	^ str
 ]
 
@@ -197,6 +216,18 @@ WSClientExplorer >> setupFocusOrder [
 		add: pathSelector;
 		add: params;
 		add: goButton
+]
+
+{ #category : #'as yet unclassified' }
+WSClientExplorer >> showCurl [
+	| endpoint method args |
+	endpoint := self params endpointClass on: apiClient.
+	self params configureOn: endpoint.
+	method := pathSelector selectedItem.
+	args := method wsEndpointExecutionParams
+		collect: [ :each | self params valueFor: each asSymbol ].
+	(endpoint curl: [ :http | http method: method wsEndpointHttpMethod asString asUppercase ])
+		inspect
 ]
 
 { #category : #api }

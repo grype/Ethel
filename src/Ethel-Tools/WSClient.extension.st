@@ -16,6 +16,21 @@ WSClient class >> buildUMLOn: aBuilder [
 ]
 
 { #category : #'*Ethel-Tools' }
+WSClient >> curlForExecuting: anEndpoint [
+	^ self curlForExecuting: anEndpoint with: nil
+]
+
+{ #category : #'*Ethel-Tools' }
+WSClient >> curlForExecuting: anEndpoint with: aBlock [
+	| http |
+	http := self createHttpClient.
+	anEndpoint prepareForExecutingOn: http.
+	anEndpoint configureOn: http.
+	aBlock ifNotNil: [ :block | block cull: http ].
+	^ http curl
+]
+
+{ #category : #'*Ethel-Tools' }
 WSClient >> gtMapIn: aComposite [
 	<gtInspectorPresentationOrder: 11>
 	^ aComposite roassal2
