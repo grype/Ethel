@@ -220,12 +220,10 @@ WSClientExplorer >> setupFocusOrder [
 
 { #category : #'as yet unclassified' }
 WSClientExplorer >> showCurl [
-	| endpoint method args |
+	| endpoint method |
 	endpoint := self params endpointClass on: apiClient.
 	self params configureOn: endpoint.
 	method := pathSelector selectedItem.
-	args := method wsEndpointExecutionParams
-		collect: [ :each | self params valueFor: each asSymbol ].
 	(endpoint curl: [ :http | http method: method wsEndpointHttpMethod asString asUppercase ])
 		inspect
 ]
