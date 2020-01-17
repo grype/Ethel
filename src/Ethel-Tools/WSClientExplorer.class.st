@@ -80,6 +80,17 @@ WSClientExplorer >> curlButton: anObject [
 	curlButton := anObject
 ]
 
+{ #category : #actions }
+WSClientExplorer >> executeEndpointOn: aClient [
+	| endpoint method args |
+	endpoint := self params endpointClass on: aClient.
+	self params configureOn: endpoint.
+	method := pathSelector selectedItem.
+	args := method wsEndpointExecutionParams
+		collect: [ :each | self params valueFor: each asSymbol ].
+	^ endpoint perform: method selector withArguments: args
+]
+
 { #category : #initialization }
 WSClientExplorer >> executingMethods [
 	| methods |
@@ -90,13 +101,7 @@ WSClientExplorer >> executingMethods [
 
 { #category : #actions }
 WSClientExplorer >> go [
-	| endpoint method args |
-	endpoint := self params endpointClass on: apiClient.
-	self params configureOn: endpoint.
-	method := pathSelector selectedItem.
-	args := method wsEndpointExecutionParams
-		collect: [ :each | self params valueFor: each asSymbol ].
-	(endpoint perform: method selector withArguments: args) inspect
+	(self executeEndpointOn: apiClient) inspect
 ]
 
 { #category : #accessing }
@@ -218,12 +223,22 @@ WSClientExplorer >> setupFocusOrder [
 
 { #category : #actions }
 WSClientExplorer >> showCurl [
-	| endpoint method |
-	endpoint := self params endpointClass on: apiClient.
-	self params configureOn: endpoint.
-	method := pathSelector selectedItem.
-	(endpoint curl: [ :http | http method: method wsEndpointHttpMethod asString asUppercase ])
-		inspect
+	| client |
+	"Stub out #createHttpClient so that we can return our own version of ZnClient, with stubbed #execute method, which simply returns a block returning the curl string for the configured client"
+	client := apiClient copy.
+	client stub createHttpClient
+		willReturn:
+			(ZnClient new
+				in: [ :http | 
+					client configureOn: http.
+					http stub execute willReturn: [ http curl ].
+					http ]).
+	"Stub validation methods as well - we don't care about validating request and the response will most certainly fail since there will be no actual request execution"
+	(client stub validateRequest: [ :obj |  ]) willReturn: true.
+	(client stub validateResponse: [ :obj |  ]) willReturn: true.
+
+	"Go on like we normally would, evaluating the block returned by the stubbed #execute"
+	(self executeEndpointOn: client) value inspect
 ]
 
 { #category : #api }
