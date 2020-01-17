@@ -10,6 +10,7 @@ Class {
 	#superclass : #DynamicComposablePresenter,
 	#instVars : [
 		'endpointClass',
+		'endpointMethod',
 		'spacer',
 		'classNameLabel',
 		'browseButton',
@@ -84,6 +85,16 @@ WSEndpointParamsPresenter >> endpointClass: anObject [
 	params addAll: (self class propertiesFromClass: anObject)
 ]
 
+{ #category : #accessing }
+WSEndpointParamsPresenter >> endpointMethod [
+	^ endpointMethod
+]
+
+{ #category : #accessing }
+WSEndpointParamsPresenter >> endpointMethod: anObject [
+	endpointMethod := anObject
+]
+
 { #category : #initialization }
 WSEndpointParamsPresenter >> initializeParamWidgets [
 	self sortedParams
@@ -112,7 +123,7 @@ WSEndpointParamsPresenter >> initializeWidgets [
 		yourself.
 	browseButton := self newButton
 		icon: (self iconNamed: #glamorousBrowse);
-		action: [ self endpointClass browse ];
+		action: [ (self endpointMethod ifNil: [ self endpointClass ]) browse ];
 		yourself.
 	inspectButton := self newButton
 		icon: (self iconNamed: #smallInspectIt);

@@ -168,29 +168,22 @@ WSClientExplorer >> params: anObject [
 
 { #category : #initialization }
 WSClientExplorer >> paramsWidgetForMethod: aMethod [
-	^ self
-		instantiate:
-			(WSEndpointParamsPresenter
-				on: aMethod methodClass
-				withParameters: aMethod wsEndpointPath pathString formatTokens , aMethod wsEndpointExecutionParams)
+	| paramsPresenter |
+	paramsPresenter := WSEndpointParamsPresenter
+		on: aMethod methodClass
+		withParameters:
+			aMethod wsEndpointPath pathString formatTokens
+				, aMethod wsEndpointExecutionParams.
+	paramsPresenter endpointMethod: aMethod.
+	^ self instantiate: paramsPresenter
 ]
 
 { #category : #initialization }
 WSClientExplorer >> pathDescriptionForMethod: aMethod [
-	| str execParams epParams methodParams pathParams prefix |
+	| str |
 	str := aMethod wsEndpointHttpMethod asString asUppercase , ' '
 		, aMethod wsEndpointPath pathString.
-	execParams := aMethod wsEndpointExecutionParams.
-	execParams isEmptyOrNil
-		ifTrue: [ ^ str ].
-	epParams := WSEndpointParamsPresenter
-		propertiesFromClass: aMethod methodClass.
-	pathParams := aMethod wsEndpointPath pathString formatTokens.
-	methodParams := execParams difference: (epParams union: pathParams).
-	prefix := ' :'.
-	methodParams isEmptyOrNil
-		ifFalse:
-			[ str := str , ' (' , prefix , (methodParams joinUsing: prefix) , ' )' ].
+	str := str , ' >> #' , aMethod selector.
 	^ str
 ]
 
