@@ -88,7 +88,7 @@ WSClientExplorer >> executingMethods [
 	^ methods asSet sorted: [ :a :b | a wsEndpointPath pathString < b wsEndpointPath pathString ]
 ]
 
-{ #category : #initialization }
+{ #category : #actions }
 WSClientExplorer >> go [
 	| endpoint method args |
 	endpoint := self params endpointClass on: apiClient.
@@ -124,7 +124,7 @@ WSClientExplorer >> initializeWidgets [
 		yourself.
 	inspectButton := self newButton
 		icon: (self iconNamed: #smallInfo);
-		action: [ apiClient inspect ].
+		action: [ self inspectClient ].
 	goButton := self newButton
 		label: 'Go';
 		action: [ self go ].
@@ -144,6 +144,11 @@ WSClientExplorer >> inspectButton [
 { #category : #accessing }
 WSClientExplorer >> inspectButton: anObject [
 	inspectButton := anObject
+]
+
+{ #category : #actions }
+WSClientExplorer >> inspectClient [
+	^ apiClient inspect
 ]
 
 { #category : #initialization }
@@ -218,7 +223,7 @@ WSClientExplorer >> setupFocusOrder [
 		add: goButton
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
 WSClientExplorer >> showCurl [
 	| endpoint method |
 	endpoint := self params endpointClass on: apiClient.
