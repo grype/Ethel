@@ -204,6 +204,7 @@ The UML view will show whatever is relevant to the inspected object. Inspecting 
 **Explorer**. Exploring API using a form-like interface.
 
 ![Explorer](resources/gh-explorer.png)
+![cURL](resources/gh-explorer-curl.png)
 
 The Explorer utility uses information found in request executing methods to construct a simple form-like interface. It allows you to manually select an endpoint, fill in the arguments, fire off a request and inspect the response. The argument values are treated as code and execution of requests is done by calling actual endpoint methods. There are also buttons for inspecting the client and the selected endpoint, shortcuts to view UML and the code browser for the selected endpoint class, and a button for producing cURL command.
 
