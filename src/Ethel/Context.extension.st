@@ -7,8 +7,8 @@ Context >> wsEndpointHttpMethodUsing: aListOfMethods [
 	validMethods := aListOfMethods
 		collect: [ :each | each asLowercase asSymbol ].
 	^ self method pragmas
-		detect: [ :each | validMethods includes: each keyword asLowercase asSymbol ]
-		ifFound: [ :val | val keyword ]
+		detect: [ :each | validMethods includes: each selector asLowercase asSymbol ]
+		ifFound: [ :val | val selector ]
 		ifNone: [ nil ]
 ]
 
