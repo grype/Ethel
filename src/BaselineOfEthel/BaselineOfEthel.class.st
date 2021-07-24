@@ -32,7 +32,7 @@ BaselineOfEthel >> baseline: spec [
 BaselineOfEthel >> dependencies: spec [
 	spec
 		baseline: 'Mocketry'
-		with: [ spec repository: 'github://dionisiydk/Mocketry:v4.0.x' ].
+		with: [ spec repository: 'github://dionisiydk/Mocketry' ].
 	spec
 		baseline: 'NeoJSON'
 		with: [ spec repository: 'github://svenvc/NeoJSON/repository' ]
