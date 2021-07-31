@@ -135,11 +135,14 @@ TWSEndpoint >> execute: anExecBlock [
 
 { #category : #executing }
 TWSEndpoint >> executingContext [
-	| sender |
 
+	| sender |
 	sender := thisContext sender.
-	[ sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ]
-		whileTrue: [ sender := sender sender ].
+	[ 
+	sender isNotNil and: [ 
+		(sender method isKindOf: CompiledMethod) not or: [ 
+			sender method isWSEndpointExecutionMethod not ] ] ] whileTrue: [ 
+		sender := sender sender ].
 
 	^ sender
 ]

@@ -1,17 +1,17 @@
-Extension { #name : #CompiledCode }
+Extension { #name : #CompiledMethod }
 
 { #category : #'*Ethel' }
-CompiledCode >> isWSEndpointExecutionMethod [
+CompiledMethod >> isWSEndpointExecutionMethod [
 	^ self wsEndpointHttpMethod isNotNil 
 ]
 
 { #category : #'*Ethel' }
-CompiledCode >> isWSEndpointReferencingMethod [
+CompiledMethod >> isWSEndpointReferencingMethod [
 	^ self wsEndpointReferences isEmptyOrNil not
 ]
 
 { #category : #'*Ethel' }
-CompiledCode >> wsEndpointExecutionParams [
+CompiledMethod >> wsEndpointExecutionParams [
 	self methodClass isWSEndpoint
 		ifFalse: [ ^ nil ].
 	^ (self pragmaAt: self methodClass endpointParamsPragma)
@@ -20,7 +20,7 @@ CompiledCode >> wsEndpointExecutionParams [
 ]
 
 { #category : #'*Ethel' }
-CompiledCode >> wsEndpointHttpMethod [
+CompiledMethod >> wsEndpointHttpMethod [
 	| methods |
 
 	self methodClass isWSEndpoint
@@ -32,7 +32,7 @@ CompiledCode >> wsEndpointHttpMethod [
 ]
 
 { #category : #'*Ethel' }
-CompiledCode >> wsEndpointPath [
+CompiledMethod >> wsEndpointPath [
 	self methodClass isWSEndpoint
 		ifFalse: [ ^ nil ].
 	self wsEndpointHttpMethod ifNil: [ ^ nil ].
@@ -42,6 +42,6 @@ CompiledCode >> wsEndpointPath [
 ]
 
 { #category : #'*Ethel' }
-CompiledCode >> wsEndpointReferences [
+CompiledMethod >> wsEndpointReferences [
 	^ self referencedClasses select: #isWSEndpoint
 ]
