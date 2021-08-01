@@ -148,7 +148,7 @@ WSClient >> execute: anEndpoint [
 WSClient >> execute: anEndpoint with: aBlock [
 	| http result |
 	http := self createHttpClient.
-	anEndpoint prepareForExecutingOn: http.
+	anEndpoint configureFromContextOn: http.
 	anEndpoint configureOn: http.
 	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.
