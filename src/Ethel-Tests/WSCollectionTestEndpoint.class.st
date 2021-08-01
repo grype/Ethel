@@ -25,17 +25,6 @@ WSCollectionTestEndpoint >> cursor [
 		yourself
 ]
 
-{ #category : #executing }
-WSCollectionTestEndpoint >> executingContext [
-	| sender |
-
-	sender := thisContext sender.
-	[ sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ]
-		whileTrue: [ sender := sender sender ].
-
-	^ sender
-]
-
 { #category : #initialization }
 WSCollectionTestEndpoint >> initialize [
 	super initialize.
