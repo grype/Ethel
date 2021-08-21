@@ -2,43 +2,43 @@ Extension { #name : #CompiledMethod }
 
 { #category : #'*Ethel' }
 CompiledMethod >> isWSEndpointExecutionMethod [
-	^ self wsEndpointHttpMethod isNotNil 
+
+	| cls |
+	cls := self methodClass.
+	^ cls isWSEndpoint and: [ 
+		  self pragmas
+			  detect: [ :pragma | 
+				  WSClient httpMethods includes:
+					  (pragma selector asString copyWithoutAll: ':') ]
+			  ifFound: [ true ]
+			  ifNone: [ false ] ]
 ]
 
 { #category : #'*Ethel' }
-CompiledMethod >> isWSEndpointReferencingMethod [
-	^ self wsEndpointReferences isEmptyOrNil not
-]
+CompiledMethod >> wsEndpointAccessor [
 
-{ #category : #'*Ethel' }
-CompiledMethod >> wsEndpointExecutionParams [
-	self methodClass isWSEndpoint
-		ifFalse: [ ^ nil ].
-	^ (self pragmaAt: self methodClass endpointParamsPragma)
-		ifNil: [ self ffiArgumentNames ]
-		ifNotNil: [ :val | val arguments first ]
-]
+	"Return an endpoint accessor. Determined in the following order:
+	1. <get: '/path/somewhere'> pragma, or
+	2. <get> & <path: '/path/somewhere'> pragmas (legacy)"
 
-{ #category : #'*Ethel' }
-CompiledMethod >> wsEndpointHttpMethod [
-	| methods |
+	| supportedMethods method path |
+	supportedMethods := WSClient httpMethods.
 
-	self methodClass isWSEndpoint
-		ifFalse: [ ^ nil ].
-	methods := (self pragmas
-		collect: [ :p | p selector asLowercase asSymbol ])
-		intersection: self methodClass supportedHttpMethods.
-	^ methods ifEmpty: [ nil ] ifNotEmpty: [ methods first ]
-]
+	method := nil.
+	path := nil.
 
-{ #category : #'*Ethel' }
-CompiledMethod >> wsEndpointPath [
-	self methodClass isWSEndpoint
-		ifFalse: [ ^ nil ].
-	self wsEndpointHttpMethod ifNil: [ ^ nil ].
-	^ (self pragmaAt: self methodClass endpointPathPragma)
-		ifNil: [ self methodClass endpointPath ]
-		ifNotNil: [ :val | self methodClass endpointPath / val arguments first ]
+	^ self pragmas
+		  detect: [ :pragma | 
+			  method := pragma selector asString copyWithoutAll: ':'.
+			  supportedMethods includes: method ]
+		  ifFound: [ :pragma | 
+			  path := pragma arguments
+				          ifEmpty: [ 
+					          (self pragmaAt: WSClient endpointPathPragma) ifNotNil: [ 
+						          :pathPragma | pathPragma arguments first ] ]
+				          ifNotEmpty: [ pragma arguments first ].
+			  WSEndpointAccessor method: method path: path ]
+		  ifNone: [ nil ]
 ]
 
 { #category : #'*Ethel' }

@@ -50,24 +50,6 @@ Trait {
 	#category : #'Ethel-Core'
 }
 
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointParamsPragma [
-	"By default retuns keywords defined by the framework, but can be overriden at the level of the endpoint itself"
-	^ WSClient endpointParamsPragma 
-]
-
-{ #category : #accessing }
-TWSEndpoint classSide >> endpointPath [
-	"Path that represents a logical endpoint whose behavior is encapsulated by the implementing class. In cases where this cannot be determined at the class level - simply return the top-most meaingful path, or the root path. TThis value can be overriden in two places: 1) instance side #endpointPath and 2) at a method level by declarating there a pragma with the keyword returned by #endpointPathPragma"
-	^ self subclassResponsibility
-]
-
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointPathPragma [
-	"By default retuns keywords defined by the framework, but can be overriden at the level of the endpoint itself"
-	^ WSClient endpointPathPragma 
-]
-
 { #category : #'instance creation' }
 TWSEndpoint classSide >> on: wsClient [
 	^ self basicNew initializeOn: wsClient
@@ -75,14 +57,10 @@ TWSEndpoint classSide >> on: wsClient [
 
 { #category : #accessing }
 TWSEndpoint classSide >> pathReferences [
-	^ (self wsEndpointExecutingMethods
-		collect: [ :aMethod | aMethod -> (aMethod wsEndpointPath) ])
-		asSet
-]
 
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> supportedHttpMethods [
-	^ WSClient supportedHttpMethods 
+	^ (self methods
+		   collect: [ :aMethod | aMethod -> aMethod wsEndpointAccessor ]
+		   thenSelect: [ :each | each value isNotNil ]) asSet
 ]
 
 { #category : #icons }
@@ -114,34 +92,14 @@ TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
 ]
 
 { #category : #configuring }
-TWSEndpoint >> configureFromContextOn: http [
-	| effectivePath contextValues segments |
-
-	effectivePath := self endpointPath.
-	contextValues := thisContext wsEndpointValues.
-
-	self executingContext
-		ifNotNil: [ :context | 
-			context wsEndpointPath ifNotNil: [ :val | effectivePath := val ].
-			(context
-				wsEndpointHttpMethodUsing: wsClient class supportedHttpMethods)
-				ifNotNil: [ :val | http method: val asUppercase asSymbol ].
-			context wsEndpointTemps
-				ifNotEmpty: [ :val | contextValues addAll: val ] ].
-
-	segments := effectivePath segments
-		collect: [ :segment | segment format: contextValues ].
-	http url: wsClient baseUrl / segments
-]
-
-{ #category : #configuring }
 TWSEndpoint >> configureOn: http [
 	"Configures http transport prior to execution"
 ]
 
 { #category : #accessing }
 TWSEndpoint >> endpointPath [
-	^ self class endpointPath 
+
+	^ nil
 ]
 
 { #category : #executing }
@@ -154,36 +112,10 @@ TWSEndpoint >> execute: anExecBlock [
 	^ wsClient execute: self with: anExecBlock 
 ]
 
-{ #category : #executing }
-TWSEndpoint >> executingContext [
-
-	| sender |
-	sender := thisContext sender.
-	[ 
-	sender isNotNil and: [ 
-		(sender method isKindOf: CompiledMethod) not or: [ 
-			sender method isWSEndpointExecutionMethod not ] ] ] whileTrue: [ 
-		sender := sender sender ].
-
-	^ sender
-]
-
 { #category : #initialization }
 TWSEndpoint >> initializeOn: aClient [
 	self initialize.
 	wsClient := aClient
-]
-
-{ #category : #configuring }
-TWSEndpoint >> prepareForExecutingOn: http [
-	self
-		deprecated: 'Use #configureFromContextOn: instead'
-		on: '31 July 2021'
-		in:
-		'Pharo-9.0.0+build.1539.sha.9b91f54a6e46f7518d14baf92fe0698c8a3260a3 (64 Bit)'
-		transformWith: '`@receiver prepareForExecutingOn:' -> '`@receiver configureFromContextOn:'.
-		
-	self configureFromContextOn: http
 ]
 
 { #category : #accessing }

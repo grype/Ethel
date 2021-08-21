@@ -103,17 +103,6 @@ WSPluggableEndpoint >> enumeration: anObject [
 	enumeration := anObject
 ]
 
-{ #category : #executing }
-WSPluggableEndpoint >> executingContext [
-	| sender |
-
-	sender := thisContext sender.
-	[ sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ]
-		whileTrue: [ sender := sender sender ].
-
-	^ sender
-]
-
 { #category : #api }
 WSPluggableEndpoint >> get [
 	method := #get.

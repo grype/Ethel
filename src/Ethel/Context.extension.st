@@ -1,6 +1,11 @@
 Extension { #name : #Context }
 
 { #category : #'*Ethel' }
+Context >> wsEndpointAccessor [
+	^ self method wsEndpointAccessor 
+]
+
+{ #category : #'*Ethel' }
 Context >> wsEndpointHttpMethodUsing: aListOfMethods [
 	| validMethods |
 
@@ -10,13 +15,6 @@ Context >> wsEndpointHttpMethodUsing: aListOfMethods [
 		detect: [ :each | validMethods includes: each selector asLowercase asSymbol ]
 		ifFound: [ :val | val selector ]
 		ifNone: [ nil ]
-]
-
-{ #category : #'*Ethel' }
-Context >> wsEndpointPath [
-	^ self method isWSEndpointExecutionMethod
-		ifTrue: [ self method wsEndpointPath ]
-		ifFalse: [ nil ]
 ]
 
 { #category : #'*Ethel' }

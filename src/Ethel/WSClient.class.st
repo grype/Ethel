@@ -34,12 +34,6 @@ Class {
 }
 
 { #category : #defaults }
-WSClient class >> endpointParamsPragma [
-	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
-	^ #params:
-]
-
-{ #category : #defaults }
 WSClient class >> endpointPathPragma [
 	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
 	^ #path:
@@ -50,6 +44,12 @@ WSClient class >> endpoints [
 	"Return collection of endpoint classes associated with this client type. 
 	By default, this returns all of the endpoint classes referenced by this and by all discovered classes"
 	^ self derivedWSEndpoints
+]
+
+{ #category : #http }
+WSClient class >> httpMethods [
+	"Returns array of possible HTTP methods"
+	^ #(#get #head #post #put #patch #delete #options #connect #trace)
 ]
 
 { #category : #'instance creation' }
@@ -77,12 +77,6 @@ WSClient class >> jsonWithUrl: aUrl httpConfiguration: aBlock [
 WSClient class >> pathReferences [
 	"Returns all path references found in related endpoint classes"
 	^ (self endpoints flatCollect: #pathReferences) asSet
-]
-
-{ #category : #http }
-WSClient class >> supportedHttpMethods [
-	"Returns array of supported HTTP methods. These are used to identify and verify executing endpoint methods - any such method should declare a corresponding pragma."
-	^ #(#get #post #put #patch #delete #options)
 ]
 
 { #category : #'instance creation' }
@@ -114,27 +108,16 @@ WSClient >> configureOn: http [
 
 { #category : #http }
 WSClient >> createHttpClient [
-	| client |
-	client := ZnClient new.
-	self configureOn: client.
-	^ client
+
+	^ ZnClient new
 ]
 
 { #category : #endpoints }
 WSClient >> endpointForPath: aPath [
-	| endpoints |
 
-	endpoints := self class endpoints
-		select: [ :aClass | 
-			aClass ~= WSPluggableEndpoint
-				and: [ aClass endpointPath matches: aPath ] ].
-"	endpoints size > 1
-		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ]."
-	^ endpoints
-		ifEmpty: [ (WSPluggableEndpoint on: self)
-				path: aPath;
-				yourself ]
-		ifNotEmpty: [ :val | val anyOne on: self ]
+	^ (WSPluggableEndpoint on: self)
+		path: aPath;
+		yourself
 ]
 
 { #category : #execution }
@@ -147,9 +130,7 @@ WSClient >> execute: anEndpoint [
 { #category : #execution }
 WSClient >> execute: anEndpoint with: aBlock [
 	| http result |
-	http := self createHttpClient.
-	anEndpoint configureFromContextOn: http.
-	anEndpoint configureOn: http.
+	http := self httpClientOnEndpoint: anEndpoint.
 	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.
 	result := http execute.
@@ -159,15 +140,44 @@ WSClient >> execute: anEndpoint with: aBlock [
 	^ result
 ]
 
-{ #category : #accessing }
-WSClient >> executorsOfPath: aPath [
-	| pathsAndMethods |
+{ #category : #executing }
+WSClient >> executingContext [
 
-	pathsAndMethods := self class endpoints
-		flatCollect: [ :each | each pathReferences ].
-	^ pathsAndMethods
-		select: [ :each | each value matches: aPath ]
-		thenCollect: [ :each | each key ]
+	| sender |
+	sender := thisContext sender.
+	[ 
+	sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ] 
+		whileTrue: [ sender := sender sender ].
+
+	^ sender
+]
+
+{ #category : #http }
+WSClient >> httpClientOnEndpoint: anEndpoint [
+	| http path contextValues url |
+
+	http := self createHttpClient.
+	self configureOn: http.
+
+	url := http request url.
+	path := url path ifEmpty: [ Path root ].
+
+	anEndpoint endpointPath ifNotNil: [ :epPath | path := path resolvePath: epPath ].
+
+	contextValues := thisContext wsEndpointValues.
+	self executingContext ifNotNil: [ :context | 
+		contextValues addAll: context wsEndpointTemps.
+		context wsEndpointAccessor ifNotNil: [ :accessor | 
+			path := path resolvePath: accessor path.
+			(self class httpMethods includes: accessor method) ifTrue: [ 
+				http method: accessor method asUppercase asSymbol ] ] ].
+	url
+		clearPath;
+		addPathSegments:
+			(path segments collect: [ :seg | seg format: contextValues ]).
+	http request url: url.
+	anEndpoint configureOn: http.
+	^ http
 ]
 
 { #category : #accessing }
