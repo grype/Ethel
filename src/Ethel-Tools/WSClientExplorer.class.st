@@ -185,9 +185,10 @@ WSClientExplorer >> paramsWidgetForMethod: aMethod [
 
 { #category : #initialization }
 WSClientExplorer >> pathDescriptionForMethod: aMethod [
-	| str |
-	str := aMethod wsEndpointHttpMethod asString asUppercase , ' '
-		, aMethod wsEndpointPath pathString.
+
+	| str accessor |
+	accessor := aMethod wsEndpointAccessor.
+	str := accessor method asUppercase , ' ' , accessor path pathString.
 	str := str , ' >> #' , aMethod selector.
 	^ str
 ]
@@ -226,7 +227,7 @@ WSClientExplorer >> showCurl [
 	| client |
 	"Stub out #createHttpClient so that we can return our own version of ZnClient, with stubbed #execute method, which simply returns a block returning the curl string for the configured client"
 	client := apiClient copy.
-	client stub createHttpClient
+	(client stub httpClientOnEndpoint: Any)
 		willReturn:
 			(ZnClient new
 				in: [ :http | 

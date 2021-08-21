@@ -127,11 +127,12 @@ WSUml >> colorForClassName: aClass [
 
 { #category : #accessing }
 WSUml >> colorForHttpMethod: anHttpMethod [
-	(anHttpMethod wsEndpointHttpMethod isNotNil
-		and: [ self httpMethods includes: anHttpMethod wsEndpointHttpMethod ])
+
+	| accessor |
+	accessor := anHttpMethod wsEndpointAccessor.
+	(accessor isNotNil and: [ self httpMethods includes: accessor method ]) 
 		ifFalse: [ ^ Color gray ].
-	^ self colors
-		at: (self httpMethods indexOf: anHttpMethod wsEndpointHttpMethod)
+	^ self colors at: (self httpMethods indexOf: accessor method)
 ]
 
 { #category : #accessing }
@@ -170,13 +171,13 @@ WSUml >> extendWithTraits [
 
 { #category : #accessing }
 WSUml >> httpMethods [
-	^ httpMethods
-		ifNil: [ | methods |
-			methods := objects flatCollect: [ :each | each methods ].
-			httpMethods := (methods
-				select: [ :each | each isWSEndpointExecutionMethod ]
-				thenCollect: [ :each | each wsEndpointHttpMethod asLowercase ])
-				asSet asOrderedCollection ]
+
+	^ httpMethods ifNil: [ 
+		  | methods |
+		  methods := objects flatCollect: [ :each | each methods ].
+		  httpMethods := (methods
+			                  collect: #wsEndpointAccessor
+			                  thenSelect: #isNotNil) asSet asOrderedCollection ]
 ]
 
 { #category : #initialization }
