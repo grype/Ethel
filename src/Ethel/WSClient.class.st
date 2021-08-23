@@ -169,7 +169,7 @@ WSClient >> httpClientOnEndpoint: anEndpoint [
 	self executingContext ifNotNil: [ :context | 
 		contextValues addAll: context wsEndpointTemps.
 		context wsEndpointAccessor ifNotNil: [ :accessor | 
-			accessor path ifNotNil: [ :val | path := path resolvePath: val ].
+			accessor path ifNotNil: [ :val | path := path resolveString: val ].
 			http method: accessor method asUppercase asSymbol ] ].
 	url
 		clearPath;
