@@ -10,8 +10,7 @@ Class {
 { #category : #tests }
 WSClientTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
 	aDestination class should equal: aClass.
-	aDestination wsClient should equal: aSource.
-	aDestination endpointPath should equal: aClass endpointPath
+	aDestination wsClient should equal: aSource
 ]
 
 { #category : #tests }
@@ -24,13 +23,6 @@ WSClientTest >> ensureEndpoint: aDestination derivedPluggableEndpointFrom: aSour
 { #category : #running }
 WSClientTest >> setUp [
 	client := WSTestClient default
-]
-
-{ #category : #tests }
-WSClientTest >> testCreateHttpClient [
-	| http |
-	http := client createHttpClient.
-	http should beKindOf: ZnClient 
 ]
 
 { #category : #tests }
@@ -65,12 +57,12 @@ WSClientTest >> testEndpointCompositionWithPath [
 	self
 		ensureEndpoint: client / (Path / #test)
 		derivedFrom: client
-		as: WSTestEndpoint.
+		as: WSPluggableEndpoint.
 
 	self
 		ensureEndpoint: client / (Path * #test)
 		derivedFrom: client
-		as: WSTestEndpoint.
+		as: WSPluggableEndpoint.
 
 	self
 		ensureEndpoint: client / (Path / #nothing / #here)
@@ -83,17 +75,17 @@ WSClientTest >> testEndpointCompositionWithString [
 	self
 		ensureEndpoint: client / #test
 		derivedFrom: client
-		as: WSTestEndpoint.
+		as: WSPluggableEndpoint.
 
 	self
 		ensureEndpoint: client / #test / #nested
 		derivedFrom: client
-		as: WSNestedTestEndpoint.
+		as: WSPluggableEndpoint.
 
 	self
 		ensureEndpoint: client / 'test/nested'
 		derivedFrom: client
-		as: WSNestedTestEndpoint.
+		as: WSPluggableEndpoint.
 
 	self
 		ensureEndpoint: client / #nothing / #here
@@ -142,16 +134,9 @@ WSClientTest >> testExecute [
 ]
 
 { #category : #tests }
-WSClientTest >> testExecutorsOfPath [
-	| implementors |
-	implementors := client executorsOfPath: WSTestEndpoint endpointPath.
-	implementors isEmptyOrNil should not be
-]
-
-{ #category : #tests }
 WSClientTest >> testHttpClientCreation [
 	client stub.
-	client createHttpClient.
+	client httpClientOnEndpoint: WSTestEndpoint new.
 	client should receive configureOn: (Instance of: ZnClient)
 ]
 

@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #accessing }
-WSNestedTestEndpoint class >> endpointPath [
+WSNestedTestEndpoint >> endpointPath [
 	^ super endpointPath  / #nested
 ]
 

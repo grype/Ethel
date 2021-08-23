@@ -14,7 +14,6 @@ Class {
 TWSEndpointTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
 	aDestination class should equal: aClass.
 	aDestination wsClient should equal: aSource wsClient.
-	aDestination endpointPath should equal: aClass endpointPath.
 	(aDestination headers keys includesAll: aSource headers keys) should be
 ]
 
@@ -97,8 +96,7 @@ TWSEndpointTest >> stubbedHttpWithResponse: aResponse [
 { #category : #'tests-configuring' }
 TWSEndpointTest >> testConfigureOn [
 	endpoint stub.
-	http := client createHttpClient.
-	endpoint configureOn: http.
+	http := client httpClientOnEndpoint: endpoint.
 	http request headers should
 		include: WSTestEndpoint testHeaderValue
 		at: WSTestEndpoint testHeaderName
@@ -121,13 +119,13 @@ TWSEndpointTest >> testEndpointCompositionWithClass [
 TWSEndpointTest >> testEndpointCompositionWithPath [
 	self
 		ensureEndpoint: endpoint / (Path * #nested)
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint.
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #test / #nested.
 
 	self
 		ensureEndpoint: endpoint / (Path / #test / #nested)
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint.
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #test / #nested.
 
 	self
 		ensureEndpoint: endpoint / (Path / #nested)
@@ -136,21 +134,16 @@ TWSEndpointTest >> testEndpointCompositionWithPath [
 
 	self
 		ensureEndpoint: endpoint / (Path / #test)
-		derivedFrom: endpoint
-		as: WSTestEndpoint
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #test
 ]
 
 { #category : #'tests-composing' }
 TWSEndpointTest >> testEndpointCompositionWithString [
 	self
 		ensureEndpoint: endpoint / #nested
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint
-]
-
-{ #category : #tests }
-TWSEndpointTest >> testEndpointPath [
-	endpoint endpointPath should equal: endpoint class endpointPath
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #test / #nested.
 ]
 
 { #category : #'tests-enumerating' }
@@ -246,7 +239,7 @@ TWSEndpointTest >> testHttpMethod [
 	| stubbedHttp |
 
 	stubbedHttp := self stubbedHttpWithResponse: self okResponse.
-	client class supportedHttpMethods
+	client class httpMethods
 		do: [ :method | 
 			endpoint perform: method.
 			stubbedHttp request method asLowercase should equal: method asLowercase ]
@@ -261,7 +254,7 @@ TWSEndpointTest >> testIsWSEndpoint [
 TWSEndpointTest >> testIsWSEndpointMethod [
 	| httpMethods |
 
-	httpMethods := endpoint class supportedHttpMethods.
+	httpMethods := client class httpMethods.
 	endpoint class methods
 		do: [ :aMethod | 
 			(httpMethods includes: aMethod selector)
@@ -323,7 +316,7 @@ TWSEndpointTest >> testPluggableEndpointComposition [
 	ep := endpoint / 'pluggable'.
 	ep class should equal: WSPluggableEndpoint.
 	ep wsClient should equal: endpoint wsClient.
-	ep endpointPath should equal: endpoint class endpointPath / 'pluggable'
+	ep endpointPath should equal: endpoint endpointPath / 'pluggable'
 ]
 
 { #category : #'tests-executing' }
@@ -367,13 +360,13 @@ TWSEndpointTest >> testUnaryWithRelativePathExecution [
 ]
 
 { #category : #'tests-other' }
-TWSEndpointTest >> testWSEndpointHttpMethod [
+TWSEndpointTest >> testWSEndpointAccessor [
 	| httpMethods |
 
-	httpMethods := endpoint class supportedHttpMethods.
+	httpMethods := client class httpMethods.
 	endpoint class methods
 		do: [ :aMethod | 
 			(httpMethods includes: aMethod selector)
-				ifTrue: [ aMethod wsEndpointHttpMethod = aMethod selector ]
+				ifTrue: [ aMethod wsEndpointAccessor method = aMethod selector ]
 				ifFalse: [ aMethod isWSEndpointExecutionMethod should not ] ]
 ]

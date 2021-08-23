@@ -10,6 +10,6 @@ Class {
 }
 
 { #category : #accessing }
-WSDetachedEmptyTestEndpoint class >> endpointPath [
+WSDetachedEmptyTestEndpoint >> endpointPath [
 	^ WSTestEndpoint endpointPath / #'detached-empty'
 ]
