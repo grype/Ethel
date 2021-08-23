@@ -13,7 +13,7 @@ WSEndpointAccessor class >> method: aMethodString path: aPath [
 
 	^ self new
 		  method: aMethodString;
-		  path: aPath asPath;
+		  path: (aPath ifNotNil: [ :val | val asPath ]);
 		  yourself
 ]
 
