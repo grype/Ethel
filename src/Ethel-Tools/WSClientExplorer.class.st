@@ -96,7 +96,7 @@ WSClientExplorer >> executingMethods [
 	| methods |
 	methods := apiClient class derivedWSEndpoints
 		flatCollect: [ :each | each wsEndpointExecutingMethods ].
-	^ methods asSet sorted: [ :a :b | a wsEndpointPath pathString < b wsEndpointPath pathString ]
+	^ methods asSet sorted: [ :a :b | (a wsEndpointPath ifNil: '') < (b wsEndpointPath ifNil: '') ]
 ]
 
 { #category : #actions }
@@ -174,21 +174,24 @@ WSClientExplorer >> params: anObject [
 { #category : #initialization }
 WSClientExplorer >> paramsWidgetForMethod: aMethod [
 	| paramsPresenter |
+
+	params := (apiClient httpClientOnEndpoint: aMethod methodClass new)
+		          request url asString urlDecoded formatTokens.
+	params addAll: aMethod wsEndpointExecutionParams.
 	paramsPresenter := WSEndpointParamsPresenter
-		on: aMethod methodClass
-		withParameters:
-			aMethod wsEndpointPath pathString formatTokens
-				, aMethod wsEndpointExecutionParams.
+		                   on: aMethod methodClass
+		                   withParameters: params.
 	paramsPresenter endpointMethod: aMethod.
 	^ self instantiate: paramsPresenter
 ]
 
 { #category : #initialization }
 WSClientExplorer >> pathDescriptionForMethod: aMethod [
+	| str accessor http |
 
-	| str accessor |
 	accessor := aMethod wsEndpointAccessor.
-	str := accessor method asUppercase , ' ' , accessor path pathString.
+	http := apiClient httpClientOnEndpoint: aMethod methodClass new.
+	str := accessor method asUppercase , ' ' , http request url path.
 	str := str , ' >> #' , aMethod selector.
 	^ str
 ]
