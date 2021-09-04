@@ -6,9 +6,11 @@ Class {
 
 { #category : #decoration }
 WSEndpointExecutorMethodDecorator class >> decorateMainTableCell: anItemCellMorph of: aDataSourceItem [
+	| icon |
 	super decorateMainTableCell: anItemCellMorph of: aDataSourceItem.
 	
-	anItemCellMorph definitionIcon: #protocolPublic
+	icon := anItemCellMorph definitionIcon: #protocolPublic.
+	icon setBalloonText: 'method executes endpoint'
 ]
 
 { #category : #decoration }
