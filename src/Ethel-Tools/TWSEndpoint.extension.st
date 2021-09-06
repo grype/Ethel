@@ -6,7 +6,7 @@ TWSEndpoint >> gtPathReferences [
 		with: self class pathReferences
 		with:
 			(self class wsEndpointReferences
-				collect: [ :each | each key -> each value anyOne endpointPath ]))
+				collect: [ :each | each key -> each value anyOne class pathPrefix ]))
 		collect: [ :each | 
 			each
 				sorted: [ :a :b | a value wsGtPrintString < b value wsGtPrintString ] ])
