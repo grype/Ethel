@@ -6,6 +6,11 @@ Class {
 	#category : #'Ethel-Examples-Github-REST'
 }
 
+{ #category : #accessing }
+GHRestPublicGistsEndpoint class >> pathPrefix [
+	^ Path / #gists / #public
+]
+
 { #category : #configuring }
 GHRestPublicGistsEndpoint >> configureOn: http [
 	super configureOn: http.

@@ -7,6 +7,11 @@ Class {
 	#category : #'Ethel-Examples-Github-REST'
 }
 
+{ #category : #accessing }
+GHRestGistsEndpoint class >> pathPrefix [
+	^ Path / #gists
+]
+
 { #category : #traversing }
 GHRestGistsEndpoint >> createWithDescription: aDescription isPublic: isPublic nameFiles: aFilesDict [
 	"aFilesDict should be { #fileName -> 'file content'... }"

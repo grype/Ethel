@@ -9,6 +9,11 @@ Class {
 	#category : #'Ethel-Examples-Github-GraphQL'
 }
 
+{ #category : #'as yet unclassified' }
+GHGraphqlRootEndpoint class >> pathPrefix [
+	^ Path root
+]
+
 { #category : #configuring }
 GHGraphqlRootEndpoint >> configureOn: http [
 	query
@@ -17,11 +22,6 @@ GHGraphqlRootEndpoint >> configureOn: http [
 
 			q := GHGraphqlNode named: #query parameters: nil children: {val}.
 			http contents: {(#query -> q printString)} asDictionary ]
-]
-
-{ #category : #accessing }
-GHGraphqlRootEndpoint >> endpointPath [
-	^ Path root
 ]
 
 { #category : #executing }
