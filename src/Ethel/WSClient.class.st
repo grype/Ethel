@@ -162,14 +162,11 @@ WSClient >> httpClientOnEndpoint: anEndpoint [
 	url := http request url.
 	path := url path ifEmpty: [ Path root ].
 
-	anEndpoint endpointPath ifNotNil: [ :epPath | 
-		path := path resolvePath: epPath ].
-
 	contextValues := thisContext wsEndpointValues.
 	self executingContext ifNotNil: [ :context | 
 		contextValues addAll: context wsEndpointTemps.
 		context wsEndpointAccessor ifNotNil: [ :accessor | 
-			accessor path ifNotNil: [ :val | path := path resolveString: val ].
+			path := path resolvePath: accessor path.
 			http method: accessor method asUppercase asSymbol ] ].
 	url
 		clearPath;

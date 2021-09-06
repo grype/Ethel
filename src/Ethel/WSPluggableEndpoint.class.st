@@ -59,6 +59,23 @@ Class {
 	#category : #'Ethel-Core'
 }
 
+{ #category : #endpoints }
+WSPluggableEndpoint >> / aStringOrEndpoint [
+	| ep |
+
+	ep := aStringOrEndpoint isWSEndpoint
+		      ifTrue: [ self wsClient / aStringOrEndpoint ]
+		      ifFalse: [ 
+			      | aPath |
+
+			      aPath := (aStringOrEndpoint isKindOf: Path)
+				               ifTrue: [ self path resolvePath: aStringOrEndpoint ]
+				               ifFalse: [ self path / aStringOrEndpoint ].
+			      self wsClient / aPath ].
+	self configureDerivedEndpoint: ep.
+	^ ep
+]
+
 { #category : #configuring }
 WSPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
 	(anEndpoint respondsTo: #httpConfiguration:)
@@ -86,11 +103,6 @@ WSPluggableEndpoint >> delete [
 WSPluggableEndpoint >> delete: aBlock [
 	method := #delete.
 	^ self execute: aBlock
-]
-
-{ #category : #accessing }
-WSPluggableEndpoint >> endpointPath [
-	^ path
 ]
 
 { #category : #accessing }

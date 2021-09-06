@@ -1,3 +1,15 @@
+"
+I represent a way to access an endpoint on a remote server.
+
+I simply capture the method and a path, like:
+
+> GET /me
+> POST /here
+
+Instance variables
+- method: capitalized `Symbol`
+- path: `Path`
+"
 Class {
 	#name : #WSEndpointAccessor,
 	#superclass : #Object,
@@ -43,8 +55,8 @@ WSEndpointAccessor >> method [
 
 { #category : #accessing }
 WSEndpointAccessor >> method: anObject [
-
-	method := anObject
+	method := anObject ifNotNil: [ :val | 
+		          val asString asUppercase asSymbol ]
 ]
 
 { #category : #accessing }
@@ -55,6 +67,5 @@ WSEndpointAccessor >> path [
 
 { #category : #accessing }
 WSEndpointAccessor >> path: anObject [
-
 	path := anObject
 ]

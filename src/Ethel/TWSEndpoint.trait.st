@@ -55,6 +55,11 @@ TWSEndpoint classSide >> on: wsClient [
 	^ self basicNew initializeOn: wsClient
 ]
 
+{ #category : #'as yet unclassified' }
+TWSEndpoint classSide >> pathPrefix [
+	^ RelativePath new
+]
+
 { #category : #accessing }
 TWSEndpoint classSide >> pathReferences [
 
@@ -79,8 +84,8 @@ TWSEndpoint >> / aStringOrEndpoint [
 		ifFalse: [ | path |
 
 			path := (aStringOrEndpoint isKindOf: Path)
-				ifTrue: [ self endpointPath resolvePath: aStringOrEndpoint ]
-				ifFalse: [ self endpointPath / aStringOrEndpoint ].
+				ifTrue: [ self class pathPrefix resolvePath: aStringOrEndpoint ]
+				ifFalse: [ self class pathPrefix / aStringOrEndpoint ].
 			self wsClient / path ].
 	self configureDerivedEndpoint: ep.
 	^ ep
@@ -94,12 +99,6 @@ TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
 { #category : #configuring }
 TWSEndpoint >> configureOn: http [
 	"Configures http transport prior to execution"
-]
-
-{ #category : #accessing }
-TWSEndpoint >> endpointPath [
-
-	^ nil
 ]
 
 { #category : #executing }
