@@ -6,7 +6,7 @@ Class {
 
 { #category : #accessing }
 WSNestedTestEndpoint >> endpointPath [
-	^ super endpointPath  / #nested
+	^ super class pathPrefix  / #nested
 ]
 
 { #category : #'private-executing' }

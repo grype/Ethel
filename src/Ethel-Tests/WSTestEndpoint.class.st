@@ -18,7 +18,7 @@ WSTestEndpoint >> delete [
 	^ self execute
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 WSTestEndpoint >> endpointPath [
 	^ Path / 'test'
 ]

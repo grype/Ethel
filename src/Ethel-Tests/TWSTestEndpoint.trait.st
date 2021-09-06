@@ -8,6 +8,11 @@ Trait {
 	#category : #'Ethel-Tests-Models'
 }
 
+{ #category : #'as yet unclassified' }
+TWSTestEndpoint classSide >> pathPrefix [
+	^ Path / #test
+]
+
 { #category : #tests }
 TWSTestEndpoint classSide >> testHeaderName [
 	^ #'X-Test'

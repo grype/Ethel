@@ -20,7 +20,7 @@ WSCollectionTestEndpoint >> cursor [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 WSCollectionTestEndpoint >> endpointPath [
 	^ Path / 'another-test'
 ]

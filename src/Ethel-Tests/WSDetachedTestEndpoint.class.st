@@ -6,9 +6,9 @@ Class {
 	#category : #'Ethel-Tests-Models'
 }
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 WSDetachedTestEndpoint >> endpointPath [
-	^ WSTestEndpoint endpointPath / #'detached'
+	^ WSTestEndpoint class pathPrefix / #'detached'
 ]
 
 { #category : #resolving }

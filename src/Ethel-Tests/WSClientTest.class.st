@@ -17,7 +17,7 @@ WSClientTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
 WSClientTest >> ensureEndpoint: aDestination derivedPluggableEndpointFrom: aSource usingPath: aPath [
 	aDestination class should equal: WSPluggableEndpoint.
 	aDestination wsClient should equal: aSource.
-	aDestination endpointPath should equal: aPath
+	aDestination path should equal: aPath
 ]
 
 { #category : #running }
@@ -165,7 +165,7 @@ WSClientTest >> testPluggableEndpointComposition [
 	ep := client / 'pluggable'.
 	ep class should equal: WSPluggableEndpoint.
 	ep wsClient should equal: client.
-	ep endpointPath should equal: Path / 'pluggable'.
+	ep path should equal: Path / 'pluggable'.
 ]
 
 { #category : #tests }

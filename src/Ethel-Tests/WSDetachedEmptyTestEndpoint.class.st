@@ -9,7 +9,7 @@ Class {
 	#category : #'Ethel-Tests-Models'
 }
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 WSDetachedEmptyTestEndpoint >> endpointPath [
-	^ WSTestEndpoint endpointPath / #'detached-empty'
+	^ WSTestEndpoint class pathPrefix / #'detached-empty'
 ]
