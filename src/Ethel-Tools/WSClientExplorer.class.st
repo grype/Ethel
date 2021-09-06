@@ -94,9 +94,12 @@ WSClientExplorer >> executeEndpointOn: aClient [
 { #category : #initialization }
 WSClientExplorer >> executingMethods [
 	| methods |
-	methods := apiClient class derivedWSEndpoints
-		flatCollect: [ :each | each wsEndpointExecutingMethods ].
-	^ methods asSet sorted: [ :a :b | (a wsEndpointPath ifNil: '') < (b wsEndpointPath ifNil: '') ]
+
+	methods := apiClient class derivedWSEndpoints flatCollect: [ :each | 
+		           each wsEndpointExecutingMethods ].
+	^ methods asSet sorted: [ :a :b | 
+		  (a wsEndpointPath ifNil: '' ifNotNil: [ :val | val pathString ])
+		  < (b wsEndpointPath ifNil: '' ifNotNil: [ :val | val pathString ]) ]
 ]
 
 { #category : #actions }
