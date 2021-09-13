@@ -11,6 +11,7 @@ WSEndpointEnvironmentPlugin >> collectMethodGroupProviders [
 
 { #category : #'item decoration' }
 WSEndpointEnvironmentPlugin >> decorateBrowserItem: anItem ofMethod: aMethod [
+	aMethod methodClass isWSEndpoint ifFalse: [ ^ self ].
 	aMethod isWSEndpointExecutionMethod
 		ifTrue: [ anItem markWith: WSEndpointExecutorTag ].
 	aMethod isWSEndpointReferencingMethod
