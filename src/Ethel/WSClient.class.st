@@ -79,6 +79,12 @@ WSClient class >> pathReferences [
 	^ (self endpoints flatCollect: #pathReferences) asSet
 ]
 
+{ #category : #icons }
+WSClient class >> systemIconName [
+
+	^ #remote
+]
+
 { #category : #'instance creation' }
 WSClient class >> withUrl: aUrl [
 	^ self basicNew initializeWithUrl: aUrl
