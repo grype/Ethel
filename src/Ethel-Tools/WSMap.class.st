@@ -20,14 +20,14 @@ WSMap >> associations [
 
 { #category : #building }
 WSMap >> buildMap [
-	map := (client class pathReferences groupedBy: [ :each | each value ])
-		associationsDo: [ :each | each value: (each value collect: #key) ].
+	map := (client class pathReferences groupedBy: [ :each | 
+		        each value path ]) associationsDo: [ :each | 
+		       each value: (each value collect: #key) ].
 
 	map at: Path root put: client.
-	map
-		keysAndValuesDo: [ :aPath :impls | 
-			(aPath withParents copyWithout: aPath)
-				do: [ :parent | map at: parent ifAbsentPut: client / parent ] ].
+	map keysAndValuesDo: [ :aPath :impls | 
+		(aPath asPath withParents copyWithout: aPath) do: [ :parent | 
+			map at: parent ifAbsentPut: client / parent ] ].
 	^ map
 ]
 

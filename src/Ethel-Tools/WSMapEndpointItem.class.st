@@ -11,7 +11,7 @@ WSMapEndpointItem class >> handles: anObj [
 
 { #category : #accessing }
 WSMapEndpointItem >> description [ 
-	^ item endpointPath segments last
+	^ item class pathPrefix segments last
 ]
 
 { #category : #testing }
@@ -19,7 +19,7 @@ WSMapEndpointItem >> shapeBorderColor [
 	^ (item isKindOf: WSPluggableEndpoint)
 		ifTrue: [ Color gray ]
 		ifFalse: [ (item class wsEndpointExecutingMethods
-				select: [ :each | each wsEndpointPath = item endpointPath ])
+				select: [ :each | each wsEndpointPath = item class pathPrefix ])
 				ifEmpty: [ Smalltalk ui theme warningTextColor alpha: 0.5 ]
 				ifNotEmpty: [ Color colorFrom: '#4682B4' ] ]
 ]

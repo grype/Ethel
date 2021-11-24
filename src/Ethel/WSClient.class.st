@@ -46,6 +46,17 @@ WSClient class >> endpoints [
 	^ self derivedWSEndpoints
 ]
 
+{ #category : #accessing }
+WSClient class >> executingMethods [
+	| methods |
+
+	methods := self endpoints flatCollect: [ :each | 
+		           each wsEndpointExecutingMethods ].
+	^ methods asSet sorted: [ :a :b | 
+		  (a wsEndpointPath ifNil: '' ifNotNil: [ :val | val pathString ])
+		  < (b wsEndpointPath ifNil: '' ifNotNil: [ :val | val pathString ]) ]
+]
+
 { #category : #http }
 WSClient class >> httpMethods [
 	"Returns array of possible HTTP methods"
