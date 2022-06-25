@@ -6,9 +6,18 @@ Class {
 
 { #category : #decoration }
 WSEndpointExecutorMethodDecorator class >> decorateMainTableCell: anItemCellMorph of: aDataSourceItem [
+
+	| httpMethod iconMap |
 	super decorateMainTableCell: anItemCellMorph of: aDataSourceItem.
-	
-	anItemCellMorph definitionIcon: #protocolPublic
+
+	httpMethod := aDataSourceItem actualObject wsEndpointHttpMethod.
+	iconMap := { 
+		           (#get -> #testGreen).
+		           (#post -> #testYellow).
+		           (#put -> #testYellow).
+		           (#delete -> #testRed) } asDictionary.
+	anItemCellMorph definitionIcon:
+		(iconMap at: httpMethod ifAbsent: #testNotRun)
 ]
 
 { #category : #decoration }
