@@ -142,13 +142,6 @@ WSClientTest >> testExecute [
 ]
 
 { #category : #tests }
-WSClientTest >> testExecutorsOfPath [
-	| implementors |
-	implementors := client executorsOfPath: WSTestEndpoint endpointPath.
-	implementors isEmptyOrNil should not be
-]
-
-{ #category : #tests }
 WSClientTest >> testHttpClientCreation [
 	client stub.
 	client createHttpClient.

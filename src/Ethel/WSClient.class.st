@@ -73,12 +73,6 @@ WSClient class >> jsonWithUrl: aUrl httpConfiguration: aBlock [
 		yourself
 ]
 
-{ #category : #accessing }
-WSClient class >> pathReferences [
-	"Returns all path references found in related endpoint classes"
-	^ (self endpoints flatCollect: #pathReferences) asSet
-]
-
 { #category : #http }
 WSClient class >> supportedHttpMethods [
 	"Returns array of supported HTTP methods. These are used to identify and verify executing endpoint methods - any such method should declare a corresponding pragma."
@@ -122,19 +116,10 @@ WSClient >> createHttpClient [
 
 { #category : #endpoints }
 WSClient >> endpointForPath: aPath [
-	| endpoints |
 
-	endpoints := self class endpoints
-		select: [ :aClass | 
-			aClass ~= WSPluggableEndpoint
-				and: [ aClass endpointPath matches: aPath ] ].
-"	endpoints size > 1
-		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ]."
-	^ endpoints
-		ifEmpty: [ (WSPluggableEndpoint on: self)
-				path: aPath;
-				yourself ]
-		ifNotEmpty: [ :val | val anyOne on: self ]
+	^ (WSPluggableEndpoint on: self)
+		  path: aPath;
+		  yourself
 ]
 
 { #category : #execution }
@@ -157,17 +142,6 @@ WSClient >> execute: anEndpoint with: aBlock [
 		ifNotNil: [ :signal | signal emit: http ].
 	self validateResponse: http response.
 	^ result
-]
-
-{ #category : #accessing }
-WSClient >> executorsOfPath: aPath [
-	| pathsAndMethods |
-
-	pathsAndMethods := self class endpoints
-		flatCollect: [ :each | each pathReferences ].
-	^ pathsAndMethods
-		select: [ :each | each value matches: aPath ]
-		thenCollect: [ :each | each key ]
 ]
 
 { #category : #accessing }
