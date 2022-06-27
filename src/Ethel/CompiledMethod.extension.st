@@ -26,7 +26,7 @@ CompiledMethod >> wsEndpointHttpMethod [
 	self methodClass isWSEndpoint
 		ifFalse: [ ^ nil ].
 	methods := (self pragmas
-		collect: [ :p | p selector asLowercase asSymbol ])
+		collect: [ :p | p selector asLowercase asSymbol copyWithoutAll: ':' ])
 		intersection: self methodClass supportedHttpMethods.
 	^ methods ifEmpty: [ nil ] ifNotEmpty: [ methods first ]
 ]
