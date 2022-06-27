@@ -38,14 +38,12 @@ GHRestGistsEndpoint >> public [
 
 { #category : #traversing }
 GHRestGistsEndpoint >> publicForUsername: aUsername [
-	<path: '/users/{aUsername}/gists'>
-	<get>
+	<get: '/users/{aUsername}/gists'>
 	^ self execute
 ]
 
 { #category : #traversing }
 GHRestGistsEndpoint >> withId: anId [
-	<path: '{anId}'>
-	<get>
+	<get: '{anId}'>
 	^ self execute
 ]
