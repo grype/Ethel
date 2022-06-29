@@ -56,12 +56,6 @@ TWSEndpoint classSide >> endpointParamsPragma [
 	^ WSClient endpointParamsPragma 
 ]
 
-{ #category : #accessing }
-TWSEndpoint classSide >> endpointPath [
-	"Path that represents a logical endpoint whose behavior is encapsulated by the implementing class. In cases where this cannot be determined at the class level - simply return the top-most meaingful path, or the root path. TThis value can be overriden in two places: 1) instance side #endpointPath and 2) at a method level by declarating there a pragma with the keyword returned by #endpointPathPragma"
-	^ self subclassResponsibility
-]
-
 { #category : #'accessing-context' }
 TWSEndpoint classSide >> endpointPathPragma [
 	"By default retuns keywords defined by the framework, but can be overriden at the level of the endpoint itself"
