@@ -13,6 +13,11 @@ ManifestUnrest class >> ruleRBUtilityMethodsRuleV1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestUnrest class >> ruleToDoRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#Path #format: #false)) #'2022-06-28T22:11:10.835776-07:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestUnrest class >> ruleUtilityMethodsRuleV1FalsePositive [
 	^ #(#(#(#RGClassDefinition #(#WSClient)) #'2022-06-26T21:23:12.024633-07:00') )
 ]

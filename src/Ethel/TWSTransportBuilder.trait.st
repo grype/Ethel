@@ -8,6 +8,11 @@ Trait {
 	#category : #'Ethel-Builders'
 }
 
+{ #category : #'instance creation' }
+TWSTransportBuilder classSide >> fromPragma: aPragma [
+	^ self subclassResponsibility 
+]
+
 { #category : #building }
 TWSTransportBuilder >> buildOn: http [
 	^ self subclassResponsibility
