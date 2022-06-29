@@ -6,15 +6,15 @@ Class {
 	#category : #'Ethel-Tests-Models'
 }
 
-{ #category : #accessing }
-WSTestEndpoint class >> endpointPath [
-	^ Path / 'test'
-]
-
 { #category : #'private-executing' }
 WSTestEndpoint >> delete [
 	<delete>
 	^ self execute
+]
+
+{ #category : #accessing }
+WSTestEndpoint >> endpointPath [
+	^ Path / 'test'
 ]
 
 { #category : #'private-executing' }

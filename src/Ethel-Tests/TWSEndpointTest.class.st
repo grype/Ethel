@@ -150,7 +150,7 @@ TWSEndpointTest >> testEndpointCompositionWithString [
 
 { #category : #tests }
 TWSEndpointTest >> testEndpointPath [
-	endpoint endpointPath should equal: endpoint class endpointPath
+	endpoint endpointPath should be: nil
 ]
 
 { #category : #'tests-enumerating' }

@@ -12,17 +12,17 @@ Class {
 	#category : #'Ethel-Tests-Models'
 }
 
-{ #category : #accessing }
-WSCollectionTestEndpoint class >> endpointPath [
-	^ Path / 'another-test'
-]
-
 { #category : #enumerating }
 WSCollectionTestEndpoint >> cursor [
 	^ WSTestCursor new
 		offset: offset;
 		total: limit * 2.5;
 		yourself
+]
+
+{ #category : #accessing }
+WSCollectionTestEndpoint >> endpointPath [
+	^ Path / 'another-test'
 ]
 
 { #category : #initialization }
