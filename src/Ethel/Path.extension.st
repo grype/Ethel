@@ -1,6 +1,16 @@
 Extension { #name : #Path }
 
 { #category : #'*Ethel' }
+Path >> format: collection [
+	1 to: self size do: [ :index | 
+		| segment |
+
+		segment := self at: index.
+		segment isEmpty ifFalse: [ 
+			self at: index put: (segment format: collection) ] ]
+]
+
+{ #category : #'*Ethel' }
 Path >> matches: aPathOrPattern [
 	| other s1 s2 isRecursiveGlobbing b |
 

@@ -132,14 +132,14 @@ WSClient >> execute: anEndpoint [
 { #category : #execution }
 WSClient >> execute: anEndpoint with: aBlock [
 	| http result |
+
 	http := self createHttpClient.
-	anEndpoint configureFromContextOn: http.
-	anEndpoint configureOn: http.
+	anEndpoint build: http inContext: thisContext.
 	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.
 	result := http execute.
-	(Smalltalk at: #WrapperSignal ifAbsent: [ nil ])
-		ifNotNil: [ :signal | signal emit: http ].
+	(Smalltalk at: #WrapperSignal ifAbsent: [ nil ]) ifNotNil: [ :signal | 
+		signal emit: http ].
 	self validateResponse: http response.
 	^ result
 ]

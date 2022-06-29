@@ -102,30 +102,28 @@ TWSEndpoint >> / aStringOrEndpoint [
 	^ ep
 ]
 
-{ #category : #configuring }
-TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
-	"Configures newly derived endpoint"
+{ #category : #'building - transport' }
+TWSEndpoint >> build: http inContext: context [
+	| pragmas builders |
+
+	self endpointPath ifNotNil: [ :aPath | 
+		http url:
+			wsClient baseUrl / (aPath format: context wsEndpointTemps) segments ].
+
+	self configureOn: http.
+
+	pragmas := self executingContext method pragmas.
+	builders := TWSTransportBuilder users flatCollect: [ :builderClass | 
+		            pragmas collect: [ :aPragma | 
+			            builderClass fromPragma: aPragma ] ].
+	builders
+		select: [ :each | each isNotNil ]
+		thenDo: [ :builder | builder buildOn: http ]
 ]
 
 { #category : #configuring }
-TWSEndpoint >> configureFromContextOn: http [
-	| effectivePath contextValues segments |
-
-	effectivePath := self endpointPath.
-	contextValues := thisContext wsEndpointValues.
-
-	self executingContext
-		ifNotNil: [ :context | 
-			context wsEndpointPath ifNotNil: [ :val | effectivePath := val ].
-			(context
-				wsEndpointHttpMethodUsing: wsClient class supportedHttpMethods)
-				ifNotNil: [ :val | http method: val asUppercase asSymbol ].
-			context wsEndpointTemps
-				ifNotEmpty: [ :val | contextValues addAll: val ] ].
-
-	segments := effectivePath segments
-		collect: [ :segment | segment format: contextValues ].
-	http url: wsClient baseUrl / segments
+TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
+	"Configures newly derived endpoint"
 ]
 
 { #category : #configuring }
@@ -167,18 +165,6 @@ TWSEndpoint >> executingContext [
 TWSEndpoint >> initializeOn: aClient [
 	self initialize.
 	wsClient := aClient
-]
-
-{ #category : #configuring }
-TWSEndpoint >> prepareForExecutingOn: http [
-	self
-		deprecated: 'Use #configureFromContextOn: instead'
-		on: '31 July 2021'
-		in:
-		'Pharo-9.0.0+build.1539.sha.9b91f54a6e46f7518d14baf92fe0698c8a3260a3 (64 Bit)'
-		transformWith: '`@receiver prepareForExecutingOn:' -> '`@receiver configureFromContextOn:'.
-		
-	self configureFromContextOn: http
 ]
 
 { #category : #accessing }
