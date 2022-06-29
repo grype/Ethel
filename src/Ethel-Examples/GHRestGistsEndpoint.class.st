@@ -7,11 +7,6 @@ Class {
 	#category : #'Ethel-Examples-Github-REST'
 }
 
-{ #category : #accessing }
-GHRestGistsEndpoint class >> endpointPath [
-	^ Path / #gists
-]
-
 { #category : #traversing }
 GHRestGistsEndpoint >> createWithDescription: aDescription isPublic: isPublic files: aFilesDict [
 	"aFilesDict should be { #fileName -> 'file content'... }"
@@ -23,6 +18,11 @@ GHRestGistsEndpoint >> createWithDescription: aDescription isPublic: isPublic fi
 		-> (aFilesDict collect: [ :each | {(#content -> each)} asDictionary ]))}
 		asDictionary.
 	self execute
+]
+
+{ #category : #accessing }
+GHRestGistsEndpoint >> endpointPath [
+	^ Path / #gists
 ]
 
 { #category : #traversing }

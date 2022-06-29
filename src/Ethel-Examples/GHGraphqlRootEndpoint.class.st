@@ -9,11 +9,6 @@ Class {
 	#category : #'Ethel-Examples-Github-GraphQL'
 }
 
-{ #category : #accessing }
-GHGraphqlRootEndpoint class >> endpointPath [
-	^ Path root
-]
-
 { #category : #configuring }
 GHGraphqlRootEndpoint >> configureOn: http [
 	query
