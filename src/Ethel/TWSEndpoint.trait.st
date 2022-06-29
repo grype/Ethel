@@ -135,7 +135,8 @@ TWSEndpoint >> configureOn: http [
 
 { #category : #accessing }
 TWSEndpoint >> endpointPath [
-	^ self class endpointPath 
+	"Users can override baseUrl of the client by returning a Path object"
+	^ nil
 ]
 
 { #category : #executing }
