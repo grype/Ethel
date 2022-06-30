@@ -55,10 +55,3 @@ WSRequestMethodBuilderTest >> testBuildMethodOnly [
 	http request method should equal: #GET.
 	http request url path should equal: originalPath
 ]
-
-{ #category : #tests }
-WSRequestMethodBuilderTest >> testBuildOn [
-	self testBuildMethodOnly.
-	self testBuildMethodAndAbsolutePath.
-	self testBuildMethodAndRelativePath
-]

@@ -118,7 +118,7 @@ TWSEndpoint >> build: http inContext: context [
 			            builderClass fromPragma: aPragma ] ].
 	builders
 		select: [ :each | each isNotNil ]
-		thenDo: [ :builder | builder buildOn: http ]
+		thenDo: [ :builder | builder buildOn: http inContext: context ]
 ]
 
 { #category : #configuring }

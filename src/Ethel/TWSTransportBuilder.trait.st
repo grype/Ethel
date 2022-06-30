@@ -12,8 +12,3 @@ Trait {
 TWSTransportBuilder classSide >> fromPragma: aPragma [
 	^ self subclassResponsibility 
 ]
-
-{ #category : #building }
-TWSTransportBuilder >> buildOn: http [
-	^ self subclassResponsibility
-]

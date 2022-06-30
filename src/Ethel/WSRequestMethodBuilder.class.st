@@ -33,16 +33,6 @@ WSRequestMethodBuilder class >> supportedHttpMethods [
 	^ #( #get #post #put #patch #delete #options )
 ]
 
-{ #category : #building }
-WSRequestMethodBuilder >> buildOn: http [
-	httpMethod ifNotNil: [ :val | http method: val asUppercase ].
-	path ifNotNil: [ :val | 
-		| url |
-
-		url := http request url.
-		url segments: (Path / url path resolve: val) segments ]
-]
-
 { #category : #accessing }
 WSRequestMethodBuilder >> httpMethod [
 
