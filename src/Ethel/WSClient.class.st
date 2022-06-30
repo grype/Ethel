@@ -67,6 +67,11 @@ WSClient class >> supportedHttpMethods [
 	^ #(#get #post #put #patch #delete #options)
 ]
 
+{ #category : #icons }
+WSClient class >> systemIconName [
+	^ #remote
+]
+
 { #category : #'instance creation' }
 WSClient class >> withUrl: aUrl [
 	^ self basicNew initializeWithUrl: aUrl
