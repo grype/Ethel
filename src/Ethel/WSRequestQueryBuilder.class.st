@@ -34,6 +34,13 @@ WSRequestQueryBuilder class >> fromPragma: aPragma [
 		            yourself
 ]
 
+{ #category : #'building - transport' }
+WSRequestQueryBuilder >> buildOn: http inContext: aContext [
+	http request url perform: selector withArguments: { 
+			queryKey.
+			(queryValue format: aContext wsEndpointTemps) }
+]
+
 { #category : #accessing }
 WSRequestQueryBuilder >> queryKey [
 
