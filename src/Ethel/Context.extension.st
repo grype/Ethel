@@ -13,13 +13,6 @@ Context >> wsEndpointHttpMethodUsing: aListOfMethods [
 ]
 
 { #category : #'*Ethel' }
-Context >> wsEndpointPath [
-	^ self method isWSEndpointExecutionMethod
-		ifTrue: [ self method wsEndpointPath ]
-		ifFalse: [ nil ]
-]
-
-{ #category : #'*Ethel' }
 Context >> wsEndpointTemps [
 	^ (self tempNames collect: [ :each | each -> (self tempNamed: each) ])
 		asDictionary

@@ -50,28 +50,9 @@ Trait {
 	#category : #'Ethel-Core'
 }
 
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointParamsPragma [
-	"By default retuns keywords defined by the framework, but can be overriden at the level of the endpoint itself"
-	^ WSClient endpointParamsPragma 
-]
-
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointPathPragma [
-	"By default retuns keywords defined by the framework, but can be overriden at the level of the endpoint itself"
-	^ WSClient endpointPathPragma 
-]
-
 { #category : #'instance creation' }
 TWSEndpoint classSide >> on: wsClient [
 	^ self basicNew initializeOn: wsClient
-]
-
-{ #category : #accessing }
-TWSEndpoint classSide >> pathReferences [
-	^ (self wsEndpointExecutingMethods
-		collect: [ :aMethod | aMethod -> (aMethod wsEndpointPath) ])
-		asSet
 ]
 
 { #category : #'accessing-context' }

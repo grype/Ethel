@@ -33,18 +33,6 @@ Class {
 	#category : #'Ethel-Core'
 }
 
-{ #category : #defaults }
-WSClient class >> endpointParamsPragma [
-	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
-	^ #params:
-]
-
-{ #category : #defaults }
-WSClient class >> endpointPathPragma [
-	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
-	^ #path:
-]
-
 { #category : #accessing }
 WSClient class >> endpoints [
 	"Return collection of endpoint classes associated with this client type. 
