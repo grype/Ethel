@@ -25,29 +25,25 @@ WSTestEndpoint >> get [
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getAbsolute [
-	<path: '/absolute'>
-	<get>
+	<get: '/absolute'>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getAbsoluteDeep [
-	<path: '/absolute/deep/path'>
-	<get>
+	<get: '/absolute/deep/path'>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getAbsoluteKeyword: anArgument [
-	<path: '/{anArgument}'>
-	<get>
+	<get: '/{anArgument}'>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getAbsoluteMixed: anArgument [
-	<path: '/absolute/{local}/{anArgument}/path'>
-	<get>
+	<get: '/absolute/{local}/{anArgument}/path'>
 	| local |
 	local := 'mixed'.
 	^ self execute
@@ -55,29 +51,25 @@ WSTestEndpoint >> getAbsoluteMixed: anArgument [
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getRelative [
-	<path: 'relative'>
-	<get>
+	<get: 'relative'>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getRelativeDeep [
-	<path: 'relative/deep/path'>
-	<get>
+	<get: 'relative/deep/path'>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getRelativeKeyword: anArgument [
-	<path: '{anArgument}'>
-	<get>
+	<get: '{anArgument}'>
 	^ self execute
 ]
 
 { #category : #'private-executing' }
 WSTestEndpoint >> getRelativeMixed: anArgument [
-	<path: 'relative/{local}/{anArgument}/path'>
-	<get>
+	<get: 'relative/{local}/{anArgument}/path'>
 	| local |
 	local := 'mixed'.
 	^ self execute

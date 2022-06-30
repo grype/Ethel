@@ -11,7 +11,7 @@ Class {
 WSClientTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
 	aDestination class should equal: aClass.
 	aDestination wsClient should equal: aSource.
-	aDestination endpointPath should equal: aClass endpointPath
+	aDestination endpointPath should equal: aClass new endpointPath
 ]
 
 { #category : #tests }
@@ -64,13 +64,13 @@ WSClientTest >> testEndpointCompositionWithClass [
 WSClientTest >> testEndpointCompositionWithPath [
 	self
 		ensureEndpoint: client / (Path / #test)
-		derivedFrom: client
-		as: WSTestEndpoint.
+		derivedPluggableEndpointFrom: client
+		usingPath: Path / #test.
 
 	self
 		ensureEndpoint: client / (Path * #test)
-		derivedFrom: client
-		as: WSTestEndpoint.
+		derivedPluggableEndpointFrom: client
+		usingPath: (client / #test) endpointPath.
 
 	self
 		ensureEndpoint: client / (Path / #nothing / #here)
@@ -82,18 +82,18 @@ WSClientTest >> testEndpointCompositionWithPath [
 WSClientTest >> testEndpointCompositionWithString [
 	self
 		ensureEndpoint: client / #test
-		derivedFrom: client
-		as: WSTestEndpoint.
+		derivedPluggableEndpointFrom: client
+		usingPath: Path / #test.
 
 	self
 		ensureEndpoint: client / #test / #nested
-		derivedFrom: client
-		as: WSNestedTestEndpoint.
+		derivedPluggableEndpointFrom: client
+		usingPath: Path / #test / #nested.
 
 	self
 		ensureEndpoint: client / 'test/nested'
-		derivedFrom: client
-		as: WSNestedTestEndpoint.
+		derivedPluggableEndpointFrom: client
+		usingPath: Path / #test / #nested.
 
 	self
 		ensureEndpoint: client / #nothing / #here

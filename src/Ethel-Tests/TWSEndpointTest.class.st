@@ -14,7 +14,7 @@ Class {
 TWSEndpointTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
 	aDestination class should equal: aClass.
 	aDestination wsClient should equal: aSource wsClient.
-	aDestination endpointPath should equal: aClass endpointPath.
+	aDestination endpointPath should equal: aDestination endpointPath.
 	(aDestination headers keys includesAll: aSource headers keys) should be
 ]
 
@@ -121,13 +121,13 @@ TWSEndpointTest >> testEndpointCompositionWithClass [
 TWSEndpointTest >> testEndpointCompositionWithPath [
 	self
 		ensureEndpoint: endpoint / (Path * #nested)
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint.
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: endpoint endpointPath / #nested.
 
 	self
 		ensureEndpoint: endpoint / (Path / #test / #nested)
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint.
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #test / #nested.
 
 	self
 		ensureEndpoint: endpoint / (Path / #nested)
@@ -136,21 +136,21 @@ TWSEndpointTest >> testEndpointCompositionWithPath [
 
 	self
 		ensureEndpoint: endpoint / (Path / #test)
-		derivedFrom: endpoint
-		as: WSTestEndpoint
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #test
 ]
 
 { #category : #'tests-composing' }
 TWSEndpointTest >> testEndpointCompositionWithString [
 	self
 		ensureEndpoint: endpoint / #nested
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: endpoint endpointPath / #nested
 ]
 
 { #category : #tests }
 TWSEndpointTest >> testEndpointPath [
-	endpoint endpointPath should be: nil
+	endpoint endpointPath should not be: nil
 ]
 
 { #category : #'tests-enumerating' }
