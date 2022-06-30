@@ -159,15 +159,6 @@ WSClientTest >> testIsWSEndpoint [
 ]
 
 { #category : #tests }
-WSClientTest >> testPathReferences [
-	| paths |
-
-	paths := client class pathReferences.
-	paths should
-		equal: (client class endpoints flatCollect: #pathReferences)
-]
-
-{ #category : #tests }
 WSClientTest >> testPluggableEndpointComposition [
 	| ep |
 	ep := client / 'pluggable'.

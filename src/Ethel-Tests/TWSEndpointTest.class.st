@@ -314,16 +314,6 @@ TWSEndpointTest >> testOn [
 	tempEndpoint wsClient should equal: client
 ]
 
-{ #category : #tests }
-TWSEndpointTest >> testPathReferences [
-	| execMethods refs |
-
-	execMethods := (endpoint class methods
-		select: [ :each | each category = #'private-executing' ]) asSet.
-	refs := endpoint class pathReferences asSet.
-	(refs collect: #key) should equal: execMethods
-]
-
 { #category : #'tests-composing' }
 TWSEndpointTest >> testPluggableEndpointComposition [
 	| ep |
