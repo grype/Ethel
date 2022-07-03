@@ -9,32 +9,41 @@ Class {
 
 { #category : #tests }
 WSRequestMethodBuilderTest >> testBuildMethodAndAbsolutePath [
-	| builder http |
+	| http visitor |
 
-	builder := WSRequestMethodBuilder new
-		           httpMethod: #get;
-		           path: Path / 'omg';
-		           yourself.
 	http := ZnClient new
 		        url: 'http://example.com/one/two' asUrl;
 		        yourself.
-	builder buildOn: http.
+
+	visitor := WSZincTransportVisitor
+		           onTransport: http
+		           inContext: thisContext.
+	WSRequestMethodBuilder new
+		httpMethod: #get;
+		path: Path / 'omg';
+		accept: visitor.
+
 	http request method should equal: #GET.
-	http request url path should equal: 'http://example.com/omg' asUrl path
+	http request url path should equal:
+		'http://example.com/omg' asUrl path
 ]
 
 { #category : #tests }
 WSRequestMethodBuilderTest >> testBuildMethodAndRelativePath [
-	| builder http |
+	| http visitor |
 
-	builder := WSRequestMethodBuilder new
-		           httpMethod: #get;
-		           path: Path * 'omg';
-		           yourself.
 	http := ZnClient new
 		        url: 'http://example.com/one/two' asUrl;
 		        yourself.
-	builder buildOn: http.
+
+	visitor := WSZincTransportVisitor
+		           onTransport: http
+		           inContext: thisContext.
+	WSRequestMethodBuilder new
+		httpMethod: #get;
+		path: Path * 'omg';
+		accept: visitor.
+
 	http request method should equal: #GET.
 	http request url path should equal:
 		'http://example.com/one/two/omg' asUrl path
@@ -42,16 +51,20 @@ WSRequestMethodBuilderTest >> testBuildMethodAndRelativePath [
 
 { #category : #tests }
 WSRequestMethodBuilderTest >> testBuildMethodOnly [
-	| builder http originalPath |
+	| http originalPath visitor |
 
-	builder := WSRequestMethodBuilder new
-		           httpMethod: #get;
-		           yourself.
 	http := ZnClient new
 		        url: 'http://example.com/one/two' asUrl;
 		        yourself.
 	originalPath := http request url path.
-	builder buildOn: http.
+
+	visitor := WSZincTransportVisitor
+		           onTransport: http
+		           inContext: thisContext.
+	WSRequestMethodBuilder new
+		httpMethod: #get;
+		accept: visitor.
+
 	http request method should equal: #GET.
 	http request url path should equal: originalPath
 ]
