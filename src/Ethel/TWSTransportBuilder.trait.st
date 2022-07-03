@@ -14,6 +14,5 @@ TWSTransportBuilder classSide >> fromPragma: aPragma [
 ]
 
 { #category : #'building - transport' }
-TWSTransportBuilder >> buildOn: http inContext: aContext [
-	^ self subclassResponsibility
+TWSTransportBuilder >> accept: aTransportVisitor [
 ]

@@ -33,11 +33,9 @@ WSRequestHeaderBuilder class >> fromPragma: aPragma [
 		            yourself
 ]
 
-{ #category : #'building - transport' }
-WSRequestHeaderBuilder >> buildOn: http inContext: aContext [
-	http perform: selector withArguments: { 
-			headerKey.
-			(headerValue format: aContext wsEndpointTemps) }
+{ #category : #visiting }
+WSRequestHeaderBuilder >> accept: aTransportVisitor [
+	aTransportVisitor visitRequestHeaderBuilder: self
 ]
 
 { #category : #accessing }

@@ -34,16 +34,8 @@ WSRequestMethodBuilder class >> supportedHttpMethods [
 ]
 
 { #category : #'building - transport' }
-WSRequestMethodBuilder >> buildOn: http inContext: aContext [
-	httpMethod ifNotNil: [ :val | http method: val asUppercase ].
-	path ifNotNil: [ :val | 
-		| url newPath |
-
-		url := http request url.
-		newPath := aContext
-			           ifNil: [ val ]
-			           ifNotNil: [ :ctx | val format: ctx wsEndpointTemps ].
-		url segments: (Path / url path resolve: newPath) segments ]
+WSRequestMethodBuilder >> accept: aTransportVisitor [
+	aTransportVisitor visitRequestMethodBuilder: self
 ]
 
 { #category : #accessing }

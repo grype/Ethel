@@ -16,8 +16,7 @@ Class {
 
 { #category : #'instance creation' }
 WSRequestQueryBuilder class >> allowedSelectors [
-	^ #( #queryAt:put: #queryAt:add: #queryAt:ifAbsent:
-	     #queryAt:ifPresent: )
+	^ #( #queryAt:put: #queryAt:add:)
 ]
 
 { #category : #'instance creation' }
@@ -35,10 +34,8 @@ WSRequestQueryBuilder class >> fromPragma: aPragma [
 ]
 
 { #category : #'building - transport' }
-WSRequestQueryBuilder >> buildOn: http inContext: aContext [
-	http request url perform: selector withArguments: { 
-			queryKey.
-			(queryValue format: aContext wsEndpointTemps) }
+WSRequestQueryBuilder >> accept: aTransportVisitor [
+	aTransportVisitor visitRequestQueryBuilder: self
 ]
 
 { #category : #accessing }

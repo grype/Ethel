@@ -85,7 +85,7 @@ TWSEndpoint >> / aStringOrEndpoint [
 
 { #category : #'building - transport' }
 TWSEndpoint >> build: http inContext: context [
-	| pragmas builders |
+	| pragmas builders visitor |
 
 	self endpointPath ifNotNil: [ :aPath | 
 		http url:
@@ -93,13 +93,14 @@ TWSEndpoint >> build: http inContext: context [
 
 	self configureOn: http.
 
-	pragmas := self executingContext method pragmas.
-	builders := TWSTransportBuilder users flatCollect: [ :builderClass | 
+	pragmas := context method pragmas.
+	builders := TWSTransportBuilder users compactCollect: [ :builderClass | 
 		            pragmas collect: [ :aPragma | 
 			            builderClass fromPragma: aPragma ] ].
-	builders
-		select: [ :each | each isNotNil ]
-		thenDo: [ :builder | builder buildOn: http inContext: context ]
+	visitor := WSZincTransportVisitor
+		           onTransport: http
+		           inContext: context.
+	builders do: [ :builder | builder accept: visitor ]
 ]
 
 { #category : #configuring }
