@@ -94,9 +94,10 @@ TWSEndpoint >> build: http inContext: context [
 	self configureOn: http.
 
 	pragmas := context method pragmas.
-	builders := TWSTransportBuilder users compactCollect: [ :builderClass | 
-		            pragmas collect: [ :aPragma | 
-			            builderClass fromPragma: aPragma ] ].
+	builders := TWSTransportBuilder users flatCollect: [ :builderClass | 
+		            pragmas
+			            collect: [ :aPragma | builderClass fromPragma: aPragma ]
+			            thenSelect: #isNotNil ].
 	visitor := WSZincTransportVisitor
 		           onTransport: http
 		           inContext: context.
