@@ -21,25 +21,28 @@ WSZincTransportVisitor >> visitContentBuilder: aBuilder [
 WSZincTransportVisitor >> visitRequestHeaderBuilder: aHeaderBuilder [
 	transport perform: aHeaderBuilder selector withArguments: { 
 			aHeaderBuilder headerKey.
-			(aHeaderBuilder headerValue format: context wsEndpointTemps) }
+			(self format: aHeaderBuilder headerValue) }
 ]
 
 { #category : #visiting }
 WSZincTransportVisitor >> visitRequestMethodBuilder: aBuilder [
-	aBuilder httpMethod ifNotNil: [ :val | transport method: val asUppercase ].
-	aBuilder path ifNotNil: [ :val | 
+	aBuilder httpMethod ifNotNil: [ :httpMethod | 
+		transport method: httpMethod asUppercase ].
+
+	aBuilder path ifNotNil: [ :path | 
 		| url newPath |
 
 		url := transport request url.
 		newPath := context
-			           ifNil: [ val ]
-			           ifNotNil: [ :ctx | val format: ctx wsEndpointTemps ].
-		transport request url segments: (Path / url path resolve: newPath) segments ]
+			           ifNil: [ path ]
+			           ifNotNil: [ :ctx | self format: path ].
+		transport request url segments:
+			(Path / url path resolve: newPath) segments ]
 ]
 
 { #category : #visiting }
 WSZincTransportVisitor >> visitRequestQueryBuilder: aBuilder [
 	transport request url perform: aBuilder selector withArguments: { 
 			aBuilder queryKey.
-			(aBuilder queryValue format: context wsEndpointTemps) }
+			(self format: aBuilder queryValue) }
 ]

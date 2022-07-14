@@ -29,6 +29,14 @@ TWSTransportVisitor >> context: anObject [
 	context := anObject
 ]
 
+{ #category : #visiting }
+TWSTransportVisitor >> format: aStringOrValueNode [
+	^ context ifNil: [ aStringOrValueNode ] ifNotNil: [ :ctx | 
+		  (aStringOrValueNode isKindOf: RBValueNode)
+			  ifTrue: [ aStringOrValueNode evaluateForContext: ctx ]
+			  ifFalse: [ aStringOrValueNode format: ctx wsEndpointTemps ] ]
+]
+
 { #category : #initialization }
 TWSTransportVisitor >> initializeWithTransport: aTransport inContext: aContext [
 	self initialize.

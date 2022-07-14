@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #'code-critics' }
+ManifestEthel class >> ruleBadMessageRule2V1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#TWSTransportVisitor #format: #false)) #'2022-07-13T23:23:24.468368-07:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestEthel class >> ruleUtilityMethodsRuleV1FalsePositive [
 	^ #(#(#(#RGPackageDefinition #(#Ethel)) #'2022-07-03T00:45:33.97343-07:00') )
 ]
