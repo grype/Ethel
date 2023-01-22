@@ -21,16 +21,16 @@ WSRequestHeaderBuilder class >> allowedSelectors [
 
 { #category : #'instance creation' }
 WSRequestHeaderBuilder class >> fromPragma: aPragma [
-	| selector args instance |
 
+	| selector args |
 	selector := aPragma selector.
 	args := aPragma arguments.
 	(self allowedSelectors includes: selector) ifFalse: [ ^ nil ].
-	instance := self new
-		            headerKey: args first asString;
-		            headerValue: args last;
-		            selector: selector;
-		            yourself
+	^ self new
+		  headerKey: args first asString;
+		  headerValue: args last;
+		  selector: selector;
+		  yourself
 ]
 
 { #category : #visiting }

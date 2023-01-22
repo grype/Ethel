@@ -21,16 +21,16 @@ WSRequestQueryBuilder class >> allowedSelectors [
 
 { #category : #'instance creation' }
 WSRequestQueryBuilder class >> fromPragma: aPragma [
-	| selector args instance |
 
+	| selector args |
 	selector := aPragma selector.
 	args := aPragma arguments.
 	(self allowedSelectors includes: selector) ifFalse: [ ^ nil ].
-	instance := self new
-		            queryKey: args first asString;
-		            queryValue: args last;
-		            selector: selector;
-		            yourself
+	^ self new
+		  queryKey: args first asString;
+		  queryValue: args last;
+		  selector: selector;
+		  yourself
 ]
 
 { #category : #'building - transport' }
