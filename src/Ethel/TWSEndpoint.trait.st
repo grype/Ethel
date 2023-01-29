@@ -114,12 +114,6 @@ TWSEndpoint >> configureOn: http [
 	"Configures http transport prior to execution"
 ]
 
-{ #category : #accessing }
-TWSEndpoint >> endpointPath [
-	"Users can override baseUrl of the client by returning a Path object"
-	^ nil
-]
-
 { #category : #executing }
 TWSEndpoint >> execute [
 	^ self execute: nil

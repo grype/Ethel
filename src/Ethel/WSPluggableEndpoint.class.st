@@ -89,11 +89,6 @@ WSPluggableEndpoint >> delete: aBlock [
 ]
 
 { #category : #accessing }
-WSPluggableEndpoint >> endpointPath [
-	^ path
-]
-
-{ #category : #accessing }
 WSPluggableEndpoint >> enumeration [
 	^ enumeration
 ]
