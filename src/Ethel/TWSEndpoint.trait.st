@@ -85,12 +85,8 @@ TWSEndpoint >> / aStringOrEndpoint [
 
 { #category : #'building - transport' }
 TWSEndpoint >> build: http inContext: context [
+
 	| pragmas builders visitor |
-
-	self endpointPath ifNotNil: [ :aPath | 
-		http url:
-			wsClient baseUrl / (aPath format: context wsEndpointTemps) segments ].
-
 	self configureOn: http.
 
 	pragmas := context method pragmas.
