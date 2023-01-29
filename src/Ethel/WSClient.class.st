@@ -78,14 +78,14 @@ WSClient class >> withUrl: aUrl [
 ]
 
 { #category : #endpoints }
-WSClient >> / aPathObject [
-	^ aPathObject isWSEndpoint
-		ifTrue: [ aPathObject on: self ]
-		ifFalse: [ self
-				endpointForPath:
-					((aPathObject isKindOf: Path)
-						ifTrue: [ aPathObject asResolvedBy: Path root ]
-						ifFalse: [ Path / aPathObject asString ]) ]
+WSClient >> / aPathOrEndpoint [
+
+	^ aPathOrEndpoint isWSEndpoint
+		  ifTrue: [ aPathOrEndpoint on: self ]
+		  ifFalse: [ 
+			  (WSPluggableEndpoint on: self)
+				  resolve: aPathOrEndpoint;
+				  yourself ]
 ]
 
 { #category : #accessing }

@@ -69,16 +69,9 @@ TWSEndpoint classSide >> systemIconName [
 
 { #category : #endpoints }
 TWSEndpoint >> / aStringOrEndpoint [
+
 	| ep |
-
-	ep := aStringOrEndpoint isWSEndpoint
-		ifTrue: [ self wsClient / aStringOrEndpoint ]
-		ifFalse: [ | path |
-
-			path := (aStringOrEndpoint isKindOf: Path)
-				ifTrue: [ self endpointPath resolvePath: aStringOrEndpoint ]
-				ifFalse: [ self endpointPath / aStringOrEndpoint ].
-			self wsClient / path ].
+	ep := self wsClient / aStringOrEndpoint.
 	self configureDerivedEndpoint: ep.
 	^ ep
 ]
