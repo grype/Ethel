@@ -107,14 +107,6 @@ WSClient >> createHttpClient [
 	^ client
 ]
 
-{ #category : #endpoints }
-WSClient >> endpointForPath: aPath [
-
-	^ (WSPluggableEndpoint on: self)
-		  path: aPath;
-		  yourself
-]
-
 { #category : #execution }
 WSClient >> execute: anEndpoint [
 	^ self
