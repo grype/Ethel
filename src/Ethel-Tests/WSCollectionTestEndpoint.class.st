@@ -20,11 +20,6 @@ WSCollectionTestEndpoint >> cursor [
 		yourself
 ]
 
-{ #category : #accessing }
-WSCollectionTestEndpoint >> endpointPath [
-	^ Path / 'another-test'
-]
-
 { #category : #initialization }
 WSCollectionTestEndpoint >> initialize [
 	super initialize.
