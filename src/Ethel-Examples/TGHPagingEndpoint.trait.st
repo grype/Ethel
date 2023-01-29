@@ -4,15 +4,16 @@ Trait {
 		'page',
 		'pageSize'
 	],
-	#traits : 'TWSEnumeration',
-	#classTraits : 'TWSEnumeration classTrait',
+	#traits : 'TGHEndpoint + TWSEnumeration',
+	#classTraits : 'TGHEndpoint classTrait + TWSEnumeration classTrait',
 	#category : #'Ethel-Examples-Github-REST'
 }
 
 { #category : #configuring }
 TGHPagingEndpoint >> configurePaginationOn: http [
-	http queryAt: #page put: page.
-	http queryAt: #per_page put: pageSize
+
+	page ifNotNil: [ :val | http queryAt: #page put: val ].
+	pageSize ifNotNil: [ :val | http queryAt: #per_page put: val ]
 ]
 
 { #category : #accessing }

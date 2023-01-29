@@ -1,8 +1,8 @@
 Class {
 	#name : #GHRestAbstractGistsEndpoint,
 	#superclass : #Object,
-	#traits : 'TWSEndpoint',
-	#classTraits : 'TWSEndpoint classTrait',
+	#traits : 'TGHEndpoint',
+	#classTraits : 'TGHEndpoint classTrait',
 	#instVars : [
 		'since'
 	],
@@ -11,8 +11,14 @@ Class {
 
 { #category : #configuring }
 GHRestAbstractGistsEndpoint >> configureOn: http [
-	since
-		ifNotNil: [ :aDateAndTime | http queryAt: #since put: aDateAndTime printString ]
+
+	http request url
+		clearPath;
+		addPathSegments:
+			(wsClient basePath resolve: self endpointPath) segments.
+
+	since ifNotNil: [ :aDateAndTime | 
+		http queryAt: #since put: aDateAndTime printString ]
 ]
 
 { #category : #accessing }
