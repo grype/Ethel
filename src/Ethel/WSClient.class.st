@@ -88,6 +88,11 @@ WSClient >> / aPathOrEndpoint [
 				  yourself ]
 ]
 
+{ #category : #'as yet unclassified' }
+WSClient >> basePath [
+	^ Path root resolve: baseUrl path
+]
+
 { #category : #accessing }
 WSClient >> baseUrl [
 	^ baseUrl
@@ -101,10 +106,8 @@ WSClient >> configureOn: http [
 
 { #category : #http }
 WSClient >> createHttpClient [
-	| client |
-	client := ZnClient new.
-	self configureOn: client.
-	^ client
+
+	^ ZnClient new
 ]
 
 { #category : #execution }
@@ -119,6 +122,7 @@ WSClient >> execute: anEndpoint with: aBlock [
 	| http result |
 
 	http := self createHttpClient.
+	self configureOn: http.
 	anEndpoint build: http inContext: anEndpoint executingContext.
 	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.

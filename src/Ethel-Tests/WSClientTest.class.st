@@ -9,16 +9,16 @@ Class {
 
 { #category : #tests }
 WSClientTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
+
 	aDestination class should equal: aClass.
-	aDestination wsClient should equal: aSource.
-	aDestination endpointPath should equal: aClass new endpointPath
+	aDestination wsClient should equal: aSource
 ]
 
 { #category : #tests }
 WSClientTest >> ensureEndpoint: aDestination derivedPluggableEndpointFrom: aSource usingPath: aPath [
+
 	aDestination class should equal: WSPluggableEndpoint.
-	aDestination wsClient should equal: aSource.
-	aDestination endpointPath should equal: aPath
+	aDestination wsClient should equal: aSource
 ]
 
 { #category : #running }
@@ -70,7 +70,7 @@ WSClientTest >> testEndpointCompositionWithPath [
 	self
 		ensureEndpoint: client / (Path * #test)
 		derivedPluggableEndpointFrom: client
-		usingPath: (client / #test) endpointPath.
+		usingPath: client / #test.
 
 	self
 		ensureEndpoint: client / (Path / #nothing / #here)
@@ -142,13 +142,6 @@ WSClientTest >> testExecute [
 ]
 
 { #category : #tests }
-WSClientTest >> testHttpClientCreation [
-	client stub.
-	client createHttpClient.
-	client should receive configureOn: (Instance of: ZnClient)
-]
-
-{ #category : #tests }
 WSClientTest >> testInitialization [
 	client baseUrl should equal: client class baseUrl 
 ]
@@ -160,11 +153,11 @@ WSClientTest >> testIsWSEndpoint [
 
 { #category : #tests }
 WSClientTest >> testPluggableEndpointComposition [
+
 	| ep |
 	ep := client / 'pluggable'.
 	ep class should equal: WSPluggableEndpoint.
-	ep wsClient should equal: client.
-	ep endpointPath should equal: Path / 'pluggable'.
+	ep wsClient should equal: client
 ]
 
 { #category : #tests }

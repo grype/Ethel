@@ -182,3 +182,11 @@ WSPluggableEndpoint >> put: aBlock [
 	method := #put.
 	^ self execute: aBlock
 ]
+
+{ #category : #resolving }
+WSPluggableEndpoint >> resolve: aPathOrString [
+
+	path := (path ifNil: [ Path root ]) resolve: (aPathOrString isString
+			         ifTrue: [ Path * aPathOrString ]
+			         ifFalse: [ aPathOrString ])
+]
