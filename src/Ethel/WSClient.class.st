@@ -88,7 +88,7 @@ WSClient >> / aPathOrEndpoint [
 				  yourself ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WSClient >> basePath [
 	^ Path root resolve: baseUrl path
 ]
