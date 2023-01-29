@@ -90,7 +90,10 @@ WSClient >> / aPathOrEndpoint [
 
 { #category : #accessing }
 WSClient >> basePath [
-	^ Path root resolve: baseUrl path
+
+	^ (self baseUrl path ifEmpty: [ nil ])
+		  ifNil: [ Path root ]
+		  ifNotNil: [ :val | Path root / val ]
 ]
 
 { #category : #accessing }
