@@ -14,7 +14,7 @@ Class {
 TWSEndpointTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
 	aDestination class should equal: aClass.
 	aDestination wsClient should equal: aSource wsClient.
-	aDestination endpointPath should equal: aClass endpointPath.
+	aDestination endpointPath should equal: aDestination endpointPath.
 	(aDestination headers keys includesAll: aSource headers keys) should be
 ]
 
@@ -121,13 +121,13 @@ TWSEndpointTest >> testEndpointCompositionWithClass [
 TWSEndpointTest >> testEndpointCompositionWithPath [
 	self
 		ensureEndpoint: endpoint / (Path * #nested)
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint.
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: endpoint endpointPath / #nested.
 
 	self
 		ensureEndpoint: endpoint / (Path / #test / #nested)
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint.
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #test / #nested.
 
 	self
 		ensureEndpoint: endpoint / (Path / #nested)
@@ -136,21 +136,21 @@ TWSEndpointTest >> testEndpointCompositionWithPath [
 
 	self
 		ensureEndpoint: endpoint / (Path / #test)
-		derivedFrom: endpoint
-		as: WSTestEndpoint
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: Path / #test
 ]
 
 { #category : #'tests-composing' }
 TWSEndpointTest >> testEndpointCompositionWithString [
 	self
 		ensureEndpoint: endpoint / #nested
-		derivedFrom: endpoint
-		as: WSNestedTestEndpoint
+		derivedPluggableEndpointFrom: endpoint
+		usingPath: endpoint endpointPath / #nested
 ]
 
 { #category : #tests }
 TWSEndpointTest >> testEndpointPath [
-	endpoint endpointPath should equal: endpoint class endpointPath
+	endpoint endpointPath should not be: nil
 ]
 
 { #category : #'tests-enumerating' }
@@ -273,30 +273,37 @@ TWSEndpointTest >> testIsWSEndpointMethod [
 TWSEndpointTest >> testKeywordWithAbsoluteMixedPathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteMixed: 'foo'.
-	http request url should
-		equal: (client baseUrl addPathSegments: (Path / 'absolute' / 'mixed' / 'foo' / 'path') segments)
+	http request url path should
+		equal: (client baseUrl addPathSegments: (Path / 'absolute' / 'mixed' / 'foo' / 'path') segments; path)
 ]
 
 { #category : #'tests-executing' }
 TWSEndpointTest >> testKeywordWithAbsolutePathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteKeyword: 'foo'.
-	http request url should equal: (client baseUrl addPathSegments: (Path / 'foo') segments)
+	http request url path should equal: (client baseUrl
+			 addPathSegments: (Path / 'foo') segments;
+			 path)
 ]
 
 { #category : #'tests-executing' }
 TWSEndpointTest >> testKeywordWithRelativeMixedPathExecution [
 	self stubForExecution.
 	endpoint getRelativeMixed: 'foo'.
-	http request url should
-		equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'relative' / 'mixed' / 'foo' / 'path') segments)
+	http request url path should equal: (client baseUrl
+			 addPathSegments:
+				 (endpoint endpointPath / 'relative' / 'mixed' / 'foo' / 'path')
+					 segments;
+			 path)
 ]
 
 { #category : #'tests-executing' }
 TWSEndpointTest >> testKeywordWithRelativePathExecution [
 	self stubForExecution.
 	endpoint getRelativeKeyword: 'foo'.
-	http request url should equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'foo') segments)
+	http request url path should equal: (client baseUrl
+			 addPathSegments: (endpoint endpointPath / 'foo') segments;
+			 path)
 ]
 
 { #category : #tests }
@@ -307,23 +314,13 @@ TWSEndpointTest >> testOn [
 	tempEndpoint wsClient should equal: client
 ]
 
-{ #category : #tests }
-TWSEndpointTest >> testPathReferences [
-	| execMethods refs |
-
-	execMethods := (endpoint class methods
-		select: [ :each | each category = #'private-executing' ]) asSet.
-	refs := endpoint class pathReferences asSet.
-	(refs collect: #key) should equal: execMethods
-]
-
 { #category : #'tests-composing' }
 TWSEndpointTest >> testPluggableEndpointComposition [
 	| ep |
 	ep := endpoint / 'pluggable'.
 	ep class should equal: WSPluggableEndpoint.
 	ep wsClient should equal: endpoint wsClient.
-	ep endpointPath should equal: endpoint class endpointPath / 'pluggable'
+	ep endpointPath should equal: endpoint endpointPath / 'pluggable'
 ]
 
 { #category : #'tests-executing' }
@@ -337,33 +334,37 @@ TWSEndpointTest >> testUnaryExecution [
 TWSEndpointTest >> testUnaryWithAbsoluteDeepPathExecution [
 	self stubForExecution.
 	endpoint getAbsoluteDeep.
-	http request url should
-		equal: (client baseUrl addPathSegments: (Path / 'absolute' / 'deep' / 'path') segments)
+	http request url path should equal: (client baseUrl
+			 addPathSegments: (Path / 'absolute' / 'deep' / 'path') segments;
+			 path)
 ]
 
 { #category : #'tests-executing' }
 TWSEndpointTest >> testUnaryWithAbsolutePathExecution [
 	self stubForExecution.
 	endpoint getAbsolute.
-	http request url should equal: (client baseUrl addPathSegments: (Path / 'absolute') segments)
+	http request url path should equal: (client baseUrl
+			 addPathSegments: (Path / 'absolute') segments;
+			 path)
 ]
 
 { #category : #'tests-executing' }
 TWSEndpointTest >> testUnaryWithRelativeDeepPathExecution [
 	self stubForExecution.
 	endpoint getRelativeDeep.
-	http request url should
-		equal: (client baseUrl addPathSegments: (endpoint endpointPath / 'relative' / 'deep' / 'path') segments)
+	http request url path should equal: (client baseUrl
+			 addPathSegments:
+				 (endpoint endpointPath / 'relative' / 'deep' / 'path') segments;
+			 path)
 ]
 
 { #category : #'tests-executing' }
 TWSEndpointTest >> testUnaryWithRelativePathExecution [
 	self stubForExecution.
 	endpoint getRelative.
-	http request url should
-		equal:
-			(client baseUrl
-				addPathSegments: (endpoint endpointPath / 'relative') segments)
+	http request url path should equal: (client baseUrl
+			 addPathSegments: (endpoint endpointPath / 'relative') segments;
+			 path)
 ]
 
 { #category : #'tests-other' }

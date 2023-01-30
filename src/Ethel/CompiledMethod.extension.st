@@ -11,34 +11,15 @@ CompiledMethod >> isWSEndpointReferencingMethod [
 ]
 
 { #category : #'*Ethel' }
-CompiledMethod >> wsEndpointExecutionParams [
-	self methodClass isWSEndpoint
-		ifFalse: [ ^ nil ].
-	^ (self pragmaAt: self methodClass endpointParamsPragma)
-		ifNil: [ self ffiArgumentNames ]
-		ifNotNil: [ :val | val arguments first ]
-]
-
-{ #category : #'*Ethel' }
 CompiledMethod >> wsEndpointHttpMethod [
 	| methods |
 
 	self methodClass isWSEndpoint
 		ifFalse: [ ^ nil ].
 	methods := (self pragmas
-		collect: [ :p | p keyword asLowercase asSymbol ])
+		collect: [ :p | p selector asLowercase asSymbol copyWithoutAll: ':' ])
 		intersection: self methodClass supportedHttpMethods.
 	^ methods ifEmpty: [ nil ] ifNotEmpty: [ methods first ]
-]
-
-{ #category : #'*Ethel' }
-CompiledMethod >> wsEndpointPath [
-	self methodClass isWSEndpoint
-		ifFalse: [ ^ nil ].
-	self wsEndpointHttpMethod ifNil: [ ^ nil ].
-	^ (self pragmaAt: self methodClass endpointPathPragma)
-		ifNil: [ self methodClass endpointPath ]
-		ifNotNil: [ :val | self methodClass endpointPath / val arguments first ]
 ]
 
 { #category : #'*Ethel' }

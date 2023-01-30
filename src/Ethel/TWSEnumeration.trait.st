@@ -231,7 +231,16 @@ TWSEnumeration >> first [
 
 { #category : #enumerating }
 TWSEnumeration >> first: aLimit [
-	^ self next: aLimit with: self cursor
+
+	| results cursor |
+	cursor := self cursor.
+	results := OrderedCollection new.
+	[ results size < aLimit and: [ cursor hasMore ] ] whileTrue: [ 
+		| newResults |
+		newResults := self next: aLimit - results size with: cursor.
+		newResults isEmptyOrNil ifTrue: [ ^ results ].
+		results addAll: newResults ].
+	^ results
 ]
 
 { #category : #enumerating }

@@ -17,7 +17,7 @@ BaselineOfEthel >> baseline: spec [
 				with: [ spec requires: #('Ethel' 'Mocketry') ].
 			spec
 				package: #'Ethel-Tools'
-				with: [ spec requires: #('Ethel' 'Roassal2' 'Mocketry') ].
+				with: [ spec requires: #('Ethel' 'Mocketry') ].
 			spec package: #'Ethel-Examples' with: [ spec requires: #('Ethel') ].
 			spec
 				group: 'default'
@@ -31,11 +31,8 @@ BaselineOfEthel >> baseline: spec [
 { #category : #baselines }
 BaselineOfEthel >> dependencies: spec [
 	spec
-		baseline: 'Roassal2'
-		with: [ spec repository: 'github://ObjectProfile/Roassal2/src' ].
-	spec
 		baseline: 'Mocketry'
-		with: [ spec repository: 'github://dionisiydk/Mocketry:v4.0.x' ].
+		with: [ spec repository: 'github://dionisiydk/Mocketry' ].
 	spec
 		baseline: 'NeoJSON'
 		with: [ spec repository: 'github://svenvc/NeoJSON/repository' ]

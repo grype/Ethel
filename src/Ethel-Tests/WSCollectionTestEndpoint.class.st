@@ -12,11 +12,6 @@ Class {
 	#category : #'Ethel-Tests-Models'
 }
 
-{ #category : #accessing }
-WSCollectionTestEndpoint class >> endpointPath [
-	^ Path / 'another-test'
-]
-
 { #category : #enumerating }
 WSCollectionTestEndpoint >> cursor [
 	^ WSTestCursor new
@@ -25,15 +20,9 @@ WSCollectionTestEndpoint >> cursor [
 		yourself
 ]
 
-{ #category : #executing }
-WSCollectionTestEndpoint >> executingContext [
-	| sender |
-
-	sender := thisContext sender.
-	[ sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ]
-		whileTrue: [ sender := sender sender ].
-
-	^ sender
+{ #category : #accessing }
+WSCollectionTestEndpoint >> endpointPath [
+	^ Path / 'another-test'
 ]
 
 { #category : #initialization }

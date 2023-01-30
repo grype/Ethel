@@ -7,8 +7,8 @@ Class {
 }
 
 { #category : #accessing }
-WSDetachedTestEndpoint class >> endpointPath [
-	^ WSTestEndpoint endpointPath / #'detached'
+WSDetachedTestEndpoint >> endpointPath [
+	^ Path / #test / #'detached'
 ]
 
 { #category : #resolving }

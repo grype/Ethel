@@ -33,18 +33,6 @@ Class {
 	#category : #'Ethel-Core'
 }
 
-{ #category : #defaults }
-WSClient class >> endpointParamsPragma [
-	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
-	^ #params:
-]
-
-{ #category : #defaults }
-WSClient class >> endpointPathPragma [
-	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
-	^ #path:
-]
-
 { #category : #accessing }
 WSClient class >> endpoints [
 	"Return collection of endpoint classes associated with this client type. 
@@ -73,16 +61,15 @@ WSClient class >> jsonWithUrl: aUrl httpConfiguration: aBlock [
 		yourself
 ]
 
-{ #category : #accessing }
-WSClient class >> pathReferences [
-	"Returns all path references found in related endpoint classes"
-	^ (self endpoints flatCollect: #pathReferences) asSet
-]
-
 { #category : #http }
 WSClient class >> supportedHttpMethods [
 	"Returns array of supported HTTP methods. These are used to identify and verify executing endpoint methods - any such method should declare a corresponding pragma."
 	^ #(#get #post #put #patch #delete #options)
+]
+
+{ #category : #icons }
+WSClient class >> systemIconName [
+	^ #remote
 ]
 
 { #category : #'instance creation' }
@@ -122,19 +109,10 @@ WSClient >> createHttpClient [
 
 { #category : #endpoints }
 WSClient >> endpointForPath: aPath [
-	| endpoints |
 
-	endpoints := self class endpoints
-		select: [ :aClass | 
-			aClass ~= WSPluggableEndpoint
-				and: [ aClass endpointPath matches: aPath ] ].
-"	endpoints size > 1
-		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ]."
-	^ endpoints
-		ifEmpty: [ (WSPluggableEndpoint on: self)
-				path: aPath;
-				yourself ]
-		ifNotEmpty: [ :val | val anyOne on: self ]
+	^ (WSPluggableEndpoint on: self)
+		  path: aPath;
+		  yourself
 ]
 
 { #category : #execution }
@@ -147,27 +125,16 @@ WSClient >> execute: anEndpoint [
 { #category : #execution }
 WSClient >> execute: anEndpoint with: aBlock [
 	| http result |
+
 	http := self createHttpClient.
-	anEndpoint prepareForExecutingOn: http.
-	anEndpoint configureOn: http.
+	anEndpoint build: http inContext: anEndpoint executingContext.
 	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.
 	result := http execute.
-	(Smalltalk at: #WrapperSignal ifAbsent: [ nil ])
-		ifNotNil: [ :signal | signal emit: http ].
+	(Smalltalk at: #WrapperSignal ifAbsent: [ nil ]) ifNotNil: [ :signal | 
+		signal emit: http ].
 	self validateResponse: http response.
 	^ result
-]
-
-{ #category : #accessing }
-WSClient >> executorsOfPath: aPath [
-	| pathsAndMethods |
-
-	pathsAndMethods := self class endpoints
-		flatCollect: [ :each | each pathReferences ].
-	^ pathsAndMethods
-		select: [ :each | each value matches: aPath ]
-		thenCollect: [ :each | each key ]
 ]
 
 { #category : #accessing }

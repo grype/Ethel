@@ -50,34 +50,9 @@ Trait {
 	#category : #'Ethel-Core'
 }
 
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointParamsPragma [
-	"By default retuns keywords defined by the framework, but can be overriden at the level of the endpoint itself"
-	^ WSClient endpointParamsPragma 
-]
-
-{ #category : #accessing }
-TWSEndpoint classSide >> endpointPath [
-	"Path that represents a logical endpoint whose behavior is encapsulated by the implementing class. In cases where this cannot be determined at the class level - simply return the top-most meaingful path, or the root path. TThis value can be overriden in two places: 1) instance side #endpointPath and 2) at a method level by declarating there a pragma with the keyword returned by #endpointPathPragma"
-	^ self subclassResponsibility
-]
-
-{ #category : #'accessing-context' }
-TWSEndpoint classSide >> endpointPathPragma [
-	"By default retuns keywords defined by the framework, but can be overriden at the level of the endpoint itself"
-	^ WSClient endpointPathPragma 
-]
-
 { #category : #'instance creation' }
 TWSEndpoint classSide >> on: wsClient [
 	^ self basicNew initializeOn: wsClient
-]
-
-{ #category : #accessing }
-TWSEndpoint classSide >> pathReferences [
-	^ (self wsEndpointExecutingMethods
-		collect: [ :aMethod | aMethod -> (aMethod wsEndpointPath) ])
-		asSet
 ]
 
 { #category : #'accessing-context' }
@@ -108,6 +83,27 @@ TWSEndpoint >> / aStringOrEndpoint [
 	^ ep
 ]
 
+{ #category : #'building - transport' }
+TWSEndpoint >> build: http inContext: context [
+	| pragmas builders visitor |
+
+	self endpointPath ifNotNil: [ :aPath | 
+		http url:
+			wsClient baseUrl / (aPath format: context wsEndpointTemps) segments ].
+
+	self configureOn: http.
+
+	pragmas := context method pragmas.
+	builders := TWSTransportBuilder users flatCollect: [ :builderClass | 
+		            pragmas
+			            collect: [ :aPragma | builderClass fromPragma: aPragma ]
+			            thenSelect: #isNotNil ].
+	visitor := WSZincTransportVisitor
+		           onTransport: http
+		           inContext: context.
+	builders do: [ :builder | builder accept: visitor ]
+]
+
 { #category : #configuring }
 TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
 	"Configures newly derived endpoint"
@@ -120,7 +116,8 @@ TWSEndpoint >> configureOn: http [
 
 { #category : #accessing }
 TWSEndpoint >> endpointPath [
-	^ self class endpointPath 
+	"Users can override baseUrl of the client by returning a Path object"
+	^ nil
 ]
 
 { #category : #executing }
@@ -135,11 +132,14 @@ TWSEndpoint >> execute: anExecBlock [
 
 { #category : #executing }
 TWSEndpoint >> executingContext [
-	| sender |
 
+	| sender |
 	sender := thisContext sender.
-	[ sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ]
-		whileTrue: [ sender := sender sender ].
+	[ 
+	sender isNotNil and: [ 
+		(sender method isKindOf: CompiledMethod) not or: [ 
+			sender method isWSEndpointExecutionMethod not ] ] ] whileTrue: [ 
+		sender := sender sender ].
 
 	^ sender
 ]
@@ -148,27 +148,6 @@ TWSEndpoint >> executingContext [
 TWSEndpoint >> initializeOn: aClient [
 	self initialize.
 	wsClient := aClient
-]
-
-{ #category : #configuring }
-TWSEndpoint >> prepareForExecutingOn: http [
-	| effectivePath contextValues segments |
-
-	effectivePath := self endpointPath.
-	contextValues := thisContext wsEndpointValues.
-
-	self executingContext
-		ifNotNil: [ :context | 
-			context wsEndpointPath ifNotNil: [ :val | effectivePath := val ].
-			(context
-				wsEndpointHttpMethodUsing: wsClient class supportedHttpMethods)
-				ifNotNil: [ :val | http method: val asUppercase asSymbol ].
-			context wsEndpointTemps
-				ifNotEmpty: [ :val | contextValues addAll: val ] ].
-
-	segments := effectivePath segments
-		collect: [ :segment | segment format: contextValues ].
-	http url: wsClient baseUrl / segments
 ]
 
 { #category : #accessing }
