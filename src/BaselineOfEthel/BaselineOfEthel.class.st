@@ -21,7 +21,7 @@ BaselineOfEthel >> baseline: spec [
 			spec package: #'Ethel-Examples' with: [ spec requires: #('Ethel') ].
 			spec
 				group: 'default'
-					with: #('Ethel' 'Ethel-Tests' 'Ethel-Tools' 'Ethel-Examples');
+					with: #(core tests tools examples);
 				group: 'core' with: #('Ethel');
 				group: 'tests' with: #('Ethel-Tests');
 				group: 'tools' with: #('Ethel-Tools');
