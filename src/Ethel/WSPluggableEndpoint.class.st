@@ -89,11 +89,6 @@ WSPluggableEndpoint >> delete: aBlock [
 ]
 
 { #category : #accessing }
-WSPluggableEndpoint >> endpointPath [
-	^ path
-]
-
-{ #category : #accessing }
 WSPluggableEndpoint >> enumeration [
 	^ enumeration
 ]
@@ -186,4 +181,12 @@ WSPluggableEndpoint >> put [
 WSPluggableEndpoint >> put: aBlock [
 	method := #put.
 	^ self execute: aBlock
+]
+
+{ #category : #resolving }
+WSPluggableEndpoint >> resolve: aPathOrString [
+
+	path := (path ifNil: [ Path root ]) resolve: (aPathOrString isString
+			         ifTrue: [ Path * aPathOrString ]
+			         ifFalse: [ aPathOrString ])
 ]

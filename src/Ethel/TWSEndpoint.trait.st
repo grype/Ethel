@@ -69,28 +69,17 @@ TWSEndpoint classSide >> systemIconName [
 
 { #category : #endpoints }
 TWSEndpoint >> / aStringOrEndpoint [
+
 	| ep |
-
-	ep := aStringOrEndpoint isWSEndpoint
-		ifTrue: [ self wsClient / aStringOrEndpoint ]
-		ifFalse: [ | path |
-
-			path := (aStringOrEndpoint isKindOf: Path)
-				ifTrue: [ self endpointPath resolvePath: aStringOrEndpoint ]
-				ifFalse: [ self endpointPath / aStringOrEndpoint ].
-			self wsClient / path ].
+	ep := self wsClient / aStringOrEndpoint.
 	self configureDerivedEndpoint: ep.
 	^ ep
 ]
 
 { #category : #'building - transport' }
 TWSEndpoint >> build: http inContext: context [
+
 	| pragmas builders visitor |
-
-	self endpointPath ifNotNil: [ :aPath | 
-		http url:
-			wsClient baseUrl / (aPath format: context wsEndpointTemps) segments ].
-
 	self configureOn: http.
 
 	pragmas := context method pragmas.
@@ -112,12 +101,6 @@ TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
 { #category : #configuring }
 TWSEndpoint >> configureOn: http [
 	"Configures http transport prior to execution"
-]
-
-{ #category : #accessing }
-TWSEndpoint >> endpointPath [
-	"Users can override baseUrl of the client by returning a Path object"
-	^ nil
 ]
 
 { #category : #executing }

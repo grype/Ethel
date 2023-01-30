@@ -78,14 +78,22 @@ WSClient class >> withUrl: aUrl [
 ]
 
 { #category : #endpoints }
-WSClient >> / aPathObject [
-	^ aPathObject isWSEndpoint
-		ifTrue: [ aPathObject on: self ]
-		ifFalse: [ self
-				endpointForPath:
-					((aPathObject isKindOf: Path)
-						ifTrue: [ aPathObject asResolvedBy: Path root ]
-						ifFalse: [ Path / aPathObject asString ]) ]
+WSClient >> / aPathOrEndpoint [
+
+	^ aPathOrEndpoint isWSEndpoint
+		  ifTrue: [ aPathOrEndpoint on: self ]
+		  ifFalse: [ 
+			  (WSPluggableEndpoint on: self)
+				  resolve: aPathOrEndpoint;
+				  yourself ]
+]
+
+{ #category : #accessing }
+WSClient >> basePath [
+
+	^ (self baseUrl path ifEmpty: [ nil ])
+		  ifNil: [ Path root ]
+		  ifNotNil: [ :val | Path root / val ]
 ]
 
 { #category : #accessing }
@@ -101,18 +109,8 @@ WSClient >> configureOn: http [
 
 { #category : #http }
 WSClient >> createHttpClient [
-	| client |
-	client := ZnClient new.
-	self configureOn: client.
-	^ client
-]
 
-{ #category : #endpoints }
-WSClient >> endpointForPath: aPath [
-
-	^ (WSPluggableEndpoint on: self)
-		  path: aPath;
-		  yourself
+	^ ZnClient new
 ]
 
 { #category : #execution }
@@ -127,6 +125,7 @@ WSClient >> execute: anEndpoint with: aBlock [
 	| http result |
 
 	http := self createHttpClient.
+	self configureOn: http.
 	anEndpoint build: http inContext: anEndpoint executingContext.
 	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.

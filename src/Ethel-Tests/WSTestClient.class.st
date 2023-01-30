@@ -6,7 +6,7 @@ Class {
 
 { #category : #accessing }
 WSTestClient class >> baseUrl [
-	^ 'http://example.com/' asUrl
+	^ 'http://example.com/base/path' asUrl
 ]
 
 { #category : #accessing }

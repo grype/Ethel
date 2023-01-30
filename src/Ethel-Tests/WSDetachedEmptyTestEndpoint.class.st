@@ -8,8 +8,3 @@ Class {
 	#classTraits : 'TWSTestEndpoint classTrait',
 	#category : #'Ethel-Tests-Models'
 }
-
-{ #category : #accessing }
-WSDetachedEmptyTestEndpoint >> endpointPath [
-	^ Path / #test / #'detached-empty'
-]

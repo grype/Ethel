@@ -12,11 +12,6 @@ WSTestEndpoint >> delete [
 	^ self execute
 ]
 
-{ #category : #accessing }
-WSTestEndpoint >> endpointPath [
-	^ Path / 'test'
-]
-
 { #category : #'private-executing' }
 WSTestEndpoint >> get [
 	<get>

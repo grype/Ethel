@@ -6,11 +6,6 @@ Class {
 	#category : #'Ethel-Tests-Models'
 }
 
-{ #category : #accessing }
-WSDetachedTestEndpoint >> endpointPath [
-	^ Path / #test / #'detached'
-]
-
 { #category : #resolving }
 WSDetachedTestEndpoint >> get [
 	<get>

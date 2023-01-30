@@ -26,15 +26,18 @@ WSZincTransportVisitor >> visitRequestHeaderBuilder: aHeaderBuilder [
 
 { #category : #visiting }
 WSZincTransportVisitor >> visitRequestMethodBuilder: aBuilder [
-	aBuilder httpMethod ifNotNil: [ :val | transport method: val asUppercase ].
-	aBuilder path ifNotNil: [ :val | 
-		| url newPath |
 
+	aBuilder httpMethod ifNotNil: [ :val | 
+		transport method: val asUppercase ].
+	aBuilder path ifNotNil: [ :val | 
+		| url newPath p |
 		url := transport request url.
 		newPath := context
 			           ifNil: [ val ]
 			           ifNotNil: [ :ctx | val format: ctx wsEndpointTemps ].
-		transport request url segments: (Path / url path resolve: newPath) segments ]
+		p := Path root.
+		url path isEmptyOrNil ifFalse: [ p := p / url path ].
+		transport request url segments: (p resolve: newPath) segments ]
 ]
 
 { #category : #visiting }
