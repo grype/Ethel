@@ -34,6 +34,12 @@ Class {
 }
 
 { #category : #defaults }
+WSClient class >> endpointParamsPragma [
+	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
+	^ #params:
+]
+
+{ #category : #defaults }
 WSClient class >> endpointPathPragma [
 	"Default pragma used by methods of an endpoint class that override its #endpointPath. Endpoint classes can override this method..."
 	^ #path:
@@ -122,8 +128,8 @@ WSClient >> endpointForPath: aPath [
 		select: [ :aClass | 
 			aClass ~= WSPluggableEndpoint
 				and: [ aClass endpointPath matches: aPath ] ].
-	endpoints size > 1
-		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ].
+"	endpoints size > 1
+		ifTrue: [ WSAmbiguousEndpointPathError signal: aPath ]."
 	^ endpoints
 		ifEmpty: [ (WSPluggableEndpoint on: self)
 				path: aPath;
@@ -147,6 +153,8 @@ WSClient >> execute: anEndpoint with: aBlock [
 	aBlock ifNotNil: [ :block | block cull: http ].
 	self validateRequest: http request.
 	result := http execute.
+	(Smalltalk at: #WrapperSignal ifAbsent: [ nil ])
+		ifNotNil: [ :signal | signal emit: http ].
 	self validateResponse: http response.
 	^ result
 ]

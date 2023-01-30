@@ -152,7 +152,7 @@ GHPublicGistsEndpoint>>configureOn: http
 "Override trait's implementation of #execute, by adding <get> pragma"
 GHPublicGistsEndpoint>>#execute
     <get>
-    ^ wsClient execute: self
+    ^ self execute: nil
 
 "Connect endpoints so that we can access them from the client and other endpoints"
 WSClient>>#gists
@@ -200,6 +200,13 @@ The map view, implemented as an extension to the inspector, distinguishes variou
 ![UML](resources/gh-uml.png)
 
 The UML view will show whatever is relevant to the inspected object. Inspecting the client object (or its class) gives the most extensive overview. Inspecting an endpoint object (or its class) limits the scope to classes that either reference or are referenced by the endpoint class. Gray lines here indicate a hierarchical relationship between classes. Blue and yellow arrows indicate references to/from other classes.
+
+**Explorer**. Exploring API using a form-like interface.
+
+![Explorer](resources/gh-explorer.png)
+![cURL](resources/gh-explorer-curl.png)
+
+The Explorer utility uses information found in request executing methods to construct a simple form-like interface. It allows you to manually select an endpoint, fill in the arguments, fire off a request and inspect the response. The argument values are treated as code and execution of requests is done by calling actual endpoint methods. There are also buttons for inspecting the client and the selected endpoint, shortcuts to view UML and the code browser for the selected endpoint class, and a button for producing cURL command.
 
 ## Etymology
 

@@ -17,7 +17,7 @@ BaselineOfEthel >> baseline: spec [
 				with: [ spec requires: #('Ethel' 'Mocketry') ].
 			spec
 				package: #'Ethel-Tools'
-				with: [ spec requires: #('Ethel' 'Roassal2') ].
+				with: [ spec requires: #('Ethel' 'Roassal2' 'Mocketry') ].
 			spec package: #'Ethel-Examples' with: [ spec requires: #('Ethel') ].
 			spec
 				group: 'default'
