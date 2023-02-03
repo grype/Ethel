@@ -51,10 +51,10 @@ TWSEndpointTest >> setUp [
 TWSEndpointTest >> stubForEnumeration [
 	endpoint := client collection.
 	cursor := self stubbedCursor.
-	http := self
-		stubbedHttpWithResponse:
-			(self
-				okResponseWith: [ (endpoint offset to: (cursor total min: endpoint offset + endpoint limit) - 1) asArray ])
+	http := self stubbedHttpWithResponse: (self okResponseWith: [ 
+			         (endpoint offset to:
+			          (cursor total min: endpoint offset + endpoint limit) - 1)
+				         asOrderedCollection ])
 ]
 
 { #category : #stubbing }

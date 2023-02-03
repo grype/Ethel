@@ -37,12 +37,11 @@ WSCollectionTestEndpoint >> limit: anObject [
 	limit := anObject
 ]
 
-{ #category : #enumerating }
-WSCollectionTestEndpoint >> next: aLimit with: aCursor [
+{ #category : #'as yet unclassified' }
+WSCollectionTestEndpoint >> nextWith: aCursor [
 	| response result contents |
 
 	offset := aCursor offset.
-	aLimit ifNotNil: [ limit := aLimit ].
 	response := self test.
 	response isSuccess
 		ifFalse: [ ^ nil ].

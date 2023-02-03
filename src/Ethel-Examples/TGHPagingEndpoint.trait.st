@@ -27,20 +27,19 @@ TGHPagingEndpoint >> maxPageSize [
 ]
 
 { #category : #enumerating }
-TGHPagingEndpoint >> next: aLimit with: aCursor [
+TGHPagingEndpoint >> nextPage [
+	^ self subclassResponsibility
+]
+
+{ #category : #'as yet unclassified' }
+TGHPagingEndpoint >> nextWith: aCursor [
 	| result |
 
 	page := aCursor page.
-	pageSize := (aLimit ifNil: [ aCursor pageSize ])
-		min: self maxPageSize.
+	pageSize := aCursor pageSize min: self maxPageSize.
 	result := self nextPage.
 	(result isNotNil and: [ result size >= pageSize ])
 		ifTrue: [ aCursor advance ]
 		ifFalse: [ aCursor hasMore: false ].
 	^ result
-]
-
-{ #category : #enumerating }
-TGHPagingEndpoint >> nextPage [
-	^ self subclassResponsibility
 ]

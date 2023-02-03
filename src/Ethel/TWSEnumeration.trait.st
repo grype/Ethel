@@ -68,56 +68,131 @@ TWSEnumeration >> collect: aBlock as: aClass [
 	| result |
 
 	result := aClass new.
-	self enumerate: [ :val | result addAll: (val collect: aBlock) ].
+	self enumerate: [ :aSlice | result addAll: (aSlice collect: aBlock) ].
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> collect: aBlock as: aClass max: aLimit [
+	| count |
+
+	self
+		deprecated: 'Use #collect:as:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+
+	count := 0.
+	^ self
+		  collect: [ :each | 
+			  count := count + 1.
+			  aBlock value: each ]
+		  as: aClass
+		  whileTrue: [ count < aLimit ]
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> collect: aBlock as: aClass whileFalse: whileBlock [
 	| result |
 
 	result := aClass new.
 	self
-		enumerate: [ :val | 
-			result addAll: (val collect: aBlock).
-			result size >= aLimit
-				ifTrue: [ ^ result first: aLimit ] ].
+		enumerate: [ :aSlice | result addAll: (aSlice collect: aBlock) ]
+		with: self cursor
+		whileFalse: whileBlock.
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> collect: aBlock as: aClass whileTrue: whileBlock [
+	| result |
+
+	result := aClass new.
+	self
+		enumerate: [ :aSlice | result addAll: (aSlice collect: aBlock) ]
+		with: self cursor
+		whileTrue: whileBlock.
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> collect: aBlock into: aCollection [
-	self enumerate: [ :val | aCollection fillFrom: val with: aBlock ].
+	self enumerate: [ :aSlice | aCollection fillFrom: aSlice with: aBlock ].
 	^ aCollection
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> collect: aBlock into: aCollection until: untilBlock [
 	self
+		deprecated: 'Use #collect:into:whileFalse: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+	self
 		enumerate: [ :val | 
 			aCollection fillFrom: val with: aBlock.
-			(untilBlock cull: val)
-				ifTrue: [ ^ self ] ].
+			(untilBlock cull: val) ifTrue: [ ^ self ] ]
+		with: self cursor
+		whileFalse: untilBlock.
+	^ aCollection
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> collect: aBlock into: aCollection whileFalse: aWhileBlock [
+	self
+		enumerate: [ :aSlice | aCollection fillFrom: aSlice with: aBlock ]
+		with: self cursor
+		whileFalse: aWhileBlock.
+	^ aCollection
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> collect: aBlock into: aCollection whileTrue: aWhileBlock [
+	self
+		enumerate: [ :aSlice | aCollection fillFrom: aSlice with: aBlock ]
+		with: self cursor
+		whileTrue: aWhileBlock.
 	^ aCollection
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> collect: aBlock max: aLimit [
+	self
+		deprecated: 'Use #collect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
 	^ self collect: aBlock as: OrderedCollection max: aLimit
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> collect: collectBlock max: aLimit thenDo: doBlock [
+	self
+		deprecated: 'Use #collect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+		
 	^ (self collect: collectBlock max: aLimit) do: doBlock
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> collect: collectBlock max: aLimit thenReject: selectBlock [
+	self
+		deprecated: 'Use #collect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
 	^ (self collect: collectBlock max: aLimit) reject: selectBlock
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> collect: collectBlock max: aLimit thenSelect: selectBlock [
+	self
+		deprecated: 'Use #collect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
 	^ (self collect: collectBlock max: aLimit) select: selectBlock
 ]
 
@@ -134,6 +209,16 @@ TWSEnumeration >> collect: collectBlock thenReject: selectBlock [
 { #category : #enumerating }
 TWSEnumeration >> collect: collectBlock thenSelect: selectBlock [
 	^ (self collect: collectBlock) select: selectBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> collect: aBlock whileFalse: aWhileBlock [
+	^ self collect: aBlock as: OrderedCollection whileFalse: aWhileBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> collect: aBlock whileTrue: aWhileBlock [
+	^ self collect: aBlock as: OrderedCollection whileTrue: aWhileBlock
 ]
 
 { #category : #accessing }
@@ -153,12 +238,11 @@ TWSEnumeration >> detect: aBlock ifFound: foundBlock [
 
 { #category : #enumerating }
 TWSEnumeration >> detect: aBlock ifFound: foundBlock ifNone: noneBlock [
-	self
-		enumerate: [ :values | 
-			values
-				detect: aBlock
-				ifFound: [ :val | ^ foundBlock cull: val ]
-				ifNone: [  ] ].
+	self enumerate: [ :aSlice | 
+		aSlice
+			detect: aBlock
+			ifFound: [ :val | ^ foundBlock cull: val ]
+			ifNone: [  ] ].
 	^ noneBlock value
 ]
 
@@ -169,40 +253,87 @@ TWSEnumeration >> detect: aBlock ifNone: exceptionBlock [
 
 { #category : #enumerating }
 TWSEnumeration >> do: aBlock [
-	self enumerate: [ :val | val do: aBlock ]
+	self enumerate: [ :aSlice | aSlice do: aBlock ]
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> do: aBlock separatedBy: separatorBlock [
-	self enumerate: [ :val | val do: aBlock separatedBy: separatorBlock ]
+	| ticked |
+
+	ticked := false.
+	self enumerate: [ :aSlice | 
+		ticked ifTrue: [ separatorBlock value ].
+		aSlice do: aBlock separatedBy: separatorBlock.
+		ticked := true ]
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> do: aBlock separatedBy: separatorBlock until: untilBlock [
 	self
-		enumerate: [ :val | 
-			val do: aBlock separatedBy: separatorBlock.
-			(untilBlock cull: val)
-				ifTrue: [ ^ self ] ]
+		deprecated: 'Use #do:separatedBy:whileFalse: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+	self do: aBlock separatedBy: separatorBlock whileFalse: untilBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> do: aBlock separatedBy: separatorBlock whileFalse: aWhileBlock [
+	| ticked |
+
+	ticked := false.
+	self
+		enumerate: [ :aSlice | 
+			ticked ifTrue: [ separatorBlock value ].
+			aSlice do: aBlock separatedBy: separatorBlock.
+			ticked := true ]
+		with: self cursor
+		whileFalse: aWhileBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> do: aBlock separatedBy: separatorBlock whileTrue: aWhileBlock [
+	| ticked |
+
+	ticked := false.
+	self
+		enumerate: [ :aSlice | 
+			ticked ifTrue: [ separatorBlock value ].
+			aSlice do: aBlock separatedBy: separatorBlock.
+			ticked := true ]
+		with: self cursor
+		whileTrue: aWhileBlock
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> do: aBlock until: untilBlock [
 	self
-		enumerate: [ :val | 
-			val do: aBlock.
-			(untilBlock cull: val)
-				ifTrue: [ ^ self ] ]
+		deprecated: 'Use #do:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+	^ self do: aBlock whileFalse: untilBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> do: aBlock whileFalse: aWhileBlock [
+	self
+		enumerate: [ :val | val do: aBlock ]
+		with: self cursor
+		whileFalse: aWhileBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> do: aBlock whileTrue: aWhileBlock [
+	self
+		enumerate: [ :val | val do: aBlock ]
+		with: self cursor
+		whileTrue: aWhileBlock
 ]
 
 { #category : #'private - enumerating' }
 TWSEnumeration >> enumerate: aBlock [ 
 	self enumerate: aBlock with: self cursor
-]
-
-{ #category : #'private - enumerating' }
-TWSEnumeration >> enumerate: aBlock limit: aLimit [
-	self enumerate: aBlock with: self cursor limit: aLimit
 ]
 
 { #category : #'private - enumerating' }
@@ -212,9 +343,15 @@ TWSEnumeration >> enumerate: aBlock with: aCursor [
 ]
 
 { #category : #'private - enumerating' }
-TWSEnumeration >> enumerate: aBlock with: aCursor limit: aLimit [
-	[ aCursor hasMore ]
-		whileTrue: [ (self next: aLimit with: aCursor) ifNotNil: aBlock ]
+TWSEnumeration >> enumerate: aBlock with: aCursor whileFalse: aWhileBlock [
+	[ aCursor hasMore and: [ aWhileBlock value not ] ] whileTrue: [ 
+		(self nextWith: aCursor) ifNotNil: aBlock ]
+]
+
+{ #category : #'private - enumerating' }
+TWSEnumeration >> enumerate: aBlock with: aCursor whileTrue: aWhileBlock [
+	[ aCursor hasMore and: [ aWhileBlock value ] ] whileTrue: [ 
+		(self nextWith: aCursor) ifNotNil: aBlock ]
 ]
 
 { #category : #'error handling' }
@@ -231,16 +368,14 @@ TWSEnumeration >> first [
 
 { #category : #enumerating }
 TWSEnumeration >> first: aLimit [
+	| results |
 
-	| results cursor |
-	cursor := self cursor.
 	results := OrderedCollection new.
-	[ results size < aLimit and: [ cursor hasMore ] ] whileTrue: [ 
-		| newResults |
-		newResults := self next: aLimit - results size with: cursor.
-		newResults isEmptyOrNil ifTrue: [ ^ results ].
-		results addAll: newResults ].
-	^ results
+	self
+		enumerate: [ :aSlice | results addAll: aSlice ]
+		with: self cursor
+		whileTrue: [ results size < aLimit ].
+	^ results first: (aLimit min: results size)
 ]
 
 { #category : #enumerating }
@@ -259,34 +394,84 @@ TWSEnumeration >> flatCollect: aBlock as: aClass [
 
 { #category : #enumerating }
 TWSEnumeration >> flatCollect: aBlock as: aClass max: aLimit [
+	| result count |
+
+	self
+		deprecated: 'Use #flatCollect:as:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+
+	count := 0.
+	result := self
+		          flatCollect: [ :aValue | 
+			          count := count + 1.
+			          aBlock value: aValue ]
+		          as: aClass
+		          whileTrue: [ count < aLimit ].
+	^ result first: (result size min: aLimit)
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> flatCollect: aBlock as: aClass whileFalse: aWhileBlock [
 	| result |
 
 	result := aClass new.
 	self
-		enumerate: [ :val | 
-			result addAll: (val flatCollect: aBlock).
-			result size >= aLimit
-				ifTrue: [ ^ result first: aLimit ] ].
+		enumerate: [ :aSlice | result addAll: (aSlice flatCollect: aBlock) ]
+		with: self cursor
+		whileFalse: aWhileBlock.
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> flatCollect: aBlock as: aClass whileTrue: aWhileBlock [
+	| result |
+
+	result := aClass new.
+	self
+		enumerate: [ :aSlice | result addAll: (aSlice flatCollect: aBlock) ]
+		with: self cursor
+		whileTrue: aWhileBlock.
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> flatCollect: aBlock max: aLimit [
+	self
+		deprecated: 'Use #flatCollect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
 	^ self flatCollect: aBlock as: OrderedCollection max: aLimit
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> flatCollect: aBlock whileFalse: aWhileBlock [
+	^ self
+		  flatCollect: aBlock
+		  as: OrderedCollection
+		  whileFalse: aWhileBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> flatCollect: aBlock whileTrue: aWhileBlock [
+	^ self
+		  flatCollect: aBlock
+		  as: OrderedCollection
+		  whileTrue: aWhileBlock
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> groupedBy: aBlock [
 	| groups |
 
-	groups := PluggableDictionary integerDictionary.
-	self
-		enumerate: [ :val | 
-			val
-				do: [ :each | 
-					(groups
-						at: (aBlock value: each)
-						ifAbsentPut: [ OrderedCollection new ]) add: each ] ].
+	groups := Dictionary new.
+	self enumerate: [ :aSlice | 
+		aSlice do: [ :each | 
+			(groups
+				 at: (aBlock value: each)
+				 ifAbsentPut: [ OrderedCollection new ]) add: each ] ].
 	^ groups
 ]
 
@@ -296,26 +481,82 @@ TWSEnumeration >> groupedBy: aBlock having: aSelectionBlock [
 ]
 
 { #category : #enumerating }
+TWSEnumeration >> groupedBy: aBlock whileFalse: aWhileBlock [
+	| groups |
+
+	groups := Dictionary new.
+	self
+		enumerate: [ :aSlice | 
+			aSlice do: [ :each | 
+				(groups
+					 at: (aBlock value: each)
+					 ifAbsentPut: [ OrderedCollection new ]) add: each ] ]
+		with: self cursor
+		whileFalse: aWhileBlock.
+	^ groups
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> groupedBy: aBlock whileTrue: aWhileBlock [
+	| groups |
+
+	groups := Dictionary new.
+	self
+		enumerate: [ :aSlice | 
+			aSlice do: [ :each | 
+				(groups
+					 at: (aBlock value: each)
+					 ifAbsentPut: [ OrderedCollection new ]) add: each ] ]
+		with: self cursor
+		whileTrue: aWhileBlock.
+	^ groups
+]
+
+{ #category : #enumerating }
 TWSEnumeration >> inject: thisValue into: binaryBlock [
 	| nextValue |
 
 	nextValue := thisValue.
-	self
-		enumerate: [ :val | 
-			val
-				do: [ :each | nextValue := binaryBlock value: nextValue value: each ] ].
+	self enumerate: [ :aSlice | 
+		aSlice do: [ :each | 
+			nextValue := binaryBlock value: nextValue value: each ] ].
 
 	^ nextValue
 ]
 
 { #category : #enumerating }
-TWSEnumeration >> next: anInt with: aCursor [
-	^ self subclassResponsibility
+TWSEnumeration >> inject: thisValue into: binaryBlock whileFalse: aWhileBlock [
+	| nextValue |
+
+	nextValue := thisValue.
+	self
+		enumerate: [ :aSlice | 
+			aSlice do: [ :each | 
+				nextValue := binaryBlock value: nextValue value: each ] ]
+		with: self cursor
+		whileFalse: aWhileBlock.
+
+	^ nextValue
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> inject: thisValue into: binaryBlock whileTrue: aWhileBlock [
+	| nextValue |
+
+	nextValue := thisValue.
+	self
+		enumerate: [ :aSlice | 
+			aSlice do: [ :each | 
+				nextValue := binaryBlock value: nextValue value: each ] ]
+		with: self cursor
+		whileTrue: aWhileBlock.
+
+	^ nextValue
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> nextWith: aCursor [
-	^ self next: nil with: aCursor
+	^ self subclassResponsibility 
 ]
 
 { #category : #enumerating }
@@ -323,23 +564,28 @@ TWSEnumeration >> reject: aBlock [
 	| result |
 
 	result := OrderedCollection new.
-	self
-		enumerate:
-			[ :val | (val reject: aBlock) ifNotNil: [ :selected | result addAll: selected ] ].
+	self enumerate: [ :aSlice | result addAll: (aSlice reject: aBlock) ].
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock max: aLimit [
-	| result |
+	| result count |
 
-	result := OrderedCollection new.
 	self
-		enumerate: [ :val | 
-			(val reject: aBlock) ifNotNil: [ :selected | result addAll: selected ].
-			result size >= aLimit
-				ifTrue: [ ^ result first: aLimit ] ].
-	^ result
+		deprecated: 'Use #reject:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+
+	count := 0.
+	result := self
+		          reject: [ :aValue | 
+			          count := count + 1.
+			          aBlock value: aValue ]
+		          whileTrue: [ count < aLimit ].
+
+	^ result first: (aLimit min: result size)
 ]
 
 { #category : #enumerating }
@@ -347,49 +593,89 @@ TWSEnumeration >> reject: aBlock thenCollect: collectBlock [
 	| result |
 
 	result := OrderedCollection new.
-	self
-		enumerate: [ :val | 
-			(val reject: aBlock thenCollect: collectBlock)
-				ifNotNil: [ :selected | result addAll: selected ] ].
+	self enumerate: [ :aSlice | 
+		result addAll: (aSlice reject: aBlock thenCollect: collectBlock) ].
 
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock thenCollect: collectBlock max: aLimit [
+	| result count |
+
+	self
+		deprecated: 'Use #reject:thenCollect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+
+	count := 0.
+	result := self
+		          reject: [ :aValue | 
+			          count := count + 1.
+			          aBlock value: aValue ]
+		          thenCollect: collectBlock
+		          whileTrue: [ count < aLimit ].
+	^ result first: (result size min: aLimit)
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> reject: aBlock thenCollect: collectBlock whileFalse: aWhileBlock [
 	| result |
 
 	result := OrderedCollection new.
 	self
-		enumerate: [ :val | 
-			(val reject: aBlock thenCollect: collectBlock)
-				ifNotNil: [ :selected | result addAll: selected ].
-			result size >= aLimit
-				ifTrue: [ ^ result first: aLimit ] ].
+		enumerate: [ :aSlice | 
+			result addAll: (aSlice reject: aBlock thenCollect: collectBlock) ]
+		with: self cursor
+		whileFalse: aWhileBlock.
+
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> reject: aBlock thenCollect: collectBlock whileTrue: aWhileBlock [
+	| result |
+
+	result := OrderedCollection new.
+	self
+		enumerate: [ :aSlice | 
+			result addAll: (aSlice reject: aBlock thenCollect: collectBlock) ]
+		with: self cursor
+		whileTrue: aWhileBlock.
 
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock thenDo: doBlock [
-	| result |
-
-	result := OrderedCollection new.
-	self
-		enumerate: [ :val | 
-			(val reject: aBlock thenDo: doBlock)
-				ifNotNil: [ :selected | result addAll: selected ] ].
-
-	^ result
+	self enumerate: [ :aSlice | aSlice reject: aBlock thenDo: doBlock ]
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock thenDo: doBlock until: untilBlock [
 	self
-		enumerate: [ :val | 
-			val reject: aBlock thenDo: doBlock.
-			(untilBlock cull: val)
-				ifTrue: [ ^ self ] ]
+		deprecated: 'Use #reject:thenDo:whileFalse: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+	^ self reject: aBlock thenDo: doBlock whileFalse: untilBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> reject: aBlock thenDo: doBlock whileFalse: aWhileBlock [
+	self
+		enumerate: [ :val | val reject: aBlock thenDo: doBlock ]
+		with: self cursor
+		whileFalse: aWhileBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> reject: aBlock thenDo: doBlock whileTrue: aWhileBlock [
+	self
+		enumerate: [ :val | val reject: aBlock thenDo: doBlock ]
+		with: self cursor
+		whileTrue: aWhileBlock
 ]
 
 { #category : #enumerating }
@@ -397,26 +683,81 @@ TWSEnumeration >> reject: aBlock thenFlatCollect: collectBlock [
 	| result |
 
 	result := OrderedCollection new.
-	self
-		enumerate: [ :val | 
-			((val reject: aBlock) flatCollect: collectBlock)
-				ifNotNil: [ :selected | result addAll: selected ] ].
+	self enumerate: [ :aSlice | 
+		result addAll: ((aSlice reject: aBlock) flatCollect: collectBlock) ].
 
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> reject: aBlock thenFlatCollect: collectBlock max: aLimit [
+	| count result |
+
+	self
+		deprecated: 'Use #reject:thenFlatCollect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+
+	count := 0.
+	result := self
+		          reject: [ :aValue | 
+			          count := count + 1.
+			          aBlock value: aValue ]
+		          thenFlatCollect: collectBlock
+		          whileTrue: [ count < aLimit ].
+	^ result first: (result size min: aLimit)
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> reject: aBlock thenFlatCollect: collectBlock whileFalse: aWhileBlock [
 	| result |
 
 	result := OrderedCollection new.
 	self
-		enumerate: [ :val | 
-			((val reject: aBlock) flatCollect: collectBlock)
-				ifNotNil: [ :selected | result addAll: selected ].
-			result size >= aLimit
-				ifTrue: [ ^ result first: aLimit ] ].
+		enumerate: [ :aSlice | 
+			result addAll: ((aSlice reject: aBlock) flatCollect: collectBlock) ]
+		with: self cursor
+		whileFalse: aWhileBlock.
 
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> reject: aBlock thenFlatCollect: collectBlock whileTrue: aWhileBlock [
+	| result |
+
+	result := OrderedCollection new.
+	self
+		enumerate: [ :aSlice | 
+			result addAll: ((aSlice reject: aBlock) flatCollect: collectBlock) ]
+		with: self cursor
+		whileTrue: aWhileBlock.
+
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> reject: aBlock whileFalse: aWhileBlock [
+	| result |
+
+	result := OrderedCollection new.
+	self
+		enumerate: [ :aSlice | result addAll: (aSlice reject: aBlock) ]
+		with: self cursor
+		whileFalse: aWhileBlock.
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> reject: aBlock whileTrue: aWhileBlock [
+	| result |
+
+	result := OrderedCollection new.
+	self
+		enumerate: [ :aSlice | result addAll: (aSlice reject: aBlock) ]
+		with: self cursor
+		whileTrue: aWhileBlock.
 	^ result
 ]
 
@@ -425,24 +766,27 @@ TWSEnumeration >> select: aBlock [
 	| result |
 
 	result := OrderedCollection new.
-	self
-		enumerate:
-			[ :val | (val select: aBlock) ifNotNil: [ :selected | result addAll: selected ] ].
+	self enumerate: [ :aSlice | result addAll: (aSlice select: aBlock) ].
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: aBlock max: aLimit [
-	| result |
+	| count result |
 
-	result := OrderedCollection new.
 	self
-		enumerate: [ :val | 
-			(val select: aBlock) ifNotNil: [ :selected | result addAll: selected ].
-			result size >= aLimit
-				ifTrue: [ ^ result first: aLimit ] ]
-		limit: aLimit.
-	^ result
+		deprecated: 'Use #select:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+
+	count := 0.
+	result := self
+		          select: [ :aValue | 
+			          count := count + 1.
+			          aBlock value: aValue ]
+		          whileTrue: [ count < aLimit ].
+	^ result first: (result size min: aLimit)
 ]
 
 { #category : #enumerating }
@@ -450,78 +794,142 @@ TWSEnumeration >> select: selectBlock thenCollect: collectBlock [
 	| result |
 
 	result := OrderedCollection new.
-	self
-		enumerate: [ :val | 
-			(val select: selectBlock thenCollect: collectBlock)
-				ifNotNil: [ :selected | result addAll: selected ] ].
+	self enumerate: [ :aSlice | 
+		result addAll: (aSlice select: selectBlock thenCollect: collectBlock) ].
 
 	^ result
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenCollect: collectBlock max: aLimit [
-	| result |
+	| count result |
 
-	result := OrderedCollection new.
 	self
-		enumerate: [ :val | 
-			(val select: selectBlock thenCollect: collectBlock)
-				ifNotNil: [ :selected | result addAll: selected ].
-			result size >= aLimit
-				ifTrue: [ ^ result first: aLimit ] ]
-		limit: aLimit.
+		deprecated: 'Use #select:thenCollect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
 
-	^ result
+	count := 0.
+	result := self
+		          select: [ :aValue | 
+			          count := count + 1.
+			          selectBlock value: aValue ]
+		          whileTrue: [ count < aLimit ].
+	result := result first: (result size min: aLimit).
+	^ result collect: collectBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: selectBlock thenCollect: collectBlock whileFalse: aWhileBlock [
+	^ (self select: selectBlock whileFalse: aWhileBlock) collect:
+		  collectBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: selectBlock thenCollect: collectBlock whileTrue: aWhileBlock [
+	^ (self select: selectBlock whileTrue: aWhileBlock) collect:
+		  collectBlock
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenDo: doBlock [
-	self enumerate: [ :val | val select: selectBlock thenDo: doBlock ]
+	self enumerate: [ :aSlice | aSlice select: selectBlock thenDo: doBlock ]
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenDo: doBlock until: untilBlock [
 	self
-		enumerate: [ :val | 
-			val select: selectBlock thenDo: doBlock.
-			(untilBlock cull: val)
-				ifTrue: [ ^ self ] ]
+		deprecated: 'Use #select:thenDo:whileFalse: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+	^ self select: selectBlock thenDo: doBlock whileFalse: untilBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: selectBlock thenDo: doBlock whileFalse: aWhileBlock [
+	self
+		enumerate: [ :aSlice | aSlice select: selectBlock thenDo: doBlock ]
+		with: self cursor
+		whileFalse: aWhileBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: selectBlock thenDo: doBlock whileTrue: aWhileBlock [
+	self
+		enumerate: [ :aSlice | aSlice select: selectBlock thenDo: doBlock ]
+		with: self cursor
+		whileTrue: aWhileBlock
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenFlatCollect: collectBlock [
-	| result |
-
-	result := OrderedCollection new.
-	self
-		enumerate: [ :val | 
-			((val select: selectBlock) flatCollect: collectBlock)
-				ifNotNil: [ :selected | result addAll: selected ] ].
-	^ result
+	^ (self select: selectBlock) collect: collectBlock 
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: selectBlock thenFlatCollect: collectBlock max: aLimit [
-	| result |
+	| result count |
 
-	result := OrderedCollection new.
 	self
-		enumerate: [ :val | 
-			((val select: selectBlock) flatCollect: collectBlock)
-				ifNotNil: [ :selected | result addAll: selected ].
-			result size >= aLimit
-				ifTrue: [ ^ result first: aLimit ] ].
-	^ result
+		deprecated: 'Use #select:thenFlatCollect:whileTrue: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+
+	count := 0.
+	result := self
+		          select: [ :aValue | 
+			          count := count + 1.
+			          selectBlock value: aValue ]
+		          thenFlatCollect: collectBlock
+		          whileTrue: [ count < aLimit ].
+	^ result first: (result size min: aLimit)
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: selectBlock thenFlatCollect: collectBlock whileFalse: aWhileBlock [
+	^ (self select: selectBlock whileFalse: aWhileBlock) flatCollect:
+		  collectBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: selectBlock thenFlatCollect: collectBlock whileTrue: aWhileBlock [
+	^ (self select: selectBlock whileTrue: aWhileBlock) flatCollect:
+		  collectBlock
 ]
 
 { #category : #enumerating }
 TWSEnumeration >> select: aBlock until: untilBlock [
+	self
+		deprecated: 'Use #select:whileFalse: instead'
+		on: '2 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+	^ self select: aBlock whileFalse: untilBlock
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: aBlock whileFalse: aWhileBlock [
 	| result |
+
 	result := OrderedCollection new.
 	self
-		enumerate: [ :val | 
-			(val select: aBlock) ifNotNil: [ :selected | result addAll: selected ].
-			(untilBlock cull: val)
-				ifTrue: [ ^ result ] ].
+		enumerate: [ :aSlice | result addAll: (aSlice select: aBlock) ]
+		with: self cursor
+		whileFalse: aWhileBlock.
+	^ result
+]
+
+{ #category : #enumerating }
+TWSEnumeration >> select: aBlock whileTrue: aWhileBlock [
+	| result |
+
+	result := OrderedCollection new.
+	self
+		enumerate: [ :aSlice | result addAll: (aSlice select: aBlock) ]
+		with: self cursor
+		whileTrue: aWhileBlock.
 	^ result
 ]
