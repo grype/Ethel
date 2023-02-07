@@ -131,10 +131,10 @@ WSPluggableEndpoint >> httpConfiguration: anObject [
 	httpConfiguration := anObject
 ]
 
-{ #category : #'as yet unclassified' }
-WSPluggableEndpoint >> next: aLimit with: aCursor [
-	enumeration ifNil: [ ^ nil ].
-	^ enumeration cull: self cull: aLimit cull: aCursor
+{ #category : #enumerating }
+WSPluggableEndpoint >> nextWith: aCursor [
+	^ enumeration ifNotNil: [ :enumBlock | 
+		  enumBlock cull: self cull: aCursor ]
 ]
 
 { #category : #api }
