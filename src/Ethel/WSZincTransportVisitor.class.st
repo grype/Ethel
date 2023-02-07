@@ -10,6 +10,23 @@ Class {
 }
 
 { #category : #visiting }
+WSZincTransportVisitor >> currentPath [
+	| currentPath |
+	currentPath := transport request url ifNotNil: [ :url | 
+		               url path ifEmpty: [ nil ] ].
+	^ currentPath
+		  ifNil: [ Path root ]
+		  ifNotNil: [ :aPath | Path root / aPath ]
+]
+
+{ #category : #visiting }
+WSZincTransportVisitor >> resolvePath: aPath [
+	^ self currentPath resolve: (context
+			   ifNil: [ aPath ]
+			   ifNotNil: [ :ctx | aPath format: ctx wsEndpointTemps ])
+]
+
+{ #category : #visiting }
 WSZincTransportVisitor >> visitContentBuilder: aBuilder [
 	aBuilder contentReader ifNotNil: [ :aReader | 
 		transport contentReader: aReader ].
@@ -26,18 +43,10 @@ WSZincTransportVisitor >> visitRequestHeaderBuilder: aHeaderBuilder [
 
 { #category : #visiting }
 WSZincTransportVisitor >> visitRequestMethodBuilder: aBuilder [
-
-	aBuilder httpMethod ifNotNil: [ :val | 
-		transport method: val asUppercase ].
-	aBuilder path ifNotNil: [ :val | 
-		| url newPath p |
-		url := transport request url.
-		newPath := context
-			           ifNil: [ val ]
-			           ifNotNil: [ :ctx | val format: ctx wsEndpointTemps ].
-		p := Path root.
-		url path isEmptyOrNil ifFalse: [ p := p / url path ].
-		transport request url segments: (p resolve: newPath) segments ]
+	aBuilder httpMethod ifNotNil: [ :aMethod | 
+		transport method: aMethod asUppercase ].
+	aBuilder path ifNotNil: [ :aPath | 
+		transport request url segments: (self resolvePath: aPath) segments ]
 ]
 
 { #category : #visiting }
