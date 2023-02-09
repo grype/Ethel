@@ -14,6 +14,11 @@ TWSTransportVisitor >> visitContentBuilder: aBuilder [
 ]
 
 { #category : #visiting }
+TWSTransportVisitor >> visitJsonContentBuilder: aBuilder [
+	^ self subclassResponsibility
+]
+
+{ #category : #visiting }
 TWSTransportVisitor >> visitRequestHeaderBuilder: aBuilder [
 	^ self subclassResponsibility
 ]

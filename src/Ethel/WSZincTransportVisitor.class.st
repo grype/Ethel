@@ -51,6 +51,13 @@ WSZincTransportVisitor >> visitContentBuilder: aBuilder [
 ]
 
 { #category : #visiting }
+WSZincTransportVisitor >> visitJsonContentBuilder: aBuilder [
+	self transport
+		contentReader: aBuilder reader;
+		contentWriter: aBuilder writer
+]
+
+{ #category : #visiting }
 WSZincTransportVisitor >> visitRequestHeaderBuilder: aHeaderBuilder [
 	self transport perform: aHeaderBuilder selector withArguments: { 
 			aHeaderBuilder headerKey.
