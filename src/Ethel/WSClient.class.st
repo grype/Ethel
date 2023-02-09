@@ -27,8 +27,7 @@ Class {
 	#name : #WSClient,
 	#superclass : #Object,
 	#instVars : [
-		'baseUrl',
-		'httpConfiguration'
+		'baseUrl'
 	],
 	#category : #'Ethel-Core'
 }

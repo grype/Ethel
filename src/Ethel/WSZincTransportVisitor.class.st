@@ -10,9 +10,15 @@ Class {
 }
 
 { #category : #visiting }
+WSZincTransportVisitor >> context [
+	^ WSCurrentContext value
+]
+
+{ #category : #visiting }
 WSZincTransportVisitor >> currentPath [
 	| currentPath |
-	currentPath := transport request url ifNotNil: [ :url | 
+
+	currentPath := self transport request url ifNotNil: [ :url | 
 		               url path ifEmpty: [ nil ] ].
 	^ currentPath
 		  ifNil: [ Path root ]
@@ -21,37 +27,53 @@ WSZincTransportVisitor >> currentPath [
 
 { #category : #visiting }
 WSZincTransportVisitor >> resolvePath: aPath [
-	^ self currentPath resolve: (context
+	^ self currentPath resolve: (self sender
 			   ifNil: [ aPath ]
 			   ifNotNil: [ :ctx | aPath format: ctx wsEndpointTemps ])
 ]
 
 { #category : #visiting }
+WSZincTransportVisitor >> sender [
+	^ self context ifNotNil: [ :aContext | aContext sender ]
+]
+
+{ #category : #visiting }
+WSZincTransportVisitor >> transport [
+	^ self context ifNotNil: [ :aContext | aContext transport ]
+]
+
+{ #category : #visiting }
 WSZincTransportVisitor >> visitContentBuilder: aBuilder [
 	aBuilder contentReader ifNotNil: [ :aReader | 
-		transport contentReader: aReader ].
+		self transport contentReader: aReader ].
 	aBuilder contentWriter ifNotNil: [ :aWriter | 
-		transport contentWriter: aWriter ]
+		self transport contentWriter: aWriter ]
 ]
 
 { #category : #visiting }
 WSZincTransportVisitor >> visitRequestHeaderBuilder: aHeaderBuilder [
-	transport perform: aHeaderBuilder selector withArguments: { 
+	self transport perform: aHeaderBuilder selector withArguments: { 
 			aHeaderBuilder headerKey.
-			(aHeaderBuilder headerValue format: context wsEndpointTemps) }
+			(aHeaderBuilder headerValue format:
+				 self sender wsEndpointTemps) }
 ]
 
 { #category : #visiting }
 WSZincTransportVisitor >> visitRequestMethodBuilder: aBuilder [
 	aBuilder httpMethod ifNotNil: [ :aMethod | 
-		transport method: aMethod asUppercase ].
+		self transport method: aMethod asUppercase ].
 	aBuilder path ifNotNil: [ :aPath | 
-		transport request url segments: (self resolvePath: aPath) segments ]
+		self transport request url segments: (self resolvePath: aPath) segments ]
 ]
 
 { #category : #visiting }
 WSZincTransportVisitor >> visitRequestQueryBuilder: aBuilder [
-	transport request url perform: aBuilder selector withArguments: { 
-			aBuilder queryKey.
-			(aBuilder queryValue format: context wsEndpointTemps) }
+	self transport request url
+		perform: aBuilder selector
+		withArguments: { 
+				aBuilder queryKey.
+				(self sender
+					 ifNil: [ aBuilder queryValue ]
+					 ifNotNil: [ :sender | 
+					 aBuilder queryValue format: sender wsEndpointTemps ]) }
 ]
