@@ -44,3 +44,21 @@ WSDynamicClient >> initialize [
 	super initialize.
 	transportBuilders := OrderedCollection new
 ]
+
+{ #category : #building }
+WSDynamicClient >> queryAt: aHeader add: aValue [
+	self addTransportBuilder: (WSRequestQueryBuilder new
+			 queryKey: aHeader;
+			 queryValue: aValue;
+			 selector: thisContext method selector;
+			 yourself)
+]
+
+{ #category : #building }
+WSDynamicClient >> queryAt: aHeader put: aValue [
+	self addTransportBuilder: (WSRequestQueryBuilder new
+			 queryKey: aHeader;
+			 queryValue: aValue;
+			 selector: thisContext method selector;
+			 yourself)
+]
