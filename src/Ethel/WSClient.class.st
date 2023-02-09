@@ -114,16 +114,6 @@ WSClient >> execute: anEndpoint with: aBlock [
 	^ result
 ]
 
-{ #category : #accessing }
-WSClient >> httpConfiguration [
-	^ httpConfiguration
-]
-
-{ #category : #accessing }
-WSClient >> httpConfiguration: anObject [
-	httpConfiguration := anObject
-]
-
 { #category : #initialization }
 WSClient >> initializeWithUrl: aUrl [
 	self initialize.
