@@ -93,7 +93,7 @@ TWSEndpointTest >> stubbedHttpWithResponse: aResponse [
 ]
 
 { #category : #'tests-configuring' }
-TWSEndpointTest >> testConfigureOn [
+TWSEndpointTest >> testConfigure [
 	endpoint stub.
 	http := client createHttpClient.
 	endpoint configureOn: http.

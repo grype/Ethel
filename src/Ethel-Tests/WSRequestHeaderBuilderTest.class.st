@@ -9,19 +9,22 @@ Class {
 
 { #category : #tests }
 WSRequestHeaderBuilderTest >> testBuildOnInContext [
-	| http temp visitor |
+	| http temp context |
 
 	http := ZnClient new
-		        get: 'http://example.com';
-		        yourself.
+		  get: 'http://example.com';
+		  yourself.
 	temp := 'omg'.
-	visitor := WSZincTransportVisitor
-		           onTransport: http
-		           inContext: thisContext.
-	WSRequestHeaderBuilder new
-		selector: #headerAt:put:;
-		headerKey: 'X-Testing';
-		headerValue: '{temp}';
-		accept: visitor.
-	(http request headers at: 'X-Testing') should equal: temp
+	context := WSContext new
+		           transport: http;
+		           sender: thisContext;
+		           yourself.
+
+	WSCurrentContext value: context during: [ 
+		WSRequestHeaderBuilder new
+			selector: #headerAt:put:;
+			headerKey: 'X-Testing';
+			headerValue: '{temp}';
+			accept: WSZincTransportVisitor new.
+		(http request headers at: 'X-Testing') should equal: temp ]
 ]

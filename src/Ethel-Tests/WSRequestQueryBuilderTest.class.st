@@ -9,19 +9,22 @@ Class {
 
 { #category : #tests }
 WSRequestQueryBuilderTest >> testBuildOnInContext [
-	| someTemp http visitor |
+	| someTemp http visitor context |
 
 	someTemp := 'omg'.
 	http := ZnClient new
-		        get: 'http://example.com' asUrl;
+		        get: 'http://example.com';
 		        yourself.
-	visitor := WSZincTransportVisitor
-		           onTransport: http
-		           inContext: thisContext.
-	WSRequestQueryBuilder new
-		selector: #queryAt:put:;
-		queryKey: #foo;
-		queryValue: '{someTemp}';
-		accept: visitor.
-	(http request url queryAt: #foo) should equal: someTemp
+	context := WSContext new
+		           transport: http;
+		           sender: thisContext;
+		           yourself.
+	WSCurrentContext value: context during: [ 
+		visitor := WSZincTransportVisitor new.
+		WSRequestQueryBuilder new
+			selector: #queryAt:put:;
+			queryKey: #foo;
+			queryValue: '{someTemp}';
+			accept: visitor.
+		(http request url queryAt: #foo) should equal: someTemp ]
 ]

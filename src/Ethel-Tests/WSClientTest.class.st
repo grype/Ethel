@@ -129,16 +129,19 @@ WSClientTest >> testExecute [
 	client stub.
 	ep stub.
 
-	[ http execute willReturn: response.
+	[ 
+	http execute willReturn: response.
 	http response willReturn: response.
 	client createHttpClient willReturn: http ] should expect.
 
 	ep get should be: response.
 
-	[ ep configureOn: (Instance of: ZnClient).
+	[ 
+	ep configure.
 	client validateRequest: (Instance of: ZnRequest).
 	http execute.
-	client validateResponse: (Instance of: ZnResponse) ] should beDoneInOrder
+	client validateResponse: (Instance of: ZnResponse) ] should
+		beDoneInOrder
 ]
 
 { #category : #tests }
