@@ -113,20 +113,6 @@ TWSEndpoint >> execute: anExecBlock [
 	^ wsClient execute: self with: anExecBlock 
 ]
 
-{ #category : #executing }
-TWSEndpoint >> executingContext [
-
-	| sender |
-	sender := thisContext sender.
-	[ 
-	sender isNotNil and: [ 
-		(sender method isKindOf: CompiledMethod) not or: [ 
-			sender method isWSEndpointExecutionMethod not ] ] ] whileTrue: [ 
-		sender := sender sender ].
-
-	^ sender
-]
-
 { #category : #initialization }
 TWSEndpoint >> initializeOn: aClient [
 	self initialize.
