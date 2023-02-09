@@ -79,7 +79,7 @@ WSClient >> baseUrl [
 	^ baseUrl
 ]
 
-{ #category : #http }
+{ #category : #configuring }
 WSClient >> configure [
 	WSCurrentContext value ifNotNil: [ :context | 
 		context transport url: self baseUrl.
@@ -89,7 +89,7 @@ WSClient >> configure [
 			self configureOn: context transport ] ]
 ]
 
-{ #category : #http }
+{ #category : #configuring }
 WSClient >> configureOn: http [
 	self
 		deprecated: 'Use #configure instead'
@@ -99,7 +99,7 @@ WSClient >> configureOn: http [
 	"self configure"
 ]
 
-{ #category : #http }
+{ #category : #execution }
 WSClient >> createHttpClient [
 
 	^ ZnClient new
@@ -143,12 +143,12 @@ WSClient >> initializeWithUrl: aUrl [
 	baseUrl := aUrl asUrl
 ]
 
-{ #category : #http }
+{ #category : #validating }
 WSClient >> validateRequest: aRequest [
 	(aRequest method isNotNil and: [ aRequest url isNotNil ]) ifFalse: [ WSHttpRequestError signal: aRequest ]
 ]
 
-{ #category : #http }
+{ #category : #validating }
 WSClient >> validateResponse: aResponse [
 	aResponse isSuccess
 		ifFalse: [ WSHttpResponseError signal: aResponse ]
