@@ -77,20 +77,21 @@ TWSEndpoint >> / aStringOrEndpoint [
 ]
 
 { #category : #'building - transport' }
-TWSEndpoint >> build: http inContext: context [
-
+TWSEndpoint >> configure [
 	| pragmas builders visitor |
-	self configureOn: http.
 
-	pragmas := context method pragmas.
-	builders := TWSTransportBuilder users flatCollect: [ :builderClass | 
-		            pragmas
-			            collect: [ :aPragma | builderClass fromPragma: aPragma ]
-			            thenSelect: #isNotNil ].
-	visitor := WSZincTransportVisitor
-		           onTransport: http
-		           inContext: context.
-	builders do: [ :builder | builder accept: visitor ]
+	WSCurrentContext value ifNotNil: [ :context | 
+		pragmas := context sender method pragmas.
+		builders := TWSTransportBuilder users flatCollect: [ :builderClass | 
+			            pragmas
+				            collect: [ :aPragma | 
+				            builderClass fromPragma: aPragma ]
+				            thenSelect: #isNotNil ].
+		visitor := self transportVisitorClass new.
+		builders do: [ :builder | builder accept: visitor ].
+		"-- Call deprecated method. This will be removed in the future --"
+		(self respondsTo: #configureOn:) ifTrue: [ 
+			self configureOn: context transport ] ]
 ]
 
 { #category : #configuring }
@@ -101,6 +102,12 @@ TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
 { #category : #configuring }
 TWSEndpoint >> configureOn: http [
 	"Configures http transport prior to execution"
+
+	self
+		deprecated: 'Use #configure instead'
+		on: '8 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'
 ]
 
 { #category : #executing }
@@ -117,6 +124,11 @@ TWSEndpoint >> execute: anExecBlock [
 TWSEndpoint >> initializeOn: aClient [
 	self initialize.
 	wsClient := aClient
+]
+
+{ #category : #'building - transport' }
+TWSEndpoint >> transportVisitorClass [
+	^ WSZincTransportVisitor
 ]
 
 { #category : #accessing }

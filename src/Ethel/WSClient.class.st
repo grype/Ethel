@@ -80,9 +80,23 @@ WSClient >> baseUrl [
 ]
 
 { #category : #http }
+WSClient >> configure [
+	WSCurrentContext value ifNotNil: [ :context | 
+		context transport url: self baseUrl.
+		
+		"-- Call deprecated method. This will be removed in the future --"
+		(self respondsTo: #configureOn:) ifTrue: [ 
+			self configureOn: context transport ] ]
+]
+
+{ #category : #http }
 WSClient >> configureOn: http [
-	http url: self baseUrl.
-	httpConfiguration ifNotNil: [ :aBlock | aBlock cull: http ]
+	self
+		deprecated: 'Use #configure instead'
+		on: '8 February 2023'
+		in:
+		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
+	"self configure"
 ]
 
 { #category : #http }
@@ -100,17 +114,26 @@ WSClient >> execute: anEndpoint [
 
 { #category : #execution }
 WSClient >> execute: anEndpoint with: aBlock [
-	| http result |
+	| http result context |
 
 	http := self createHttpClient.
-	self configureOn: http.
-	anEndpoint build: http inContext: anEndpoint executingContext.
-	aBlock ifNotNil: [ :block | block cull: http ].
-	self validateRequest: http request.
-	result := http execute.
-	(Smalltalk at: #WrapperSignal ifAbsent: [ nil ]) ifNotNil: [ :signal | 
-		signal emit: http ].
-	self validateResponse: http response.
+	context := WSContext new
+		           transport: http;
+		           endpoint: anEndpoint;
+		           yourself.
+	result := nil.
+
+	WSCurrentContext value: context during: [ 
+		self configure.
+		anEndpoint configure.
+		aBlock ifNotNil: [ :block | block cull: http ].
+		self validateRequest: http request.
+		Smalltalk
+			at: #WrapperSignal
+			ifPresent: [ :signalClass | signalClass emit: http ].
+		result := http execute.
+		self validateResponse: http response ].
+
 	^ result
 ]
 
