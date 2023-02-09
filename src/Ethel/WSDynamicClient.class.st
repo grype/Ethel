@@ -23,7 +23,7 @@ WSDynamicClient >> configure [
 
 { #category : #building }
 WSDynamicClient >> expectJsonContent [
-	self addTransportBuilder: WSRequestJsonContentBuilder new
+	self addTransportBuilder: WSJsonContentBuilder new
 ]
 
 { #category : #building }

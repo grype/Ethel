@@ -1,5 +1,5 @@
 Class {
-	#name : #WSRequestJsonContentBuilder,
+	#name : #WSJsonContentBuilder,
 	#superclass : #Object,
 	#traits : 'TWSTransportBuilder',
 	#classTraits : 'TWSTransportBuilder classTrait',
@@ -11,44 +11,44 @@ Class {
 }
 
 { #category : #'instance creation' }
-WSRequestJsonContentBuilder class >> fromPragma: aPragma [
+WSJsonContentBuilder class >> fromPragma: aPragma [
 	^ aPragma = 'json'
 		  ifTrue: [ self new ]
 		  ifFalse: [ nil ]
 ]
 
 { #category : #'building - transport' }
-WSRequestJsonContentBuilder >> accept: aTransportVisitor [
+WSJsonContentBuilder >> accept: aTransportVisitor [
 	aTransportVisitor visitJsonContentBuilder: self
 ]
 
 { #category : #initialization }
-WSRequestJsonContentBuilder >> initialize [
+WSJsonContentBuilder >> initialize [
 	super initialize.
 	reader := [ :aJsonString | NeoJSONReader fromString: aJsonString ].
 	writer := [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ]
 ]
 
 { #category : #accessing }
-WSRequestJsonContentBuilder >> reader [
+WSJsonContentBuilder >> reader [
 
 	^ reader
 ]
 
 { #category : #accessing }
-WSRequestJsonContentBuilder >> reader: anObject [
+WSJsonContentBuilder >> reader: anObject [
 
 	reader := anObject
 ]
 
 { #category : #accessing }
-WSRequestJsonContentBuilder >> writer [
+WSJsonContentBuilder >> writer [
 
 	^ writer
 ]
 
 { #category : #accessing }
-WSRequestJsonContentBuilder >> writer: anObject [
+WSJsonContentBuilder >> writer: anObject [
 
 	writer := anObject
 ]
