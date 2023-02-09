@@ -22,6 +22,15 @@ WSDynamicClient >> configure [
 ]
 
 { #category : #building }
+WSDynamicClient >> headerAt: aHeader add: aValue [
+	self addTransportBuilder: (WSRequestHeaderBuilder new
+			 headerKey: aHeader;
+			 headerValue: aValue;
+			 selector: thisContext method selector;
+			 yourself)
+]
+
+{ #category : #building }
 WSDynamicClient >> headerAt: aHeader put: aValue [
 	self addTransportBuilder: (WSRequestHeaderBuilder new
 			 headerKey: aHeader;
