@@ -60,12 +60,6 @@ Class {
 }
 
 { #category : #configuring }
-WSPluggableEndpoint >> configureDerivedEndpoint: anEndpoint [
-	(anEndpoint respondsTo: #httpConfiguration:)
-		ifTrue: [ anEndpoint httpConfiguration: self httpConfiguration ]
-]
-
-{ #category : #configuring }
 WSPluggableEndpoint >> configureOn: http [
 	http method: method asString asUppercase asSymbol.
 	httpConfiguration ifNotNil: [ :val | val cull: http cull: self ]
@@ -96,17 +90,6 @@ WSPluggableEndpoint >> enumeration [
 { #category : #accessing }
 WSPluggableEndpoint >> enumeration: anObject [
 	enumeration := anObject
-]
-
-{ #category : #executing }
-WSPluggableEndpoint >> executingContext [
-	| sender |
-
-	sender := thisContext sender.
-	[ sender isNotNil and: [ sender method isWSEndpointExecutionMethod not ] ]
-		whileTrue: [ sender := sender sender ].
-
-	^ sender
 ]
 
 { #category : #api }
