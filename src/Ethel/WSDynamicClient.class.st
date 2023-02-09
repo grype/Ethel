@@ -22,6 +22,11 @@ WSDynamicClient >> configure [
 ]
 
 { #category : #building }
+WSDynamicClient >> expectJsonContent [
+	self addTransportBuilder: WSRequestJsonContentBuilder new
+]
+
+{ #category : #building }
 WSDynamicClient >> headerAt: aHeader add: aValue [
 	self addTransportBuilder: (WSRequestHeaderBuilder new
 			 headerKey: aHeader;
