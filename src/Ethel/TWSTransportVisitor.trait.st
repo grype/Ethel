@@ -10,16 +10,20 @@ Trait {
 
 { #category : #visiting }
 TWSTransportVisitor >> visitContentBuilder: aBuilder [
+	^ self subclassResponsibility
 ]
 
 { #category : #visiting }
 TWSTransportVisitor >> visitRequestHeaderBuilder: aBuilder [
+	^ self subclassResponsibility
 ]
 
 { #category : #visiting }
 TWSTransportVisitor >> visitRequestMethodBuilder: aBuilder [
+	^ self subclassResponsibility
 ]
 
 { #category : #visiting }
 TWSTransportVisitor >> visitRequestQueryBuilder: aBuilder [
+	^ self subclassResponsibility
 ]
