@@ -39,27 +39,6 @@ WSClient class >> endpoints [
 	^ self derivedWSEndpoints
 ]
 
-{ #category : #'instance creation' }
-WSClient class >> jsonWithUrl: aUrl [
-	^ (self withUrl: aUrl)
-		httpConfiguration: [ :http | 
-			http
-				contentReader: [ :aJsonString | NeoJSONReader fromString: aJsonString ];
-				contentWriter: [ :obj | NeoJSONWriter toString: obj ] ];
-		yourself
-]
-
-{ #category : #'instance creation' }
-WSClient class >> jsonWithUrl: aUrl httpConfiguration: aBlock [
-	^ (self withUrl: aUrl)
-		httpConfiguration: [ :http | 
-			http
-				contentReader: [ :aJsonString | NeoJSONReader fromString: aJsonString ];
-				contentWriter: [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ].
-			aBlock ifNotNil: [ :val | val cull: http ] ];
-		yourself
-]
-
 { #category : #http }
 WSClient class >> supportedHttpMethods [
 	"Returns array of supported HTTP methods. These are used to identify and verify executing endpoint methods - any such method should declare a corresponding pragma."
