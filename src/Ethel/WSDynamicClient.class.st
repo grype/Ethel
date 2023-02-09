@@ -7,7 +7,7 @@ Class {
 	#category : #'Ethel-Core'
 }
 
-{ #category : #adding }
+{ #category : #building }
 WSDynamicClient >> addTransportBuilder: aBuilder [
 	transportBuilders add: aBuilder
 ]
@@ -21,7 +21,7 @@ WSDynamicClient >> configure [
 	transportBuilders do: [ :aBuilder | aBuilder accept: visitor ]
 ]
 
-{ #category : #accessing }
+{ #category : #building }
 WSDynamicClient >> headerAt: aHeader put: aValue [
 	self addTransportBuilder: (WSRequestHeaderBuilder new
 			 headerKey: aHeader;
