@@ -95,11 +95,6 @@ TWSEndpoint >> configure [
 ]
 
 { #category : #configuring }
-TWSEndpoint >> configureDerivedEndpoint: anEndpoint [
-	"Configures newly derived endpoint"
-]
-
-{ #category : #configuring }
 TWSEndpoint >> configureOn: http [
 	"Configures http transport prior to execution"
 
