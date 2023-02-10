@@ -18,15 +18,20 @@ GHGraphqlClient >> baseUrl [
 ]
 
 { #category : #http }
-GHGraphqlClient >> configureOn: http [
-	super configureOn: http.
-	http
-		headerAt: #Authorization put: 'bearer ' , config authToken;
-		enforceHttpSuccess: true;
-		enforceAcceptContentType: false;
-		numberOfRetries: 3;
-		contentWriter: [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ];
-		contentReader: [ :obj | NeoJSONReader fromString: obj ]
+GHGraphqlClient >> configure [
+	super configure.
+	WSCurrentContext value ifNotNil: [ :context | 
+		| http |
+
+		http := context transport.
+		http
+			headerAt: #Authorization put: 'bearer ' , config authToken;
+			enforceHttpSuccess: true;
+			enforceAcceptContentType: false;
+			numberOfRetries: 3;
+			contentWriter: [ :obj | 
+				ZnEntity json: (NeoJSONWriter toString: obj) ];
+			contentReader: [ :obj | NeoJSONReader fromString: obj ] ]
 ]
 
 { #category : #initialization }

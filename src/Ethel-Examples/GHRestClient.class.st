@@ -18,14 +18,17 @@ GHRestClient >> baseUrl [
 ]
 
 { #category : #http }
-GHRestClient >> configureOn: http [
-	super configureOn: http.
-	http
-		contentReader: [ :entity | 
+GHRestClient >> configure [
+	super configure.
+	WSCurrentContext value ifNotNil: [ :context | 
+		| http |
+
+		http := context transport.
+		http contentReader: [ :entity | 
 			(entity contentType sub asLowercase includesSubstring: 'json')
 				ifTrue: [ NeoJSONReader fromString: entity contents ]
 				ifFalse: [ entity contents ] ].
-	http headerAt: #Authorization put: 'token ' , config authToken
+		http headerAt: #Authorization put: 'token ' , config authToken ]
 ]
 
 { #category : #execution }

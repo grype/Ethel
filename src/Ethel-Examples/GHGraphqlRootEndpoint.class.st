@@ -9,7 +9,7 @@ Class {
 	#category : #'Ethel-Examples-Github-GraphQL'
 }
 
-{ #category : #configuring }
+{ #category : #'as yet unclassified' }
 GHGraphqlRootEndpoint >> configureOn: http [
 	query
 		ifNotNil: [ :val | 

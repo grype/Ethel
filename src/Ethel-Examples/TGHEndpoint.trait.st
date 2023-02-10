@@ -8,7 +8,7 @@ Trait {
 	#category : #'Ethel-Examples-Github-REST'
 }
 
-{ #category : #configuring }
+{ #category : #'as yet unclassified' }
 TGHEndpoint >> configureOn: http [
 
 	http request url path segments:

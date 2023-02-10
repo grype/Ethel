@@ -9,7 +9,7 @@ Class {
 	#category : #'Ethel-Examples-Github-REST'
 }
 
-{ #category : #configuring }
+{ #category : #'as yet unclassified' }
 GHRestAbstractGistsEndpoint >> configureOn: http [
 
 	http request url

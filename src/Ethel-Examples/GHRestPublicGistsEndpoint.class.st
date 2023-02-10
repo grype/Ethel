@@ -6,7 +6,7 @@ Class {
 	#category : #'Ethel-Examples-Github-REST'
 }
 
-{ #category : #configuring }
+{ #category : #'as yet unclassified' }
 GHRestPublicGistsEndpoint >> configureOn: http [
 	super configureOn: http.
 	self configurePaginationOn: http
