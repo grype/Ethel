@@ -14,8 +14,8 @@ TWSTransportVisitor >> visitContentBuilder: aBuilder [
 ]
 
 { #category : #visiting }
-TWSTransportVisitor >> visitJsonContentBuilder: aBuilder [
-	^ self subclassResponsibility
+TWSTransportVisitor >> visitContextBuilder: aBuilder [
+	^ aBuilder block value: WSCurrentContext value
 ]
 
 { #category : #visiting }

@@ -1,12 +1,7 @@
 Class {
 	#name : #WSJsonContentBuilder,
-	#superclass : #Object,
-	#traits : 'TWSTransportBuilder',
+	#superclass : #WSContentBuilder,
 	#classTraits : 'TWSTransportBuilder classTrait',
-	#instVars : [
-		'reader',
-		'writer'
-	],
 	#category : #'Ethel-Builders'
 }
 
@@ -17,38 +12,9 @@ WSJsonContentBuilder class >> fromPragma: aPragma [
 		  ifFalse: [ nil ]
 ]
 
-{ #category : #'building - transport' }
-WSJsonContentBuilder >> accept: aTransportVisitor [
-	aTransportVisitor visitJsonContentBuilder: self
-]
-
 { #category : #initialization }
 WSJsonContentBuilder >> initialize [
 	super initialize.
 	reader := [ :aJsonString | NeoJSONReader fromString: aJsonString ].
 	writer := [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ]
-]
-
-{ #category : #accessing }
-WSJsonContentBuilder >> reader [
-
-	^ reader
-]
-
-{ #category : #accessing }
-WSJsonContentBuilder >> reader: anObject [
-
-	reader := anObject
-]
-
-{ #category : #accessing }
-WSJsonContentBuilder >> writer [
-
-	^ writer
-]
-
-{ #category : #accessing }
-WSJsonContentBuilder >> writer: anObject [
-
-	writer := anObject
 ]

@@ -44,17 +44,15 @@ WSZincTransportVisitor >> transport [
 
 { #category : #visiting }
 WSZincTransportVisitor >> visitContentBuilder: aBuilder [
-	aBuilder contentReader ifNotNil: [ :aReader | 
-		self transport contentReader: aReader ].
-	aBuilder contentWriter ifNotNil: [ :aWriter | 
+	aBuilder reader ifNotNil: [ :aReader | 
+		aReader isBlock
+			ifTrue: [ self transport contentReader: aReader ]
+			ifFalse: [ 
+				self sender ifNotNil: [ :sender | 
+					self transport contentReader: [ :aContent | 
+						sender receiver perform: aReader with: aContent ] ] ] ].
+	aBuilder writer ifNotNil: [ :aWriter | 
 		self transport contentWriter: aWriter ]
-]
-
-{ #category : #visiting }
-WSZincTransportVisitor >> visitJsonContentBuilder: aBuilder [
-	self transport
-		contentReader: aBuilder reader;
-		contentWriter: aBuilder writer
 ]
 
 { #category : #visiting }
