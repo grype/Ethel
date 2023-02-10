@@ -18,7 +18,7 @@ TWSTestEndpoint classSide >> testHeaderValue [
 	^ 'Testing'
 ]
 
-{ #category : #configuring }
+{ #category : #'as yet unclassified' }
 TWSTestEndpoint >> configureDerivedEndpoint: anEndpoint [
 	self headers
 		associationsDo: [ :each | 
@@ -26,7 +26,7 @@ TWSTestEndpoint >> configureDerivedEndpoint: anEndpoint [
 				ifTrue: [ anEndpoint headers add: each ] ]
 ]
 
-{ #category : #configuring }
+{ #category : #'as yet unclassified' }
 TWSTestEndpoint >> configureOn: http [
 	http headerAt: self class testHeaderName put: self class testHeaderValue 
 ]
