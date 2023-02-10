@@ -1,6 +1,6 @@
 Extension { #name : #ZnUrl }
 
 { #category : #'*Ethel' }
-ZnUrl >> asWebService [
+ZnUrl >> asWebClient [
 	^ WSDynamicClient withUrl: self
 ]

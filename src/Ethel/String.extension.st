@@ -1,6 +1,6 @@
 Extension { #name : #String }
 
 { #category : #'*Ethel' }
-String >> asWebService [
+String >> asWebClient [
 	^ WSDynamicClient withUrl: self asUrl
 ]
