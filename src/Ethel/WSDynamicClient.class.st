@@ -12,6 +12,11 @@ WSDynamicClient >> addTransportBuilder: aBuilder [
 	transportBuilders add: aBuilder
 ]
 
+{ #category : #enumerating }
+WSDynamicClient >> beforeRequestDo: aBlock [
+	self addTransportBuilder: (WSContextBuilder with: aBlock)
+]
+
 { #category : #configuring }
 WSDynamicClient >> configure [
 	| visitor |
@@ -66,4 +71,14 @@ WSDynamicClient >> queryAt: aHeader put: aValue [
 			 queryValue: aValue;
 			 selector: thisContext method selector;
 			 yourself)
+]
+
+{ #category : #'as yet unclassified' }
+WSDynamicClient >> readContents: aBlock [
+	self addTransportBuilder: (WSContentBuilder new reader: aBlock)
+]
+
+{ #category : #'as yet unclassified' }
+WSDynamicClient >> writeContents: aBlock [
+	self addTransportBuilder: (WSContentBuilder new writer: aBlock)
 ]
