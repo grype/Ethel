@@ -47,14 +47,13 @@ To explicitly create a pluggable endpoint:
 Class {
 	#name : #WSPluggableEndpoint,
 	#superclass : #Object,
-	#traits : 'TWSEndpoint + TWSEnumeration',
+	#traits : 'TWSEndpoint @ {#defaultConfigure->#configure} + TWSEnumeration',
 	#classTraits : 'TWSEndpoint classTrait + TWSEnumeration classTrait',
 	#instVars : [
 		'path',
-		'method',
 		'enumeration',
-		'httpConfiguration',
-		'wsClient'
+		'wsClient',
+		'ignoresPath'
 	],
 	#category : #'Ethel-Core'
 }
@@ -72,13 +71,13 @@ WSPluggableEndpoint >> cursor [
 
 { #category : #api }
 WSPluggableEndpoint >> delete [
-	method := #delete.
+	<delete>
 	^ self execute
 ]
 
 { #category : #api }
 WSPluggableEndpoint >> delete: aBlock [
-	method := #delete.
+	<delete>
 	^ self execute: aBlock
 ]
 
@@ -94,13 +93,13 @@ WSPluggableEndpoint >> enumeration: anObject [
 
 { #category : #api }
 WSPluggableEndpoint >> get [
-	method := #get.
+	<get>
 	^ self execute
 ]
 
 { #category : #api }
 WSPluggableEndpoint >> get: aBlock [
-	method := #get.
+	<get>
 	^ self execute: aBlock
 ]
 
@@ -122,13 +121,13 @@ WSPluggableEndpoint >> nextWith: aCursor [
 
 { #category : #api }
 WSPluggableEndpoint >> patch [
-	method := #patch.
+	<patch>
 	^ self execute
 ]
 
 { #category : #api }
 WSPluggableEndpoint >> patch: aBlock [
-	method := #patch.
+	<patch>
 	^ self execute: aBlock
 ]
 
@@ -144,25 +143,25 @@ WSPluggableEndpoint >> path: anObject [
 
 { #category : #api }
 WSPluggableEndpoint >> post [
-	method := #post.
+	<post>
 	^ self execute
 ]
 
 { #category : #api }
 WSPluggableEndpoint >> post: aBlock [
-	method := #post.
+	<post>
 	^ self execute: aBlock
 ]
 
 { #category : #api }
 WSPluggableEndpoint >> put [
-	method := #put.
+	<put>
 	^ self execute
 ]
 
 { #category : #api }
 WSPluggableEndpoint >> put: aBlock [
-	method := #put.
+	<put>
 	^ self execute: aBlock
 ]
 
