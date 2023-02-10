@@ -69,10 +69,11 @@ TWSEndpoint classSide >> systemIconName [
 
 { #category : #endpoints }
 TWSEndpoint >> / aStringOrEndpoint [
-
 	| ep |
+
 	ep := self wsClient / aStringOrEndpoint.
-	self configureDerivedEndpoint: ep.
+	(self respondsTo: #configureDerivedEndpoint:) ifTrue: [ 
+		self configureDerivedEndpoint: ep ].
 	^ ep
 ]
 
@@ -92,17 +93,6 @@ TWSEndpoint >> configure [
 		"-- Call deprecated method. This will be removed in the future --"
 		(self respondsTo: #configureOn:) ifTrue: [ 
 			self configureOn: context transport ] ]
-]
-
-{ #category : #configuring }
-TWSEndpoint >> configureOn: http [
-	"Configures http transport prior to execution"
-
-	self
-		deprecated: 'Use #configure instead'
-		on: '8 February 2023'
-		in:
-		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'
 ]
 
 { #category : #executing }

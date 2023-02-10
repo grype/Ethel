@@ -82,21 +82,7 @@ WSClient >> baseUrl [
 { #category : #configuring }
 WSClient >> configure [
 	WSCurrentContext value ifNotNil: [ :context | 
-		context transport url: self baseUrl.
-		
-		"-- Call deprecated method. This will be removed in the future --"
-		(self respondsTo: #configureOn:) ifTrue: [ 
-			self configureOn: context transport ] ]
-]
-
-{ #category : #configuring }
-WSClient >> configureOn: http [
-	self
-		deprecated: 'Use #configure instead'
-		on: '8 February 2023'
-		in:
-		'Pharo-10.0.0+build.536.sha.2314c3f457171dcde477ff6575b578835f1fd519 (64 Bit)'.
-	"self configure"
+		context transport url: self baseUrl ]
 ]
 
 { #category : #execution }

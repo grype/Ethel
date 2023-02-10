@@ -58,10 +58,22 @@ Class {
 	#category : #'Ethel-Core'
 }
 
-{ #category : #configuring }
-WSPluggableEndpoint >> configureOn: http [
-	http method: method asString asUppercase asSymbol.
-	httpConfiguration ifNotNil: [ :val | val cull: http cull: self ]
+{ #category : #endpoints }
+WSPluggableEndpoint >> / aStringOrEndpoint [
+	| ep |
+
+	ep := self wsClient / aStringOrEndpoint.
+	(ep isKindOf: WSPluggableEndpoint) ifTrue: [ 
+		ep path: (Path from: path pathString , ep path pathString) ].
+	^ ep
+]
+
+{ #category : #'building - transport' }
+WSPluggableEndpoint >> configure [
+	self defaultConfigure.
+	WSCurrentContext value ifNotNil: [ :context | 
+		ignoresPath ifFalse: [ 
+			context transport request url addPathSegments: path segments ] ]
 ]
 
 { #category : #accessing }
@@ -104,13 +116,15 @@ WSPluggableEndpoint >> get: aBlock [
 ]
 
 { #category : #accessing }
-WSPluggableEndpoint >> httpConfiguration [
-	^ httpConfiguration
+WSPluggableEndpoint >> ignoresPath [
+
+	^ ignoresPath
 ]
 
 { #category : #accessing }
-WSPluggableEndpoint >> httpConfiguration: anObject [
-	httpConfiguration := anObject
+WSPluggableEndpoint >> ignoresPath: anObject [
+
+	ignoresPath := anObject
 ]
 
 { #category : #enumerating }
