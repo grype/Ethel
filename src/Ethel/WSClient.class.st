@@ -57,12 +57,13 @@ WSClient class >> withUrl: aUrl [
 
 { #category : #endpoints }
 WSClient >> / aPathOrEndpoint [
-
 	^ aPathOrEndpoint isWSEndpoint
 		  ifTrue: [ aPathOrEndpoint on: self ]
 		  ifFalse: [ 
 			  (WSPluggableEndpoint on: self)
-				  resolve: aPathOrEndpoint;
+				  path: (aPathOrEndpoint isString
+						   ifTrue: [ Path from: aPathOrEndpoint ]
+						   ifFalse: [ aPathOrEndpoint ]);
 				  yourself ]
 ]
 

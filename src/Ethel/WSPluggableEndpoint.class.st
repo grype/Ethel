@@ -64,7 +64,7 @@ WSPluggableEndpoint >> / aStringOrEndpoint [
 
 	ep := self wsClient / aStringOrEndpoint.
 	(ep isKindOf: WSPluggableEndpoint) ifTrue: [ 
-		ep path: (Path from: path pathString , ep path pathString) ].
+		ep path: (path resolve: ep path) ].
 	^ ep
 ]
 
@@ -127,6 +127,12 @@ WSPluggableEndpoint >> ignoresPath: anObject [
 	ignoresPath := anObject
 ]
 
+{ #category : #initialization }
+WSPluggableEndpoint >> initialize [
+	super initialize.
+	path := Path * ''
+]
+
 { #category : #enumerating }
 WSPluggableEndpoint >> nextWith: aCursor [
 	^ enumeration ifNotNil: [ :enumBlock | 
@@ -182,7 +188,7 @@ WSPluggableEndpoint >> put: aBlock [
 { #category : #resolving }
 WSPluggableEndpoint >> resolve: aPathOrString [
 
-	path := (path ifNil: [ Path root ]) resolve: (aPathOrString isString
+	path := (path ifNil: [ wsClient basePath ]) resolve: (aPathOrString isString
 			         ifTrue: [ Path * aPathOrString ]
 			         ifFalse: [ aPathOrString ])
 ]
