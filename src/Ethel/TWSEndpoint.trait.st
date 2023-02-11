@@ -73,7 +73,11 @@ TWSEndpoint >> / aStringOrEndpoint [
 
 	ep := self wsClient / aStringOrEndpoint.
 	(self respondsTo: #configureDerivedEndpoint:) ifTrue: [ 
-		self configureDerivedEndpoint: ep ].
+		Deprecation new
+			context: thisContext sender;
+			explanation: 'Override #/ instead';
+			signal.
+		self perform: #configureDerivedEndpoint: with: ep ].
 	^ ep
 ]
 
