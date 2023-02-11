@@ -54,12 +54,18 @@ TWSEndpointTest >> stubForEnumeration [
 	http := self stubbedHttpWithResponse: (self okResponseWith: [ 
 			         (endpoint offset to:
 			          (cursor total min: endpoint offset + endpoint limit) - 1)
-				         asOrderedCollection ])
+				         asOrderedCollection ]).
+	self stubForValidatedRequest 
 ]
 
 { #category : #stubbing }
 TWSEndpointTest >> stubForExecution [
 	http := self stubbedHttpWithResponse: self okResponse
+]
+
+{ #category : #stubbing }
+TWSEndpointTest >> stubForValidatedRequest [
+	(client stub validateRequest: Any) willReturn: true
 ]
 
 { #category : #stubbing }
@@ -96,10 +102,16 @@ TWSEndpointTest >> stubbedHttpWithResponse: aResponse [
 TWSEndpointTest >> testConfigure [
 	endpoint stub.
 	http := client createHttpClient.
-	endpoint configureOn: http.
-	http request headers should
-		include: WSTestEndpoint testHeaderValue
-		at: WSTestEndpoint testHeaderName
+	WSCurrentContext
+		value: (WSContext new
+				 transport: http;
+				 endpoint: endpoint;
+				 yourself)
+		during: [ 
+			endpoint configure.
+			http request headers should
+				include: WSTestEndpoint testHeaderValue
+				at: WSTestEndpoint testHeaderName ]
 ]
 
 { #category : #'tests-composing' }
@@ -239,10 +251,10 @@ TWSEndpointTest >> testHttpMethod [
 	| stubbedHttp |
 
 	stubbedHttp := self stubbedHttpWithResponse: self okResponse.
-	client class supportedHttpMethods
-		do: [ :method | 
-			endpoint perform: method.
-			stubbedHttp request method asLowercase should equal: method asLowercase ]
+	client class supportedHttpMethods do: [ :method | 
+		endpoint perform: method.
+		stubbedHttp request method asLowercase should equal:
+			method asLowercase ]
 ]
 
 { #category : #'tests-other' }
@@ -307,10 +319,11 @@ TWSEndpointTest >> testOn [
 { #category : #'tests-composing' }
 TWSEndpointTest >> testPluggableEndpointComposition [
 	| ep |
+
 	ep := endpoint / 'pluggable'.
 	ep class should equal: WSPluggableEndpoint.
 	ep wsClient should equal: endpoint wsClient.
-	ep path should equal: Path / 'pluggable'
+	ep path should equal: Path * 'pluggable'
 ]
 
 { #category : #'tests-executing' }

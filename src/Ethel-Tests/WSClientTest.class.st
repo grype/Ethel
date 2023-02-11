@@ -16,9 +16,9 @@ WSClientTest >> ensureEndpoint: aDestination derivedFrom: aSource as: aClass [
 
 { #category : #tests }
 WSClientTest >> ensureEndpoint: aDestination derivedPluggableEndpointFrom: aSource usingPath: aPath [
-
 	aDestination class should equal: WSPluggableEndpoint.
-	aDestination wsClient should equal: aSource
+	aDestination wsClient should equal: aSource.
+	aDestination path should equal: aPath
 ]
 
 { #category : #running }
@@ -57,7 +57,7 @@ WSClientTest >> testEndpointCompositionWithClass [
 	self
 		ensureEndpoint: client / #nowhere / #in / #particular
 		derivedPluggableEndpointFrom: client
-		usingPath: Path / #nowhere / #in / #particular
+		usingPath: Path * #nowhere / #in / #particular
 ]
 
 { #category : #tests }
@@ -70,7 +70,7 @@ WSClientTest >> testEndpointCompositionWithPath [
 	self
 		ensureEndpoint: client / (Path * #test)
 		derivedPluggableEndpointFrom: client
-		usingPath: client / #test.
+		usingPath: Path * #test.
 
 	self
 		ensureEndpoint: client / (Path / #nothing / #here)
@@ -83,22 +83,17 @@ WSClientTest >> testEndpointCompositionWithString [
 	self
 		ensureEndpoint: client / #test
 		derivedPluggableEndpointFrom: client
-		usingPath: Path / #test.
+		usingPath: Path * #test.
 
 	self
 		ensureEndpoint: client / #test / #nested
 		derivedPluggableEndpointFrom: client
-		usingPath: Path / #test / #nested.
+		usingPath: Path * #test / #nested.
 
 	self
 		ensureEndpoint: client / 'test/nested'
 		derivedPluggableEndpointFrom: client
-		usingPath: Path / #test / #nested.
-
-	self
-		ensureEndpoint: client / #nothing / #here
-		derivedPluggableEndpointFrom: client
-		usingPath: Path / #nothing / #here
+		usingPath: Path * #test / #nested
 ]
 
 { #category : #tests }
@@ -132,7 +127,8 @@ WSClientTest >> testExecute [
 	[ 
 	http execute willReturn: response.
 	http response willReturn: response.
-	client createHttpClient willReturn: http ] should expect.
+	client createHttpClient willReturn: http.
+	(client validateRequest: Any) willReturn: true. ] should expect.
 
 	ep get should be: response.
 

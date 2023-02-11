@@ -18,17 +18,23 @@ TWSTestEndpoint classSide >> testHeaderValue [
 	^ 'Testing'
 ]
 
-{ #category : #'as yet unclassified' }
-TWSTestEndpoint >> configureDerivedEndpoint: anEndpoint [
-	self headers
-		associationsDo: [ :each | 
-			(anEndpoint traitComposition includesTrait: TWSTestEndpoint)
-				ifTrue: [ anEndpoint headers add: each ] ]
+{ #category : #endpoints }
+TWSTestEndpoint >> / aStringOrEndpoint [
+	| ep |
+
+	ep := self wsClient / aStringOrEndpoint.
+	self headers associationsDo: [ :each | 
+		(ep traitComposition includesTrait: TWSTestEndpoint) ifTrue: [ 
+			ep headers add: each ] ].
+	^ ep
 ]
 
 { #category : #'as yet unclassified' }
-TWSTestEndpoint >> configureOn: http [
-	http headerAt: self class testHeaderName put: self class testHeaderValue 
+TWSTestEndpoint >> configure [
+	WSCurrentContext value ifNotNil: [ :context | 
+		context transport
+			headerAt: self class testHeaderName
+			put: self class testHeaderValue ]
 ]
 
 { #category : #accessing }
