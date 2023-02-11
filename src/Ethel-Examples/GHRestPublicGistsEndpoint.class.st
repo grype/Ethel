@@ -7,9 +7,10 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-GHRestPublicGistsEndpoint >> configureOn: http [
-	super configureOn: http.
-	self configurePaginationOn: http
+GHRestPublicGistsEndpoint >> configure [
+	super configure.
+	WSCurrentContext value ifNotNil: [ :context | 
+		self configurePaginationOn: context transport ]
 ]
 
 { #category : #accessing }
