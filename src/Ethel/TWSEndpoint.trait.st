@@ -83,20 +83,13 @@ TWSEndpoint >> / aStringOrEndpoint [
 
 { #category : #'building - transport' }
 TWSEndpoint >> configure [
-	| pragmas builders visitor |
-
 	WSCurrentContext value ifNotNil: [ :context | 
-		pragmas := context sender method pragmas.
-		builders := TWSTransportBuilder users flatCollect: [ :builderClass | 
-			            pragmas
-				            collect: [ :aPragma | 
-				            builderClass fromPragma: aPragma ]
-				            thenSelect: #isNotNil ].
-		visitor := self transportVisitorClass new.
-		builders do: [ :builder | builder accept: visitor ].
-		"-- Call deprecated method. This will be removed in the future --"
 		(self respondsTo: #configureOn:) ifTrue: [ 
-			self configureOn: context transport ] ]
+			Deprecation new
+				context: thisContext sender;
+				explanation: 'Use #configure instead';
+				signal.
+			self perform: #configureOn: with: context transport ] ]
 ]
 
 { #category : #executing }
@@ -113,11 +106,6 @@ TWSEndpoint >> execute: anExecBlock [
 TWSEndpoint >> initializeOn: aClient [
 	self initialize.
 	wsClient := aClient
-]
-
-{ #category : #'building - transport' }
-TWSEndpoint >> transportVisitorClass [
-	^ WSZincTransportVisitor
 ]
 
 { #category : #accessing }

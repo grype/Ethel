@@ -50,6 +50,11 @@ WSClient class >> systemIconName [
 	^ #remote
 ]
 
+{ #category : #'building - transport' }
+WSClient class >> transportVisitorClass [
+	^ WSZincTransportVisitor
+]
+
 { #category : #'instance creation' }
 WSClient class >> withUrl: aUrl [
 	^ self basicNew initializeWithUrl: aUrl
@@ -82,6 +87,39 @@ WSClient >> baseUrl [
 
 { #category : #configuring }
 WSClient >> configure [
+	self configureRequestUrl.
+	self configureBuilders.
+	self configureDeprecated
+]
+
+{ #category : #configuring }
+WSClient >> configureBuilders [
+	| pragmas builders visitor |
+
+	WSCurrentContext value ifNotNil: [ :context | 
+		pragmas := context sender method pragmas.
+		builders := TWSTransportBuilder users flatCollect: [ :builderClass | 
+			            pragmas
+				            collect: [ :aPragma | 
+				            builderClass fromPragma: aPragma ]
+				            thenSelect: #isNotNil ].
+		visitor := self class transportVisitorClass new.
+		builders do: [ :builder | builder accept: visitor ] ]
+]
+
+{ #category : #configuring }
+WSClient >> configureDeprecated [
+	WSCurrentContext value ifNotNil: [ :context | 
+		(self respondsTo: #configureOn:) ifTrue: [ 
+			Deprecation new
+				context: thisContext sender;
+				explanation: 'Use #configure instead';
+				signal.
+			self perform: #configureOn: with: context transport ] ]
+]
+
+{ #category : #configuring }
+WSClient >> configureRequestUrl [
 	WSCurrentContext value ifNotNil: [ :context | 
 		context transport url: self baseUrl ]
 ]
