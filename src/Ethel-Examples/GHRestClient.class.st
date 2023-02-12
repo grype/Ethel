@@ -21,14 +21,17 @@ GHRestClient >> baseUrl [
 GHRestClient >> configure [
 	super configure.
 	WSCurrentContext value ifNotNil: [ :context | 
-		| http |
+		| http newPath |
 
 		http := context transport.
 		http contentReader: [ :entity | 
 			(entity contentType sub asLowercase includesSubstring: 'json')
 				ifTrue: [ NeoJSONReader fromString: entity contents ]
 				ifFalse: [ entity contents ] ].
-		http headerAt: #Authorization put: 'token ' , config authToken ]
+		http headerAt: #Authorization put: 'token ' , config authToken.
+		newPath := self basePath resolve: context endpoint endpointPath.
+		http request url clearPath.
+		http request url addPathSegments: newPath segments ]
 ]
 
 { #category : #execution }
