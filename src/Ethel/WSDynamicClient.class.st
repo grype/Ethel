@@ -73,12 +73,12 @@ WSDynamicClient >> queryAt: aHeader put: aValue [
 			 yourself)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #building }
 WSDynamicClient >> readContents: aBlock [
 	self addTransportBuilder: (WSContentBuilder new reader: aBlock)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #building }
 WSDynamicClient >> writeContents: aBlock [
 	self addTransportBuilder: (WSContentBuilder new writer: aBlock)
 ]
