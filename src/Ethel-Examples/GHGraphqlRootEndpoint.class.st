@@ -9,14 +9,15 @@ Class {
 	#category : #'Ethel-Examples-Github-GraphQL'
 }
 
-{ #category : #'as yet unclassified' }
-GHGraphqlRootEndpoint >> configureOn: http [
-	query
-		ifNotNil: [ :val | 
+{ #category : #configuring }
+GHGraphqlRootEndpoint >> configure [
+	WSCurrentContext value ifNotNil: [ :context | 
+		query ifNotNil: [ :val | 
 			| q |
 
-			q := GHGraphqlNode named: #query parameters: nil children: {val}.
-			http contents: {(#query -> q printString)} asDictionary ]
+			q := GHGraphqlNode named: #query parameters: nil children: { val }.
+			context transport contents:
+				{ (#query -> q printString) } asDictionary ] ]
 ]
 
 { #category : #executing }

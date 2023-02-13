@@ -10,15 +10,18 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-GHRestAbstractGistsEndpoint >> configureOn: http [
+GHRestAbstractGistsEndpoint >> configure [
+	WSCurrentContext value ifNotNil: [ :context | 
+		| http |
 
-	http request url
-		clearPath;
-		addPathSegments:
-			(wsClient basePath resolve: self endpointPath) segments.
+		http := context transport.
+		http request url
+			clearPath;
+			addPathSegments:
+				(wsClient basePath resolve: self endpointPath) segments.
 
-	since ifNotNil: [ :aDateAndTime | 
-		http queryAt: #since put: aDateAndTime printString ]
+		since ifNotNil: [ :aDateAndTime | 
+			http queryAt: #since put: aDateAndTime printString ] ]
 ]
 
 { #category : #accessing }
