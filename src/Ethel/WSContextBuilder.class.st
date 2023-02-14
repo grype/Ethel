@@ -1,3 +1,13 @@
+"
+I provide pluggable behavior for configuring transport.
+
+I help `WSDynamicClient` with adhoc transport configuration. For example:
+
+```
+'https://example.com/api' asWebClient
+	beforeRequestDo: [:context | ... ]
+```
+"
 Class {
 	#name : #WSContextBuilder,
 	#superclass : #Object,

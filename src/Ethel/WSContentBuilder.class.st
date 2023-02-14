@@ -1,3 +1,10 @@
+"
+I am an abstract content builder.
+
+My subclasses define how to encode request data and/or decode response data.
+
+Subclasses are expected to provide their implementations via #reader and #writer.
+"
 Class {
 	#name : #WSContentBuilder,
 	#superclass : #Object,

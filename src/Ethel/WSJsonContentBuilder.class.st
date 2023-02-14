@@ -1,3 +1,6 @@
+"
+I encode/decode data using JSON format
+"
 Class {
 	#name : #WSJsonContentBuilder,
 	#superclass : #WSContentBuilder,

@@ -1,3 +1,6 @@
+"
+I encode/decode data using Base64 format
+"
 Class {
 	#name : #WSBase64ContentBuilder,
 	#superclass : #WSContentBuilder,
