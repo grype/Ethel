@@ -24,7 +24,7 @@ Behavior >> derivedWSEndpoints [
 { #category : #'*Ethel' }
 Behavior >> isWSEndpoint [
 	^ self withAllSuperclasses
-		contains: [ :each | each traitComposition includesTrait: TWSEndpoint ]
+		anySatisfy: [ :each | each traitComposition includesTrait: TWSEndpoint ]
 ]
 
 { #category : #'*Ethel' }
