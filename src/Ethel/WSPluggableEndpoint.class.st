@@ -63,8 +63,7 @@ WSPluggableEndpoint >> / aStringOrEndpoint [
 	| ep |
 
 	ep := self wsClient / aStringOrEndpoint.
-	(ep isKindOf: WSPluggableEndpoint) ifTrue: [ 
-		ep path: (path resolve: ep path) ].
+	ep isWSPluggableEndpoint ifTrue: [ ep path: (path resolve: ep path) ].
 	^ ep
 ]
 
@@ -131,6 +130,11 @@ WSPluggableEndpoint >> ignoresPath: anObject [
 WSPluggableEndpoint >> initialize [
 	super initialize.
 	path := Path * ''
+]
+
+{ #category : #testing }
+WSPluggableEndpoint >> isWSPluggableEndpoint [
+	^ true
 ]
 
 { #category : #enumerating }
