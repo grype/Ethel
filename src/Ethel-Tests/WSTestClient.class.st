@@ -1,6 +1,9 @@
 Class {
 	#name : #WSTestClient,
 	#superclass : #WSClient,
+	#instVars : [
+		'baseUrl'
+	],
 	#category : #'Ethel-Tests-Models'
 }
 
@@ -11,13 +14,26 @@ WSTestClient class >> baseUrl [
 
 { #category : #accessing }
 WSTestClient class >> default [
-	^ self withUrl: self baseUrl 
+
+	^ self new baseUrl: self baseUrl
 ]
 
 { #category : #accessing }
 WSTestClient class >> endpoints [
 	^ super endpoints
 		, (self package classes select: #isWSEndpoint) reject: #isTrait
+]
+
+{ #category : #accessing }
+WSTestClient >> baseUrl [
+
+	^ baseUrl
+]
+
+{ #category : #accessing }
+WSTestClient >> baseUrl: anObject [
+
+	baseUrl := anObject
 ]
 
 { #category : #endpoints }

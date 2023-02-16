@@ -158,11 +158,3 @@ WSClientTest >> testPluggableEndpointComposition [
 	ep class should equal: WSPluggableEndpoint.
 	ep wsClient should equal: client
 ]
-
-{ #category : #tests }
-WSClientTest >> testWithUrl [
-	| url tempClient |
-	url := 'https://example.com/foo/bar' asUrl.
-	tempClient := WSClient withUrl: url.
-	tempClient baseUrl should equal: url
-]

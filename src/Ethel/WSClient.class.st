@@ -26,9 +26,6 @@ Instance Variables
 Class {
 	#name : #WSClient,
 	#superclass : #Object,
-	#instVars : [
-		'baseUrl'
-	],
 	#category : #'Ethel-Core'
 }
 
@@ -55,11 +52,6 @@ WSClient class >> transportVisitorClass [
 	^ WSZincTransportVisitor
 ]
 
-{ #category : #'instance creation' }
-WSClient class >> withUrl: aUrl [
-	^ self basicNew initializeWithUrl: aUrl
-]
-
 { #category : #endpoints }
 WSClient >> / aPathOrEndpoint [
 	^ aPathOrEndpoint isWSEndpoint
@@ -82,7 +74,8 @@ WSClient >> basePath [
 
 { #category : #accessing }
 WSClient >> baseUrl [
-	^ baseUrl
+
+	^ self subclassResponsibility 
 ]
 
 { #category : #configuring }
@@ -160,12 +153,6 @@ WSClient >> execute: anEndpoint with: aBlock [
 		self validateResponse: http response ].
 
 	^ result
-]
-
-{ #category : #initialization }
-WSClient >> initializeWithUrl: aUrl [
-	self initialize.
-	baseUrl := aUrl asUrl
 ]
 
 { #category : #validating }

@@ -31,14 +31,25 @@ Class {
 	#name : #WSDynamicClient,
 	#superclass : #WSClient,
 	#instVars : [
-		'transportBuilders'
+		'transportBuilders',
+		'baseUrl'
 	],
 	#category : #'Ethel-Core'
 }
 
+{ #category : #'instance creation' }
+WSDynamicClient class >> withUrl: aUrl [
+	^ self basicNew initializeWithUrl: aUrl
+]
+
 { #category : #building }
 WSDynamicClient >> addTransportBuilder: aBuilder [
 	transportBuilders add: aBuilder
+]
+
+{ #category : #accessing }
+WSDynamicClient >> baseUrl [
+	^ self shouldBeImplemented
 ]
 
 { #category : #enumerating }
@@ -82,6 +93,12 @@ WSDynamicClient >> headerAt: aHeader put: aValue [
 WSDynamicClient >> initialize [
 	super initialize.
 	transportBuilders := OrderedCollection new
+]
+
+{ #category : #initialization }
+WSDynamicClient >> initializeWithUrl: aUrl [
+	self initialize.
+	baseUrl := aUrl asUrl
 ]
 
 { #category : #building }
