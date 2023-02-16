@@ -47,13 +47,13 @@ To explicitly create a pluggable endpoint:
 Class {
 	#name : #WSPluggableEndpoint,
 	#superclass : #Object,
-	#traits : 'TWSEndpoint @ {#defaultConfigure->#configure} + TWSEnumeration',
-	#classTraits : 'TWSEndpoint classTrait + TWSEnumeration classTrait',
+	#traits : 'TWSEndpoint @ {#defaultConfigure->#configure} + TWSEnumeration + TWSPathEncoder',
+	#classTraits : 'TWSEndpoint classTrait + TWSEnumeration classTrait + TWSPathEncoder classTrait',
 	#instVars : [
 		'path',
 		'enumeration',
 		'wsClient',
-		'ignoresPath'
+		'pathEncoder'
 	],
 	#category : #'Ethel-Core'
 }
@@ -69,10 +69,10 @@ WSPluggableEndpoint >> / aStringOrEndpoint [
 
 { #category : #'building - transport' }
 WSPluggableEndpoint >> configure [
+
 	self defaultConfigure.
 	WSCurrentContext value ifNotNil: [ :context | 
-		ignoresPath ifFalse: [ 
-			context transport request url addPathSegments: path segments ] ]
+		(pathEncoder ifNil: [ self ]) encodePath: path on: context transport ]
 ]
 
 { #category : #accessing }
@@ -90,6 +90,16 @@ WSPluggableEndpoint >> delete [
 WSPluggableEndpoint >> delete: aBlock [
 	<delete>
 	^ self execute: aBlock
+]
+
+{ #category : #private }
+WSPluggableEndpoint >> encodePath: aPath on: aTransport [
+
+	| newPath |
+	newPath := aTransport basePath resolve: aPath.
+	aTransport request url
+		clearPath;
+		addPathSegments: aPath segments
 ]
 
 { #category : #accessing }
@@ -112,18 +122,6 @@ WSPluggableEndpoint >> get [
 WSPluggableEndpoint >> get: aBlock [
 	<get>
 	^ self execute: aBlock
-]
-
-{ #category : #accessing }
-WSPluggableEndpoint >> ignoresPath [
-
-	^ ignoresPath
-]
-
-{ #category : #accessing }
-WSPluggableEndpoint >> ignoresPath: anObject [
-
-	ignoresPath := anObject
 ]
 
 { #category : #initialization }

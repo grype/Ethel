@@ -18,6 +18,11 @@ ManifestEthel class >> ruleCollectionProtocolRuleV1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestEthel class >> ruleExcessiveMethodsRuleV1FalsePositive [
+	^ #(#(#(#RGClassDefinition #(#WSPluggableEndpoint)) #'2023-02-15T20:30:46.854335-08:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestEthel class >> ruleUtilityMethodsRuleV1FalsePositive [
 	^ #(#(#(#RGPackageDefinition #(#Ethel)) #'2022-07-03T00:45:33.97343-07:00') )
 ]
