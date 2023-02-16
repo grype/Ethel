@@ -163,6 +163,18 @@ WSPluggableEndpoint >> path: anObject [
 	path := anObject
 ]
 
+{ #category : #accessing }
+WSPluggableEndpoint >> pathEncoder [
+
+	^ pathEncoder
+]
+
+{ #category : #accessing }
+WSPluggableEndpoint >> pathEncoder: anObject [
+
+	pathEncoder := anObject
+]
+
 { #category : #api }
 WSPluggableEndpoint >> post [
 	<post>
