@@ -1,48 +1,60 @@
 "
-I am a pluggable endpoint that's primarily used for scripting interactions with web-based services. I provide an interface for configuring requests and implement common HTTP methods via #get, #post, #put, #patch and #delete.
+I am a pluggable endpoint that's primarily used for scripting interactions with web-based services. 
 
-Sending #/ message with a path argument to an instance of ==WSClient== or ==TWSEndpoint== will first look for a concrete endpoint class for the resulting path. If none could be found, my instance will be returned, capturing the final path.
+I work in tandem with `WSDynamicClient` and provide an interface for executing requests via #get, #post, #put, #patch and #delete methods, which reflect the HTTP method they utilize.
 
-I provide two ways of configuring http request: one via #httpConfiguration, and the other via parameterized executing methods (#get:, etc). The former tends to stick with my instances and is executed first. The latter is evaluated immediately before executing the configured HTTP request and is only used for that one request. The block argument will be passed an instance of ==ZnClient==.
+## Deriving endpoints
 
-I also implement a block-based enumeration via #enumeration:. When set, the block will be passed three arguments: 1) an instance of the endpoint 2) number of items requested and 3) pertinent cursor object (see ==TWSEnumeration== and ==TWSEnumerationCursor==).
+Sending #/ message with a path argument to me or the `WSClient` will create a new instance of me capturing the argument as its path. When deriving pluggable endpoints this way, the path accumulates - i.e. client / #foo / #bar will produce an instance with a relative path of 'foo/bar'. The path argument can be a symbol, string or a Path object.
 
-[[[
-			client := WSClient withUrl: 'http://example.com'.
-			client httpConfiguration: [:http | 
-				http contenWriter: [ :obj | ZnEntity json: (NeoJSONWriter toString: obj) ] ].
-			
-			""GET /examples""
-			(client / #examples) get. 
-			
-			""PUT /examples {aNewExample asJson}""
-			(client / #examples) put: [ :http | 
-				http request contents: aNewExample
-				].
-			
-			""Paginate the entirety of GET /examples?page=&page_size=""
-			(client / #examples) 
-				enumeration: [ :endpoint :limit :cursor |
-					| result |
-					""Return result of #get:, and update cursor""
-					result := endpoint get: [ :http | 
-						http 
-							queryAt: #page put: (cursor at: #page ifAbsentPut: 1);
-							queryAt: #page_size put: (cursor at: #page_size ifAbsentPut: 100)
-						].
-					cursor at: #page put: (cursor at: #page) + 1.
-					cursor hasMore: result size = (cursor at: #page_size).
-					result
-					]; 
-				collect: #yourself.
-]]]
+## Example
 
-To explicitly create a pluggable endpoint:
+Here's a typical example of what I can do:
 
-[[[
-			client := WSClient withUrl: 'http://example.com'.
-			(client / WSPluggableEndpoint) path: Path / #examples; get.
-]]]
+```
+client := 'http://example.com/api' asWebClient.
+(client / #foo / #bar) get.  ""GET /api/foo/bar""
+```
+
+You can pass a block to the executing methods if you need to configure the request further:
+
+```
+(client / #foo / #bar) get: [:http | http request queryAt: #baz put: #baaz ]. ""GET /api/foo/bar?baz=baaz""
+```
+
+Similarly, when POSTing data:
+
+```
+(client / #foo / #bar) post: [:http | http request content: someObject ].
+```
+
+## Path encoding
+
+My instances are typically distinguished by their paths. When I execute a request, I resolve my path onto the client's base path. Not all APIs work this way, and the path - being a unique identifier for a logical endpoint - may need to be encoded differently - maybe in a header or a query parameter, or maybe even part of the JSON payload.
+
+The behavior for encoding my paths onto the request is defined in the `TWSPathEncoder` trait. I use that trait to provide the default implementation of resolving the path as a path. You can supply a different object via #pathEncoder:.
+
+## Enumeration
+
+I implement a block-based enumeration via #onNext:. Pass a block that accepts two arguments: 1) the endpoint instance and 2) the cursor (see `TWSEnumeration` and `TWSEnumerationCursor`). The cursor will be an instance of `WSPluggableCursor`, which acts like a dictionary with a very limited API. The block would need to perform a request, advance the cursor and return the result. In this case the result is a slice of the larger collection of some objects that the endpoint iterates over. For example:
+
+```
+(client / #examples) 
+	onNext: [ :endpoint :cursor |
+		| result |
+		""Return result of #get:, and update cursor""
+		result := endpoint get: [ :http | 
+			http 
+				queryAt: #page put: (cursor at: #page ifAbsentPut: 1);
+				queryAt: #page_size put: (cursor at: #page_size ifAbsentPut: 100) ].
+		cursor at: #page put: (cursor at: #page) + 1.
+		cursor hasMore: result size = (cursor at: #page_size).
+		result]; 
+	collect: #yourself.
+```
+
+Calling #collect will result in calling #nextWith:. which in turn will evaluate the block passed to #onNext. In this example, the block executes a GET request, adding some paginating query params, then advances the cursor by incrementing the page value and indicating whether there are more results, and finally returns the result. As you iterate over the elements using the familiar Collections API, this block gets called for as long as the cursor responds truthfully to #hasMore.
+
 "
 Class {
 	#name : #WSPluggableEndpoint,
@@ -51,9 +63,9 @@ Class {
 	#classTraits : 'TWSEndpoint classTrait + TWSEnumeration classTrait + TWSPathEncoder classTrait',
 	#instVars : [
 		'path',
-		'enumeration',
 		'wsClient',
-		'pathEncoder'
+		'pathEncoder',
+		'enumerationBlock'
 	],
 	#category : #'Ethel-Core'
 }
@@ -102,16 +114,6 @@ WSPluggableEndpoint >> encodePath: aPath on: aTransport [
 		addPathSegments: aPath segments
 ]
 
-{ #category : #accessing }
-WSPluggableEndpoint >> enumeration [
-	^ enumeration
-]
-
-{ #category : #accessing }
-WSPluggableEndpoint >> enumeration: anObject [
-	enumeration := anObject
-]
-
 { #category : #api }
 WSPluggableEndpoint >> get [
 	<get>
@@ -137,8 +139,19 @@ WSPluggableEndpoint >> isWSPluggableEndpoint [
 
 { #category : #enumerating }
 WSPluggableEndpoint >> nextWith: aCursor [
-	^ enumeration ifNotNil: [ :enumBlock | 
+	^ enumerationBlock ifNotNil: [ :enumBlock | 
 		  enumBlock cull: self cull: aCursor ]
+]
+
+{ #category : #accessing }
+WSPluggableEndpoint >> onNext [
+
+	^ enumerationBlock
+]
+
+{ #category : #accessing }
+WSPluggableEndpoint >> onNext: anObject [
+	enumerationBlock := anObject
 ]
 
 { #category : #api }
