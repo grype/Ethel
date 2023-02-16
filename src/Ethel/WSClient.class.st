@@ -1,22 +1,14 @@
 "
 I am a general purpose web-based API client.
 
-I am used for communicating with RESTful Services and the like. I can be used as-is, but do subclasses me if you'd like to make explicit a particular web-based API. I use ZincHTTPComponents for the actual HTTP transport, and collaborate with instances implementing ==TWSEndpoint== for configuring and executing HTTP requests.
+I am used for communicating with RESTful Services and the like. I can't be used as-is and need to be subclassed. I only provide the machinery required for executing endpoints (objects that use `TWSEndpoint`). There's one pre-defined subclass of mine that provides a generic API for making requests. Its name is `WSDynamicClient` and it's great for scripting requests. If you're interested in implementing a specific web API - it's best to subclass me.
 
-Instantiate me #withUrl:
+I use ZincHTTPComponents for the actual HTTP transport, and I collaborate with instances implementing `TWSEndpoint` for configuring and executing HTTP requests.
 
-[[[ client := WSClient withUrl: 'https://api.example.com/v1'. ]]]
-
-From there, you're typically traversing endpoints and executing requests:
-
-[[[ response := (client / #things) get. ""GET /things"" ]]]
-
-When deriving endpoints via #/ message, I will first attempt to find a concrete class that implements the resulting path, and if none could be found I'll create an instance of ==WSPluggableEndpoint==. You can also pass a concrete class that uses ==TWSEndpoint== as the argument.
-	
-When subclassing:
-	* override #configureHttpClient: when there's a need to configure http transport with data not specific to a particular endpoint (endpoints get to configure transport separately)
+## Subclassing notes	
+	* override #configure when there's a need to configure http transport with data not specific to a particular endpoint (endpoints get to configure transport separately)
 	* override #validateResponse: for custom error handling
-	* declare methods for traversing concrete endpoints if you'd like them to be discoverable
+	* as a matter of convenience - declare methods for traversing/instantiating concrete endpoints
 
 Instance Variables
 	baseUrl:		<ZnUrl>
